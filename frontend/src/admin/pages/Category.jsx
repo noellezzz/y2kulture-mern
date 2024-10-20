@@ -6,6 +6,7 @@ import Button from '@mui/material/Button';
 import { fetchData, fetchDataN, createFunc, addToTable, updateFunc, addAndRemoveToTable, deleteFunc } from '../utils/crudUtils';
 import { CSSTransition } from 'react-transition-group';
 import CreateModal from '../components/CreateModal';
+import EditModal from '../components/EditModal';
 import Fab from '@mui/material/Fab'; 
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -17,13 +18,15 @@ const Category = () => {
   const [flattenData, setFlattenData] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [openModalCat, setOpenModalCat] = useState(false);
+  const [editModal, setEditModal] = useState(false);
+  const [editModalCat, setEditModalCat] = useState(false);
 
-  const [formState, setFormState] = useState({title: '', description: ''});
+  const [formState, setFormState] = useState({});
   const [formStateCat, setFormStateCat] = useState({title: '', description: '', clothing_type: ''});
 
   const modalData = {
-    title: 'Create New Clothing Type',
-    content: 'Fill out the form below to create a new clothing type.',
+    title: 'Clothing Type',
+    content: 'clothing type.',
     fields: [
       {
         label: 'Title',
@@ -49,8 +52,8 @@ const Category = () => {
   };
 
   const modalDataCat = {
-    title: 'Create New Clothing Category',
-    content: 'Fill out the form below to create a new clothing Category.',
+    title: 'Category',
+    content: 'Category.',
     fields: [
       {
         label: 'Title',
@@ -76,7 +79,7 @@ const Category = () => {
         label: 'Clothing Type',
         type: 'select',
         name: 'clothing_type',
-        placeholder: 'Enter User',
+        placeholder: 'Enter Type',
         value: formStateCat.clothing_type, 
         onChange: (e) => setFormStateCat({ ...formStateCat, clothing_type: e.target.value }),
         required: true,
@@ -109,8 +112,50 @@ const Category = () => {
   }, [apiDataCat]);
 
   const loadModalCreate = () => {
+    setFormState({title: '', description: '',})
     setOpenModal(true)
   }
+
+  const loadDataById = async (id) => {
+    setFormState({_id: '', title: '', description: ''})
+
+    const response = await fetchDataN('type', id) 
+    setFormState({
+      _id: id,
+      title: response.data.data.title, 
+      description: response.data.data.description});
+    setEditModal(true)
+  }
+
+  const loadDataByIdCat = async (id) => {
+    setFormState({_id: '', title: '', description: '', clothing_type: ''})
+
+    const response = await fetchDataN('category', id) 
+    console.log(response.data.data.clothing_type[0].title)
+    setFormStateCat({
+      _id: id,
+      title: response.data.data.title, 
+      description: response.data.data.description,
+      clothing_type: response.data.data.clothing_type[0]._id});
+      console.log(formStateCat)
+    setEditModalCat(true)
+  }
+
+  const handleUpdate = async () => {
+    const response = await updateFunc('type', formState._id, formState)
+    console.log(formState)
+    const newType = {
+        _id: response.data.data._id,
+        title: formState.title,
+        description: formState.description,
+        categoryId: formState.categoryId,
+        newData: true,
+      };
+
+      addAndRemoveToTable(setApiData, newType)
+      setFormState({_id: '',title: '', description: '',})
+      setEditModal(false);
+  };
 
   const loadModalCreateCat = () => {
     setOpenModalCat(true)
@@ -118,6 +163,7 @@ const Category = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    console.log(formState)
     const response = await createFunc('type', formState);
 
     const newType = {
@@ -146,7 +192,7 @@ const Category = () => {
     };
 
     addToTable(setApiDataCat, newCat)
-    setFormStateCat({title: '', description: '', category: ''}); 
+    setFormStateCat({title: '', description: '', category: ''});
     setOpenModalCat(false);
   };
 
@@ -155,7 +201,7 @@ const Category = () => {
   };
   
   const handleDelete = (id) => {
-    deleteFunc('type', id, setApiDataCat)
+    deleteFunc('type', id, setApiData)
   };
   
   const handleDeleteCat = (id) => {
@@ -166,23 +212,29 @@ const Category = () => {
     <div className="main-container__admin double-holder">
       <div className="container sub-container__double-lg">
         <div className="container-body">
-          <DataTable value={apiData}>
-            <Column field="_id" header="ID" />
-            <Column field="title" header="Title" />
-            <Column field="description" header="Description" />
+          <DataTable 
+            value={apiData}
+            scrollable 
+            scrollHeight="250px" 
+            style={{ zIndex: 1 }} 
+          >
+            <Column style={{zIndex: 2}} field="_id" header="ID" />
+            <Column style={{zIndex: 2}} field="title" header="Title" />
+            <Column style={{zIndex: 2}} field="description" header="Description" />
             <Column 
+              style={{zIndex: 2}}
               field="controls" 
               header="Controls" 
               body={(rowData) => (
                 <>
-                  <Fab onClick={() => handleEdit(rowData)} 
-                    color="primary" aria-label="edit" size="small" sx={{ width: 32, height: 10 }}
+                  <Fab onClick={() => loadDataById(rowData._id)} 
+                    color="primary" aria-label="edit" size="small" sx={{ zIndex: 0, width: 32, height: 10 }}
                   >
                     <EditIcon sx={{ width: 15, height: 15 }}/>
                   </Fab>
                   &nbsp;
                   <Fab onClick={() => handleDelete(rowData._id)} 
-                    color="secondary" aria-label="edit" size="small" sx={{ width: 32, height: 10 }}
+                    color="secondary" aria-label="edit" size="small" sx={{ zIndex: 0, width: 32, height: 10 }}
                   >
                     <DeleteIcon sx={{ width: 15, height: 15 }}/>
                   </Fab>
@@ -206,35 +258,59 @@ const Category = () => {
           >
               <CreateModal setOpenModal={setOpenModal} modalData={modalData} handleSubmit={handleSubmit} />
           </CSSTransition>
+
+          <CSSTransition
+              in={editModal}
+              timeout={300}
+              classNames="modal"
+              unmountOnExit
+          >
+              <EditModal setOpenModal={setEditModal} modalData={modalData} handleUpdate={handleUpdate} formState={formState} />
+          </CSSTransition>
         </div>
       </div>
       <div className="container sub-container__double-lg">
         <div className="container-body">
-          <DataTable value={flattenData}>
-            <Column field="id" header="ID" />
-            <Column field="title" header="Title" />
-            <Column field="description" header="Description" />
-            <Column field="clothingType" header="Type" />
+        <DataTable 
+            value={flattenData}  
+            scrollable 
+            scrollHeight="250px" 
+            style={{ zIndex: 1 }} 
+        >
+            <Column style={{zIndex: 2}} field="id" header="ID" />
+            <Column style={{zIndex: 2}} field="title" header="Title" />
+            <Column style={{zIndex: 2}} field="description" header="Description" />
+            <Column style={{zIndex: 2}} field="clothingType" header="Type" />
             <Column 
+              style={{zIndex: 2}}
               field="controls" 
               header="Controls" 
               body={(rowData) => (
                 <>
-                  <Fab onClick={() => handleEdit(rowData)} 
-                    color="primary" aria-label="edit" size="small" sx={{ width: 32, height: 10 }}
+                  <Fab 
+                    onClick={() => loadDataByIdCat(rowData.id)} 
+                    color="primary" 
+                    aria-label="edit" 
+                    size="small" 
+                    sx={{ zIndex: 0, width: 32, height: 10 }}  
                   >
                     <EditIcon sx={{ width: 15, height: 15 }}/>
                   </Fab>
                   &nbsp;
-                  <Fab onClick={() => handleDeleteCat(rowData.id)} 
-                    color="secondary" aria-label="edit" size="small" sx={{ width: 32, height: 10 }}
+                  <Fab 
+                    onClick={() => handleDeleteCat(rowData.id)} 
+                    color="secondary" 
+                    aria-label="delete" 
+                    size="small" 
+                    sx={{ zIndex: 0, width: 32, height: 10 }}  
                   >
                     <DeleteIcon sx={{ width: 15, height: 15 }}/>
                   </Fab>
                 </>
               )}
             />
-          </DataTable>
+        </DataTable>
+
         </div>
 
         <div className="container-footer">
@@ -250,6 +326,15 @@ const Category = () => {
               unmountOnExit
           >
               <CreateModal setOpenModal={setOpenModalCat} modalData={modalDataCat} handleSubmit={handleSubmitCat} />
+          </CSSTransition>
+
+          <CSSTransition
+              in={editModalCat}
+              timeout={300}
+              classNames="modal"
+              unmountOnExit
+          >
+              <EditModal setOpenModal={setEditModalCat} modalData={modalDataCat} handleUpdate={handleUpdate} formState={formStateCat} />
           </CSSTransition>
         </div>
       </div>

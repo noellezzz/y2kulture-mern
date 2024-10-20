@@ -18,8 +18,8 @@ const CreateModal = ({ setOpenModal, modalData: { title, content, fields }, hand
             className="modal-container"
             onClick={(e) => e.stopPropagation()}
         >
-            <h2>{title}</h2>
-            <p>{content}</p>
+            <h2>Create New {title}</h2>
+            <p>Fill out the following fields to create a new {content}</p>
             <form className="crud-form" onSubmit={handleSubmit}>
             {fields.map((field, index) => (
                 field.col ? (

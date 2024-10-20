@@ -9,18 +9,20 @@ import CreateModal from '../components/CreateModal';
 import Fab from '@mui/material/Fab'; 
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditModal from '../components/EditModal';
 
 const Product = () => {
   const [apiData, setApiData] = useState([]);
   const [categoryOps, setCategoryOps] = useState([]);
   const [flattenData, setFlattenData] = useState([]);
   const [openModal, setOpenModal] = useState(false);
+  const [editModal, setEditModal] = useState(false);
 
-  const [formState, setFormState] = useState({title: '', description: '', category: '',});
+  const [formState, setFormState] = useState({_id: '', title: '', description: '', category: '', categoryId: ''});
 
   const modalData = {
-    title: 'Create New Product',
-    content: 'Fill out the form below to create a new product.',
+    title: 'Product',
+    content: 'product.',
     fields: [
       {
         label: 'Product',
@@ -49,7 +51,7 @@ const Product = () => {
         name: 'category',
         placeholder: 'Enter Category',
         value: formState.category,
-        onChange: (e) => setFormState({ ...formState, category: e.target.value }),
+        onChange: (e) => setFormState({ ...formState, category: e.target.value, categoryTitle: e.target.title }),
         required: true,
         options: categoryOps,
         requestFor: 'title',
@@ -73,7 +75,9 @@ const Product = () => {
         id: product._id,
         title: product.title,
         description: product.description,
-        categoryTitle: product.category[0]?.title || 'N/A',
+        categoryTitle: (product.category && Array.isArray(product.category) && product.category.length > 0) 
+                        ? product.category[0].title 
+                        : 'N/A',
         // clothingType: product.category[0]?.clothing_type.map(ct => ct.title).join(', ') || 'N/A',
         createdAt: new Date(product.createdAt).toLocaleString(),
         updatedAt: new Date(product.updatedAt).toLocaleString(),
@@ -84,17 +88,17 @@ const Product = () => {
   }, [apiData]);
 
   const loadModalCreate = () => {
+    setFormState({title: '', description: '', category: ''}); 
     setOpenModal(true)
   }
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    
+    console.log(formState)
     const response = await createFunc('product', formState);
-    console.log(response)
     const newProduct = {
       _id: response.data.data._id,
-      title: formState.title,
+      title: formState.description,
       description: formState.description,
       category: formState.category,
       newData: true
@@ -105,8 +109,30 @@ const Product = () => {
     setOpenModal(false);
   };
 
-  const handleEdit = (product) => {
-    console.log("Edit clicked for:", product);
+  const loadDataById = async (id) => {
+    const response = await fetchDataN('product', id) 
+    setFormState({
+      _id: id,
+      title: response.data.data.title, 
+      description: response.data.data.description, 
+      category: response.data.data.category[0]._id, });
+    setEditModal(true)
+  }
+
+  const handleUpdate = async () => {
+    const response = await updateFunc('product', formState._id, formState)
+    console.log(formState)
+    const newProduct = {
+        _id: response.data.data._id,
+        title: formState.title,
+        description: formState.description,
+        categoryId: formState.categoryId,
+        newData: true,
+      };
+
+      addAndRemoveToTable(setApiData, newProduct)
+      setFormState({_id: '',title: '', description: '', categoryId: '', category: ''})
+      setEditModal(false);
   };
   
   const handleDelete = (id) => {
@@ -130,7 +156,7 @@ const Product = () => {
               header="Controls" 
               body={(rowData) => (
                 <>
-                  <Fab onClick={() => handleEdit(rowData)} 
+                  <Fab onClick={() => loadDataById(rowData.id)} 
                     color="primary" aria-label="edit" size="small" sx={{ width: 32, height: 10 }}
                   >
                     <EditIcon sx={{ width: 15, height: 15 }}/>
@@ -160,6 +186,15 @@ const Product = () => {
               unmountOnExit
           >
               <CreateModal setOpenModal={setOpenModal} modalData={modalData} handleSubmit={handleSubmit} />
+          </CSSTransition>
+
+          <CSSTransition
+              in={editModal}
+              timeout={300}
+              classNames="modal"
+              unmountOnExit
+          >
+              <EditModal setOpenModal={setEditModal} modalData={modalData} handleUpdate={handleUpdate} formState={formState} />
           </CSSTransition>
         </div>
       </div>
