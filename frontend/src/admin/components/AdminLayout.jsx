@@ -90,7 +90,7 @@ const demoTheme = createTheme({
       main: '#4caf50',
     },
     background: {
-      default: '#EFEFEF',
+      default: '#faf4e4',
       paper: '#ffffff',
     },
   },

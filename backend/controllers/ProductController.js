@@ -4,7 +4,13 @@ import mongoose from 'mongoose'
 export const getProduct = async (request, response) => {
     try {
         const product = await Product.find({})
-        .populate('category')
+        .populate({
+            path: 'category',
+            populate: {
+                path: 'clothing_type',
+                model: 'Type' 
+            }
+        })
         .exec();
         response.status(200).json({ success: true, message: "Product Retrieved.", data: product });
     } catch (error) {
@@ -34,10 +40,17 @@ export const createProduct = async (request, response) => {
     }
 
     const newProduct = new Product(product);
-
+    
     try {
         await newProduct.save();
-        response.status(201).json({ success:true, data: newProduct, message: "Product created Successfully!"});
+        const populatedProduct = await Product.findById(newProduct._id)
+        .populate({
+          path: 'category',
+          populate: {
+            path: 'clothing_type', 
+          },
+        });
+        response.status(201).json({ success:true, data: populatedProduct, message: "Product created Successfully!"});
     } catch (error) {
         console.error("Error in Create Product:", error.message);
         response.status(500).json({ success: false, message: "Server Error: Error in Creating Product."});

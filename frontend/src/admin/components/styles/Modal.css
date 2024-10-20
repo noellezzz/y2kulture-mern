@@ -1,0 +1,126 @@
+.modal-background {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    background-color: rgba(0, 0, 0, 0.3);
+    z-index: 2000; 
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding:50px;
+}
+
+.modal-container {
+    display: block;
+    background: white;
+    padding: 50px;
+    border-radius: 3px;
+    font-weight: 300;
+
+    width: 1000px;
+    height: 500px;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 25px;
+    animation: drop 0.8s forwards; 
+}
+
+.modal-container h2 {
+    font-size: 25px;
+    line-height: 25px;
+    margin-bottom: 15px;
+}
+
+.modal-container p {
+    font-size: 18px;
+    line-height: 22px;
+}
+
+.content {
+    min-height: 100%;
+    height: 100%;
+    background: white;
+    position: relative;
+    z-index: 0;
+}
+
+.content h1 {
+    padding: 75px 0 30px 0;
+    text-align: center;
+    font-size: 30px;
+    line-height: 30px;
+}
+
+.content .buttons {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0;
+    text-align: center;
+}
+
+.input-group {
+    margin-bottom: 10px;
+}
+
+.MuiFormControl-root {
+    width: 100%;
+    
+}
+
+.content .buttons .button {
+    display: inline-block;
+    text-align: center;
+    padding: 10px 15px;
+    margin: 10px;
+    background: red; 
+    background-color: #efefef;
+    border-radius: 3px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+}
+
+.content .buttons .button:hover {
+    color: white;
+    background: #009bd5;
+}
+
+.modal-exit {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.modal-exit-active {
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 300ms, transform 300ms;
+}
+
+
+@keyframes drop {
+    0% {
+        height: 550px;
+        transform: translateY(-500px); 
+    }
+    50% {
+        min-height: 300px;
+        transform: translateY(10px); 
+    } 
+    100% {
+        height: 550px;
+    }
+}
+
+.modal-exit {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.modal-exit-active {
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 300ms, transform 300ms;
+}
