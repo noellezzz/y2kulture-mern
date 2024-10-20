@@ -13,7 +13,7 @@
 .sub-container__single-lg {
     /* border: 1px solid red; */
     border-radius: 20px;
-    height: 40vh;
+    height: 50vh;
     width: 100%;
     background-color: white;
     box-shadow: 2px 2px 0px 5px rgba(0,0,0,0.75);
@@ -26,7 +26,7 @@
 .sub-container__double-lg {
     /* border: 1px solid red; */
     border-radius: 20px;
-    height: 40vh;
+    height: 50vh;
     width: 100%;
     background-color: white;
     box-shadow: 2px 2px 0px 5px rgba(0,0,0,0.75);
@@ -66,9 +66,9 @@
 
 .p-datatable-table td,th {
     max-width: 50px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;  
+    word-wrap: break-word; 
+    overflow-wrap: break-word; 
 }
 
 .double-holder {

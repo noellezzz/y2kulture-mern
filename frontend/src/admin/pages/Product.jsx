@@ -143,7 +143,13 @@ const Product = () => {
     <div className="main-container__admin">
       <div className="container sub-container__single-lg">
         <div className="container-body">
-          <DataTable value={flattenData} tableStyle={{ minWidth: '50rem' }}>
+          <DataTable 
+            value={flattenData} 
+            tableStyle={{ minWidth: '50rem' }}
+            scrollable 
+            scrollHeight="320px" 
+            style={{ zIndex: 1 }} 
+          >
             <Column field="id" header="ID" />
             <Column field="title" header="Title" />
             <Column field="description" header="Description" />

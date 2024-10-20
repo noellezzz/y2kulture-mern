@@ -22,7 +22,8 @@ const Category = () => {
   const [editModalCat, setEditModalCat] = useState(false);
 
   const [formState, setFormState] = useState({});
-  const [formStateCat, setFormStateCat] = useState({title: '', description: '', clothing_type: ''});
+  const [formStateCat, setFormStateCat] = useState({});
+  const [foreignPHolder, setforeignPHolder] = useState('');
 
   const modalData = {
     title: 'Clothing Type',
@@ -81,7 +82,13 @@ const Category = () => {
         name: 'clothing_type',
         placeholder: 'Enter Type',
         value: formStateCat.clothing_type, 
-        onChange: (e) => setFormStateCat({ ...formStateCat, clothing_type: e.target.value }),
+          onChange: (e) => {
+            const selectedIndex = e.target.selectedIndex;
+            const selectedText = e.target.options[selectedIndex].text; // Get the displayed text of the selected option
+        
+            setFormStateCat({ ...formStateCat, clothing_type: e.target.value });
+            setforeignPHolder(selectedText); // Set the foreignPHolder to the displayed text
+        },
         required: true,
         options: typeOps,
         requestFor: 'title',
@@ -102,7 +109,11 @@ const Category = () => {
         id: category._id,
         title: category.title,
         description: category.description,
-        clothingType: category.clothing_type[0]?.title || 'N/A',
+        clothingType: (Array.isArray(category.clothing_type) && category.clothing_type.length > 0)
+                      ? category.clothing_type[0].title
+                      : (typeof category.clothing_type === 'string' && category.clothing_type.trim() !== '')
+                        ? category.clothing_type
+                        : 'N/A',
         createdAt: new Date(category.createdAt).toLocaleString(),
         updatedAt: new Date(category.updatedAt).toLocaleString(),
       }));
@@ -129,15 +140,15 @@ const Category = () => {
 
   const loadDataByIdCat = async (id) => {
     setFormState({_id: '', title: '', description: '', clothing_type: ''})
-
+    setforeignPHolder('')
     const response = await fetchDataN('category', id) 
-    console.log(response.data.data.clothing_type[0].title)
     setFormStateCat({
       _id: id,
       title: response.data.data.title, 
       description: response.data.data.description,
-      clothing_type: response.data.data.clothing_type[0]._id});
-      console.log(formStateCat)
+      clothing_type: response.data.data.clothing_type[0]._id
+    });
+    setforeignPHolder(response.data.data.clothing_type[0].title)
     setEditModalCat(true)
   }
 
@@ -148,7 +159,6 @@ const Category = () => {
         _id: response.data.data._id,
         title: formState.title,
         description: formState.description,
-        categoryId: formState.categoryId,
         newData: true,
       };
 
@@ -157,7 +167,25 @@ const Category = () => {
       setEditModal(false);
   };
 
+  const handleUpdateCat = async () => {
+    // console.log('pholder', foreignPHolder)
+    const response = await updateFunc('category', formStateCat._id, formStateCat)
+    const newCat = {
+        _id: response.data.data._id,
+        title: formStateCat.title,
+        description: formStateCat.description,
+        clothing_type: foreignPHolder,
+        newData: true,
+      };
+      addAndRemoveToTable(setApiDataCat, newCat)
+      setFormStateCat({_id: '',title: '', description: '', clothing_type: ''})
+      setEditModalCat(false);
+      setforeignPHolder('')
+      fetchData('type', setTypeOps);
+  };
+
   const loadModalCreateCat = () => {
+    setFormStateCat({title: '', description: '', clothing_type: ''})
     setOpenModalCat(true)
   }
 
@@ -175,6 +203,7 @@ const Category = () => {
 
     addToTable(setApiData, newType)
     setFormState({title: '', description: ''}); 
+    fetchData('type', setTypeOps);
     setOpenModal(false);
   };
 
@@ -187,7 +216,7 @@ const Category = () => {
       _id: response.data.data._id,
       title: formStateCat.title,
       description: formStateCat.description,
-      clothing_type: formStateCat.clothing_type,
+      clothing_type: foreignPHolder,
       newData: true
     };
 
@@ -195,13 +224,10 @@ const Category = () => {
     setFormStateCat({title: '', description: '', category: ''});
     setOpenModalCat(false);
   };
-
-  const handleEdit = (product) => {
-    console.log("Edit clicked for:", product);
-  };
   
   const handleDelete = (id) => {
     deleteFunc('type', id, setApiData)
+    fetchData('type', setTypeOps);
   };
   
   const handleDeleteCat = (id) => {
@@ -215,7 +241,7 @@ const Category = () => {
           <DataTable 
             value={apiData}
             scrollable 
-            scrollHeight="250px" 
+            scrollHeight="320px" 
             style={{ zIndex: 1 }} 
           >
             <Column style={{zIndex: 2}} field="_id" header="ID" />
@@ -274,11 +300,11 @@ const Category = () => {
         <DataTable 
             value={flattenData}  
             scrollable 
-            scrollHeight="250px" 
+            scrollHeight="320px" 
             style={{ zIndex: 1 }} 
         >
             <Column style={{zIndex: 2}} field="id" header="ID" />
-            <Column style={{zIndex: 2}} field="title" header="Title" />
+            <Column style={{zIndex: 2, minWidth:80}} field="title" header="Title" />
             <Column style={{zIndex: 2}} field="description" header="Description" />
             <Column style={{zIndex: 2}} field="clothingType" header="Type" />
             <Column 
@@ -334,7 +360,7 @@ const Category = () => {
               classNames="modal"
               unmountOnExit
           >
-              <EditModal setOpenModal={setEditModalCat} modalData={modalDataCat} handleUpdate={handleUpdate} formState={formStateCat} />
+              <EditModal setOpenModal={setEditModalCat} modalData={modalDataCat} handleUpdate={handleUpdateCat} formState={formStateCat} />
           </CSSTransition>
         </div>
       </div>
