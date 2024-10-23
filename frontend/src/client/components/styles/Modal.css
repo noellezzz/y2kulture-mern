@@ -1,0 +1,205 @@
+.login-modal__container {
+    height: 680px;
+    width: 540px;
+    border-radius: 20px;
+    animation: dropLogin 0.8s forwards; 
+    background-color: white;
+    padding:20px 40px;
+
+}
+
+.form-selection {
+    margin: 20px 0px;
+    display: flex;
+    justify-content: center;
+    gap:20px;
+}
+
+.form-selection button {
+    width: 120px;
+    border-radius: 20px;
+    background-color: white;
+    border: 3px solid var(--primary-color);
+    color: var(--primary-color);
+    padding: 15px 0px;
+    border-radius: 20px;
+    margin: 10px 0px;
+}
+
+.form-selection .active {
+    background-color: var(--primary-color);
+    color:white;
+}
+
+.login-modal__container .logo-container {
+    /* border:1px solid red; */
+    height:100px;
+    width: 100%;
+}
+
+.logo-container img{
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+    overflow: hidden;
+}
+
+@keyframes dropLogin {
+    0% {
+        height: 680px;
+        transform: translateY(-500px); 
+    }
+    50% {
+        min-height: 300px;
+        transform: translateY(10px); 
+    } 
+    100% {
+        height: 680px;
+    }
+}
+
+.login-form .input-group {
+    display: flex;
+    flex-direction: column;
+    /* border:1px solid red; */
+    margin: 10px 0px;
+}
+
+.input-group label{
+    margin-bottom: 5px;
+}
+
+.input-group input{
+    all: unset;
+    width: 100%;
+    height: 40px;
+    border-radius: 20px;
+    border:1px solid gray;
+    padding-left: 20px;
+    box-sizing: border-box;
+}
+
+.between-utils {
+    display: flex;
+    justify-content: space-between;
+    /* border:1px solid red; */
+}
+
+.remember-me__checkbox {
+    margin-right: 10px;
+}
+
+.full-width {
+    width: 100% !important;
+}
+
+.alt-login {
+    display: flex;
+    justify-content: space-between;
+}
+
+.prime-button {
+display: inline-block;
+color: #fff;
+transition: all 0.3s;
+position: relative; 
+overflow: hidden;
+z-index: 1;
+}
+
+.prime-button::after {
+content: '';
+position: absolute;
+top: 0; 
+left: 0;
+width: 100%;
+height: 100%; 
+border-radius: 20px;
+z-index: -2;
+}
+
+.prime-button::before {
+content: '';
+position: absolute;
+top: 0; 
+left: 0;
+width: 0%;
+height: 100%; 
+background-color: #c52400;
+transition: all 0.3s;
+border-radius: 10px;
+z-index: -1;
+}
+
+.prime-button:hover::before {
+width: 100%;
+}
+  
+
+.prime-button {
+    background-color: var(--primary-color);
+    padding: 15px 0px;
+    color:white;
+    border-radius: 20px;
+    border: 0px solid black;
+    margin: 10px 0px;
+    width: 210px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap:10px
+}
+
+.facebook-button {
+    background-color: #1877F2;
+}
+
+.gmail-button {
+    background-color: #c71610;
+}
+
+.facebook-button::after {
+    background-color: #1877F2;
+}
+    
+.facebook-button::before {
+    background-color: #15427d;
+}
+
+.gmail-button::after {
+    background-color: #c71610;
+}
+    
+.gmail-button::before {
+    background-color: #a20c06;
+}
+
+.line-break {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+}
+
+.line-break::before,
+.line-break::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid rgb(216, 216, 216);
+}
+
+.line-break::before {
+    margin-right: 10px;
+}
+
+.line-break::after {
+    margin-left: 10px;
+}
+
+.line-break span {
+    white-space: nowrap;
+}
+
+.btn-icon {
+    font-size: 20px;
+}

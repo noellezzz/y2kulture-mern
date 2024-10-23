@@ -1,10 +1,25 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import './styles/Header.css'
 import mainLogo from '../../assets/main-logo.png'
 import { Link } from 'react-router-dom'
 import { FaSearch, FaShoppingBag , FaUser  } from "react-icons/fa";
+import LoginModal from './LoginModal'
+import { CSSTransition } from 'react-transition-group';
 
 const Header = () => {
+  const [modalOpen, setModalOpen] = useState([false])
+  useEffect(() => {
+    if(modalOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [modalOpen])
+
   return (
     <div className='client-header'>
       <nav className='client-navigation'>
@@ -24,10 +39,20 @@ const Header = () => {
           <div className="navigation-line">
             <Link><FaSearch /></Link>
             <Link><FaShoppingBag /></Link>
-            <Link><FaUser /></Link>
+            <Link 
+              onClick={() => { setModalOpen(true) }}
+            ><FaUser /></Link>
           </div>
         </div>
       </nav>
+      <CSSTransition
+            in={modalOpen}
+            timeout={300}
+            classNames="modal"
+            unmountOnExit
+        >
+            <LoginModal setModalOpen={setModalOpen}/>
+        </CSSTransition>
     </div>
   )
 }

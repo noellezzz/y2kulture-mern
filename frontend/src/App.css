@@ -11,3 +11,20 @@ body {
 .client-side * {
   font-family: var(--primary-font);
 }
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #e5d9c6;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--pale-primary-color);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-color);
+}
