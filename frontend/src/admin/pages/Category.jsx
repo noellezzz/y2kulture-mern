@@ -84,10 +84,10 @@ const Category = () => {
         value: formStateCat.clothing_type, 
           onChange: (e) => {
             const selectedIndex = e.target.selectedIndex;
-            const selectedText = e.target.options[selectedIndex].text; // Get the displayed text of the selected option
+            const selectedText = e.target.options[selectedIndex].text; 
         
             setFormStateCat({ ...formStateCat, clothing_type: e.target.value });
-            setforeignPHolder(selectedText); // Set the foreignPHolder to the displayed text
+            setforeignPHolder(selectedText); 
         },
         required: true,
         options: typeOps,
