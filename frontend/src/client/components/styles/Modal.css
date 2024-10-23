@@ -24,11 +24,13 @@
     padding: 15px 0px;
     border-radius: 20px;
     margin: 10px 0px;
+    transition: .5s ease-in-out;
 }
 
 .form-selection .active {
     background-color: var(--primary-color);
     color:white;
+    transition: .5s ease-in-out;
 }
 
 .login-modal__container .logo-container {
@@ -58,7 +60,7 @@
     }
 }
 
-.login-form .input-group {
+.login-form .input-group, .register-form .input-group {
     display: flex;
     flex-direction: column;
     /* border:1px solid red; */
@@ -202,4 +204,36 @@ width: 100%;
 
 .btn-icon {
     font-size: 20px;
+}
+
+.form-panel {
+    /* border:1px solid red; */
+    display: flex;
+    overflow: hidden;
+    padding:5px;
+    gap:10px;
+}
+
+.form-panel form{
+    min-width: 100%;
+}
+
+.register-active .login-form {
+    transform: translateX(-458px);
+    transition: transform .5s;
+}
+
+.register-active .register-form {
+    transform: translateX(-458px);
+    transition: transform .5s;
+}
+
+.login-active .login-form {
+    transform: translateX(0px);
+    transition: transform .5s;
+}
+
+.login-active .register-form {
+    transform: translateX(0px);
+    transition: transform .5s;
 }
