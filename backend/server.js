@@ -5,6 +5,7 @@ import categoryRoute from './routes/CategoryRoute.js'
 import typeRoute from './routes/TypeRoute.js'
 import productRoute from './routes/ProductRoute.js'
 import promoRoute from './routes/PromoRoute.js'
+import userRoute from './routes/userRoute.js'
 
 import { connectDB } from './config/db.js'
 
@@ -20,6 +21,7 @@ app.use('/api/category', categoryRoute);
 app.use('/api/type', typeRoute);
 app.use('/api/product', productRoute);
 app.use('/api/promo', promoRoute);
+app.use('/api/user', userRoute);
 
 app.listen(port, () => {
     console.log("Server is running. Connected to port: ", port)

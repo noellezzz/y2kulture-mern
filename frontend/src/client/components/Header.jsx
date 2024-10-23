@@ -7,8 +7,9 @@ import LoginModal from './LoginModal'
 import { CSSTransition } from 'react-transition-group';
 
 const Header = () => {
-  const [formActive, setFormActive] = useState('login')
-  const [modalOpen, setModalOpen] = useState([false])
+  const [formActive, setFormActive] = useState('register')
+  const [modalOpen, setModalOpen] = useState(false)
+
   useEffect(() => {
     if(modalOpen) {
       document.body.style.overflow = "hidden";
@@ -47,13 +48,13 @@ const Header = () => {
         </div>
       </nav>
       <CSSTransition
-            in={modalOpen}
-            timeout={300}
-            classNames="modal"
-            unmountOnExit
-        >
-            <LoginModal setModalOpen={setModalOpen} formActive={formActive} setFormActive={setFormActive}/>
-        </CSSTransition>
+          in={modalOpen}
+          timeout={300}
+          classNames="modal"
+          unmountOnExit
+      >
+          <LoginModal setModalOpen={setModalOpen} formActive={formActive} setFormActive={setFormActive}/>
+      </CSSTransition>
     </div>
   )
 }

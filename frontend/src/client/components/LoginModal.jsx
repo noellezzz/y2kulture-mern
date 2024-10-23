@@ -6,6 +6,8 @@ import { BiLogoGmail } from "react-icons/bi";
 import mainLogo from '../../assets/main-logo.png'
 
 const LoginModal = ({ setModalOpen, formActive, setFormActive  }) => {
+  const [formState, setFormState] = useState({email:'', password:''})
+
   return (
     <div onClick={() => { setModalOpen(false) }} className="modal-background">
         <div onClick={(e) => e.stopPropagation()} className="login-modal__container">
