@@ -8,6 +8,8 @@ import Category from './admin/pages/Category'
 import Promo from './admin/pages/Promo'
 import Orders from './admin/pages/Orders'
 import { Toaster } from 'react-hot-toast';
+import ClientLayout from './client/components/ClientLayout'
+import Welcome from './client/pages/Welcome'
 
 function App() {
   const adminRoutes = [
@@ -23,11 +25,15 @@ function App() {
       <Toaster
           toastOptions={{
             style: {
-              zIndex: 9999, // High z-index value to ensure it appears above other elements
+              zIndex: 9999,
             },
           }}
         />
       <Routes>
+        <Route path="/" element={<ClientLayout />}>
+          <Route index element={<Welcome />} />
+        </Route>
+
         <Route path="/admin" element={<AdminLayout />}>
           {adminRoutes.map(({ path, element }) => (
             <Route key={path} path={path} element={element} />

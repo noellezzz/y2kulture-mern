@@ -1,8 +1,27 @@
+@font-face {
+    font-family: 'ITCAvantGardeBK';
+    src: url('./assets/ITCAvantGardeStd-Bk.ttf') format('truetype'),
+  }
+  
+@font-face {
+    font-family: 'ITCAvantGardeMd';
+    src: url('./assets/ITCAvantGardeStd-Md.ttf.ttf') format('truetype'),
+  }
+
 :root {
     --primary-color: #fd552e;
     --secondary-color: #e6e6e6;
+    --tertiary-color: #fcf4e7;
+    --fourth-color: #ef78a2;
     --error-color: #f44336;
     --warning-color: #ff9800;
     --info-color: #2196f3;
     --success-color: #4caf50;
+
+    --primary-font: 'ITCAvantGardeBK', sans-serif;
+    --primary-md-font: 'ITCAvantGardeMd', sans-serif;
+
+    --herosize-font: 112px;
+    --extralarge-font: 64px;
+    --large-font: 42px;
 }
