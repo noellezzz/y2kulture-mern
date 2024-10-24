@@ -11,11 +11,13 @@ const UserSchema = mongoose.Schema({
     },
     role: {
         type: String,
-        required: true
+        required: true,
+        default: 'user'
     },
     status: {
         type:String,
-        required: true
+        required: true,
+        default: 'active'
     }
     }, {
         timestamps: true,

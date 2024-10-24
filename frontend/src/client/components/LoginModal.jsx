@@ -4,9 +4,37 @@ import { Link } from 'react-router-dom'
 import { FaFacebook } from "react-icons/fa";
 import { BiLogoGmail } from "react-icons/bi";
 import mainLogo from '../../assets/main-logo.png'
+import { createFunc } from '../../admin/utils/crudUtils'
+import axios from 'axios'
 
 const LoginModal = ({ setModalOpen, formActive, setFormActive  }) => {
   const [formState, setFormState] = useState({email:'', password:''})
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormState((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }
+    ));
+  console.log(formState)
+  };
+
+  const loginAttempt = async(request, response) => {
+    try {
+      const data = axios.post("http://localhost:8000/auth", formState)
+      console.log("Logged In!")
+    } catch (e) {
+      console.log("Error logging in.", e)
+    }
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    createFunc('user', formState)
+    loginAttempt()
+  }
+
+
 
   return (
     <div onClick={() => { setModalOpen(false) }} className="modal-background">
@@ -53,16 +81,30 @@ const LoginModal = ({ setModalOpen, formActive, setFormActive  }) => {
                 Login
               </button>
             </form>
-            <form className="register-form">
+            <form onSubmit={handleSubmit} className="register-form">
               <div className="input-group">
                 <label htmlFor="email">Email Address</label> 
-                <input name="email" id="email" type="text" placeholder='Enter your Email Address'/>
+                <input 
+                  name="email" 
+                  id="email" 
+                  type="text" 
+                  placeholder='Enter your Email Address'
+                  value={formState.email}
+                  onChange={handleChange}
+                />
               </div>
               <div className="input-group">
                 <label htmlFor="Password">Password</label> 
-                <input name="Password" id="Password" type="password" placeholder='Enter your Password'/>
+                <input 
+                  name="password" 
+                  id="password" 
+                  type="password" 
+                  placeholder='Enter your Password'
+                  value={formState.password}
+                  onChange={handleChange}
+                />
               </div>
-              <button className='full-width prime-button'>
+              <button type="submit" className='full-width prime-button'>
                 Sign Up
               </button>
             </form>

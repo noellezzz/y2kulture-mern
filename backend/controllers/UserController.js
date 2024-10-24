@@ -25,7 +25,7 @@ export const getOneUser = async (request, response) => {
 export const createUser = async (request, response) => {
     const user = request.body;
     
-    if( !user.email || !user.password || !user.status || !user.role) {
+    if( !user.email || !user.password) {
         return response.status(400).json({ success:false, message:"Please provide all fields."});
     }
 

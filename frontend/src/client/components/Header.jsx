@@ -7,7 +7,7 @@ import LoginModal from './LoginModal'
 import { CSSTransition } from 'react-transition-group';
 
 const Header = () => {
-  const [formActive, setFormActive] = useState('register')
+  const [formActive, setFormActive] = useState('login')
   const [modalOpen, setModalOpen] = useState(false)
 
   useEffect(() => {
