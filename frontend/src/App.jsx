@@ -17,7 +17,7 @@ function App() {
   useEffect(() => {
     axios.get('http://localhost:8000/auth')
     .then((response) => {
-      console.log(response)
+      console.log("Is Logged in", response)
     })
   }, [])
 

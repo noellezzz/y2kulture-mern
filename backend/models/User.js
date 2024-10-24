@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import jwt from 'jsonwebtoken'
 
 const UserSchema = mongoose.Schema({
     email: {
@@ -22,6 +23,12 @@ const UserSchema = mongoose.Schema({
     }, {
         timestamps: true,
 });
+
+UserSchema.methods.getJwtToken = function () {
+    return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
+        expiresIn: process.env.JWT_EXPIRES_TIME
+    });
+}
 
 const User = mongoose.model('User', UserSchema);
 export default User;

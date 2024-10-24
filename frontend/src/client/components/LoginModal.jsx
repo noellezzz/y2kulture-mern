@@ -8,6 +8,7 @@ import { createFunc } from '../../admin/utils/crudUtils'
 import axios from 'axios'
 
 const LoginModal = ({ setModalOpen, formActive, setFormActive  }) => {
+  
   const [formState, setFormState] = useState({email:'', password:''})
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -34,7 +35,10 @@ const LoginModal = ({ setModalOpen, formActive, setFormActive  }) => {
     loginAttempt()
   }
 
-
+  const handleLogin = (e) => {
+    e.preventDefault();
+    loginAttempt()
+  }
 
   return (
     <div onClick={() => { setModalOpen(false) }} className="modal-background">
@@ -59,14 +63,28 @@ const LoginModal = ({ setModalOpen, formActive, setFormActive  }) => {
             </button>
           </div>
           <div className={`form-panel ${formActive === 'login' ? 'login-active' : 'register-active'}`}>
-            <form className="login-form">
+            <form onSubmit={handleLogin} className="login-form">
               <div className="input-group">
                 <label htmlFor="email">Email Address</label> 
-                <input name="email" id="email" type="text" placeholder='Enter your Email Address'/>
+                <input 
+                  name="email" 
+                  id="email" 
+                  type="text" 
+                  placeholder='Enter your Email Address'
+                  value={formState.email}
+                  onChange={handleChange}
+                />
               </div>
               <div className="input-group">
                 <label htmlFor="Password">Password</label> 
-                <input name="Password" id="Password" type="password" placeholder='Enter your Password'/>
+                <input 
+                  name="password" 
+                  id="password" 
+                  type="password" 
+                  placeholder='Enter your Password'
+                  value={formState.password}
+                  onChange={handleChange}
+                />
               </div>
               <div className="between-utils">
                 <div className="remember-me">

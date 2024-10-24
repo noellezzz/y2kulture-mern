@@ -10,28 +10,16 @@ import loginRoute from './routes/Auth/LoginRoute.js'
 import cookieParser from 'cookie-parser'
 import bodyParser from 'body-parser'
 import session from 'express-session'
+import { corsOptions } from './config/corsOptions.js'
 
 import { connectDB } from './config/db.js'
 
 const app = express()
 app.use(express.json())
-app.use(cors({
-    origin: ["http://localhost:5173"],
-    methods: ["GET", "POST"],
-    credentials: true
-}))
+app.use(cors(corsOptions))
 app.use(cookieParser())
 app.use(bodyParser.urlencoded({ extended: true }))
 
-app.use(session({
-    key: "userId",
-    secret: "something",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        expires: 60 * 60 * 24,
-    }
-}))
 
 dotenv.config()
 
