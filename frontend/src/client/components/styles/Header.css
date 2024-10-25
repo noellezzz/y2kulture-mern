@@ -5,11 +5,11 @@
     height: 75px;
     top: 0;
     left: 0;
-    /* box-shadow: 0px 0px 14px 0px rgba(0,0,0,0.24);
+    box-shadow: 0px 0px 14px 0px rgba(0,0,0,0.24);
     -webkit-box-shadow: 0px 0px 14px 0px rgba(0,0,0,0.24);
-    -moz-box-shadow: 0px 0px 14px 0px rgba(0,0,0,0.24); */
+    -moz-box-shadow: 0px 0px 14px 0px rgba(0,0,0,0.24);
     background-color: var(--tertiary-color);
-    border-bottom: 1px solid black;
+    /* border-bottom: 1px solid black; */
 }
 
 .client-navigation {

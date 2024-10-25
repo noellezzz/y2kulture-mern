@@ -14,12 +14,21 @@ import axios from 'axios'
 
 function App() {
   axios.defaults.withCredentials = true;
+  const [userLoggedIn, setUserLoggedIn] = useState(false)
   useEffect(() => {
-    axios.get('http://localhost:8000/auth')
-    .then((response) => {
-      console.log("Is Logged in", response)
-    })
+    checkLogin()
+    console.log(userLoggedIn)
   }, [])
+
+const checkLogin = async(request, response) => {
+  try {
+    const response = await axios.get('http://localhost:8000/auth')
+    console.log(response.data)
+    setUserLoggedIn(true)
+  } catch {
+    setUserLoggedIn(false)
+  }
+}
 
   const adminRoutes = [
     { path: "", element: <Dashboard /> },
