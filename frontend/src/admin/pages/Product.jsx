@@ -17,9 +17,36 @@ const Product = () => {
   const [flattenData, setFlattenData] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
+  const [images, setImages] = useState([]);
+  const [imagesPreview, setImagesPreview] = useState([])
 
   const [formState, setFormState] = useState({_id: '', title: '', description: '', category: '', categoryId: ''});
+  const onChange = e => {
+    const files = Array.from(e.target.files)
+    const newImages = [];
+    setImagesPreview([]);
+    setImages([])
+    files.forEach(file => {
+        const reader = new FileReader();
+        
+        reader.onload = () => {
+            if (reader.readyState === 2) {
+                setImagesPreview(oldArray => [...oldArray, reader.result])
+                setImages(oldArray => [...oldArray, reader.result])
+                newImages.push(reader.result);
+            }
+        }
+        reader.readAsDataURL(file)
 
+        // console.log(reader)
+    })
+    setFormState((prevState) => ({
+      ...prevState,
+      images: newImages,
+  }));
+    console.log(images)
+    console.log(formState)
+}
   const modalData = {
     title: 'Product',
     content: 'product.',
@@ -36,7 +63,6 @@ const Product = () => {
         withForeign: false,
       },
       {
-
         label: 'Description',
         type: 'text',
         name: 'description',
@@ -57,8 +83,17 @@ const Product = () => {
         requestFor: 'title',
         withForeign: false,
       },
+      {
+        label: 'Images',
+        type: 'file',
+        name: 'images',
+        id: 'custom_file',
+        onChange: (e) => onChange(e),
+        required: true,
+      },
     ]
   };
+  
 
   useEffect(() => {
     fetchData('product', setApiData);
@@ -88,13 +123,24 @@ const Product = () => {
   }, [apiData]);
 
   const loadModalCreate = () => {
-    setFormState({title: '', description: '', category: ''}); 
+    setFormState({title: '', description: '', category: '', images: []}); 
     setOpenModal(true)
   }
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    
+    const formData = new FormData();
+    
+    formData.append('title', formState.title);
+    formData.append('description', formState.description);
+    formData.append('category', formState.category);
+    images.forEach((image) => {
+      formData.append('images', image)
+    });
+
     console.log(formState)
+
     const response = await createFunc('product', formState);
     const newProduct = {
       _id: response.data.data._id,

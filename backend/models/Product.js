@@ -10,12 +10,24 @@ const productSchema = mongoose.Schema({
         required: true,
         },
     category: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: 'Category',
+                required: true
+            }
+        ],
+    images: [
         {
-            type: Schema.Types.ObjectId,
-            ref: 'Category',
-            required: true
+            public_id: {
+                type: String,
+                required:true
+            },
+            url: {
+                type:String,
+                required: true
+            }
         }
-        ],  
+    ]  
     },
     {
         timestamps: true,
