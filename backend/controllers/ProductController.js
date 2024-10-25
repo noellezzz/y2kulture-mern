@@ -1,5 +1,6 @@
 import Product from "../models/Product.js"
 import mongoose from 'mongoose'
+import cloudinary from 'cloudinary'
 
 export const getProduct = async (request, response) => {
     try {
@@ -34,6 +35,37 @@ export const getOneProduct = async (request, response) => {
 
 export const createProduct = async (request, response) => {
     const product = request.body;
+
+    let images = []
+	if (typeof request.body.images === 'string') {
+		images.push(request.body.images)
+	} else {
+		images = request.body.images
+	}
+
+	let imagesLinks = [];
+    // console.log(request.body)
+	for (let i = 0; i < images.length; i++) {
+		try {
+			const result = await cloudinary.v2.uploader.upload(images[i], {
+				folder: 'products',
+				width: 150,
+				crop: "scale",
+			});
+
+			imagesLinks.push({
+				public_id: result.public_id,
+				url: result.secure_url
+			})
+
+		} catch (error) {
+			console.log("Cant Upload", error)
+		}
+
+	}
+
+	request.body.images = imagesLinks
+    console.log(imagesLinks)
     
     if(!product.title || !product.description || !product.category) {
         return response.status(400).json({ success:false, message:"Please provide all fields."});

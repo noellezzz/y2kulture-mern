@@ -8,7 +8,7 @@ import { createFunc } from '../../admin/utils/crudUtils'
 import axios from 'axios'
 
 const LoginModal = ({ setModalOpen, formActive, setFormActive  }) => {
-  
+  const [loggedIn, setLoggedIn] = useState(false)
   const [formState, setFormState] = useState({email:'', password:''})
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -22,10 +22,13 @@ const LoginModal = ({ setModalOpen, formActive, setFormActive  }) => {
 
   const loginAttempt = async(request, response) => {
     try {
-      const data = axios.post("http://localhost:8000/auth", formState)
-      console.log("Logged In!")
+      const data = await axios.post("http://localhost:8000/auth", formState)
+      console.log(data)
+      setLoggedIn(true)
+      window.location.reload()
     } catch (e) {
       console.log("Error logging in.", e)
+      setLoggedIn(false)
     }
   }
 
