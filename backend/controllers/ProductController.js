@@ -49,7 +49,8 @@ export const createProduct = async (request, response) => {
 		try {
 			const result = await cloudinary.v2.uploader.upload(images[i], {
 				folder: 'products',
-				width: 150,
+				width: 500,
+                height:500,
 				crop: "scale",
 			});
 
