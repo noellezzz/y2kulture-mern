@@ -56,8 +56,9 @@
     justify-content: end;
 }
 
-.p-datatable-table td{
+.p-datatable-table td, th{
     font-size: 12px;
+    padding:10px
 }
 
 .p-datatable-table th {
