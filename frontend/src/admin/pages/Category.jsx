@@ -241,7 +241,7 @@ const Category = () => {
           <DataTable 
             value={apiData}
             scrollable 
-            scrollHeight="320px" 
+            scrollHeight="290px" 
             style={{ zIndex: 1 }} 
           >
             <Column style={{zIndex: 2}} field="_id" header="ID" />
@@ -300,7 +300,7 @@ const Category = () => {
         <DataTable 
             value={flattenData}  
             scrollable 
-            scrollHeight="320px" 
+            scrollHeight="290px" 
             style={{ zIndex: 1 }} 
         >
             <Column style={{zIndex: 2}} field="id" header="ID" />

@@ -1,25 +1,131 @@
 import React, { useState, useEffect } from 'react';
-import { DataTable } from 'primereact/datatable';
-import { Column } from 'primereact/column';
 import "primereact/resources/themes/lara-light-cyan/theme.css";
-import Button from '@mui/material/Button';
+
+// Utils
 import { fetchData, fetchDataN, createFunc, addToTable, updateFunc, addAndRemoveToTable, deleteFunc } from '../utils/crudUtils';
-import { CSSTransition } from 'react-transition-group';
-import CreateModal from '../components/CreateModal';
+
+// Icons and Imported Components
 import Fab from '@mui/material/Fab'; 
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { IoMdEye } from "react-icons/io";
+import Button from '@mui/material/Button';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+import { CSSTransition } from 'react-transition-group';
+
+// Modals
 import EditModal from '../components/EditModal';
+import InfoModal from '../components/InfoModal';
+import CreateModal from '../components/CreateModal';
 
 const Promo = () => {
-  const [apiData, setApiData] = useState([]);
+  // Promo Isolate
   const [categoryOps, setCategoryOps] = useState([]);
+
+  // CRUD Necessities
+  const [apiData, setApiData] = useState([]);
   const [flattenData, setFlattenData] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
-  const [foreignPHolder, setforeignPHolder] = useState('');
-
+  const [infoModal, setInfoModal] = useState(false);
+  const [imagesPreview, setImagesPreview] = useState([])
+  const [foreignHolder, setForeignHolder] = useState('')
   const [formState, setFormState] = useState({_id: '', title: '', description: '', promo_for: '', categoryTitle: ''});
+
+  const onChange = e => {
+    const files = Array.from(e.target.files)
+    const newImages = [];
+    setImagesPreview([]);
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (reader.readyState === 2) {
+          setImagesPreview(oldArray => [...oldArray, reader.result])
+          newImages.push(reader.result);
+        }
+      }
+      reader.readAsDataURL(file)
+    })
+    setFormState((prevState) => ({
+      ...prevState,
+      images: newImages,
+    }));
+  }
+
+  const resetFormstate = () => {
+    setForeignHolder('')
+    setFormState({ title: '', description: '', promo_for: '', images: [] });
+    setImagesPreview([])
+  }
+
+  const loadModalCreate = () => {
+    resetFormstate()
+    setOpenModal(true)
+  }
+
+  const loadDataGen = async(id) => {
+    const response = await fetchDataN('promo', id) 
+    setFormState({
+      _id: id,
+      title: response.data.data.title, 
+      description: response.data.data.description, 
+      promo_for: response.data.data.promo_for[0]._id,
+      images: response.data.data.images,
+    });
+
+    response.data.data.images.map((image) => (
+      setImagesPreview(oldArray => [...oldArray, image.url])
+    ))
+  }
+
+  const loadDataById = async (id) => {
+    resetFormstate()
+    loadDataGen(id)
+    setEditModal(true)
+  }
+
+  const loadDataByIdInfo = async (id) => {
+    resetFormstate()
+    loadDataGen(id)
+    setInfoModal(true)
+  }
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const response = await createFunc('promo', formState);
+    const newPromo = {
+      _id: response.data.data._id,
+      title: formState.description,
+      description: formState.description,
+      promo_for: foreignHolder,
+      createdAt: new Date().toLocaleString(),
+      updatedAt: new Date().toLocaleString(),
+      newData: true
+    };
+    addToTable(setApiData, newPromo)
+    setOpenModal(false);
+  };
+
+  const handleUpdate = async () => {
+    const response = await updateFunc('promo', formState._id, formState)
+    console.log(formState)
+    const newPromo = {
+        _id: response.data.data._id,
+        title: formState.title,
+        description: formState.description,
+        promo_for: foreignHolder,
+        createdAt: new Date().toLocaleString(),
+        updatedAt: new Date().toLocaleString(),
+        newData: true,
+      };
+      addAndRemoveToTable(setApiData, newPromo)
+      setEditModal(false);
+  };
+  
+  const handleDelete = (id) => {
+    deleteFunc('promo', id, setApiData)
+  };
 
   const modalData = {
     title: 'Promo',
@@ -64,6 +170,14 @@ const Promo = () => {
         requestFor: 'title',
         withForeign: false,
       },
+      {
+        label: 'Images',
+        type: 'file',
+        name: 'images',
+        id: 'custom_file',
+        onChange: (e) => onChange(e),
+        required: false,
+      },
     ]
   };
 
@@ -71,10 +185,6 @@ const Promo = () => {
     fetchData('promo', setApiData);
     fetchData('category', setCategoryOps);
   }, []);
-  
-  // useEffect(() => {
-  //   console.log(categoryOps)
-  // }, []);
 
   useEffect(() => {
     if (apiData.length > 0) {
@@ -94,60 +204,6 @@ const Promo = () => {
       console.log(flattened);
     }
   }, [apiData]);
-
-  const loadModalCreate = () => {
-    setFormState({title: '', description: '', promo_for: ''}); 
-    setOpenModal(true)
-  }
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    console.log(formState)
-    const response = await createFunc('promo', formState);
-    const newPromo = {
-      _id: response.data.data._id,
-      title: formState.description,
-      description: formState.description,
-      promo_for: foreignPHolder,
-      newData: true
-    };
-
-    addToTable(setApiData, newPromo)
-    setFormState({title: '', description: '', promo_for: ''}); 
-    setOpenModal(false);
-  };
-
-  const loadDataById = async (id) => {
-    const response = await fetchDataN('promo', id) 
-    console.log(response)
-    setFormState({
-      _id: id,
-      title: response.data.data.title, 
-      description: response.data.data.description, 
-      promo_for: response.data.data.promo_for[0]._id
-    });
-    setEditModal(true)
-  }
-
-  const handleUpdate = async () => {
-    const response = await updateFunc('promo', formState._id, formState)
-    console.log(formState)
-    const newPromo = {
-        _id: response.data.data._id,
-        title: formState.title,
-        description: formState.description,
-        promo_for: formState.promo_for,
-        newData: true,
-      };
-
-      addAndRemoveToTable(setApiData, newPromo)
-      setFormState({_id: '',title: '', description: '', categoryId: '', promo_for: ''})
-      setEditModal(false);
-  };
-  
-  const handleDelete = (id) => {
-    deleteFunc('promo', id, setApiData)
-  };
 
   return (
     <div className="main-container__admin">
@@ -182,6 +238,12 @@ const Promo = () => {
                   >
                     <DeleteIcon sx={{ width: 15, height: 15 }}/>
                   </Fab>
+                  &nbsp;
+                  <Fab onClick={() => loadDataByIdInfo(rowData.id)}
+                    color="info" aria-label="info" size="small" sx={{ zIndex: 0, width: 32, height: 10 }}
+                  >
+                    <IoMdEye sx={{ width: 15, height: 15 }} />
+                  </Fab>
                 </>
               )}
             />
@@ -200,7 +262,7 @@ const Promo = () => {
               classNames="modal"
               unmountOnExit
           >
-              <CreateModal setOpenModal={setOpenModal} modalData={modalData} handleSubmit={handleSubmit} />
+              <CreateModal setOpenModal={setOpenModal} modalData={modalData} handleSubmit={handleSubmit} imagesPreview={imagesPreview} setImagesPreview={setImagesPreview} />
           </CSSTransition>
 
           <CSSTransition
@@ -209,7 +271,16 @@ const Promo = () => {
               classNames="modal"
               unmountOnExit
           >
-              <EditModal setOpenModal={setEditModal} modalData={modalData} handleUpdate={handleUpdate} formState={formState} />
+              <EditModal setOpenModal={setEditModal} modalData={modalData} handleUpdate={handleUpdate} formState={formState} imagesPreview={imagesPreview} setImagesPreview={setImagesPreview} />
+          </CSSTransition>
+
+          <CSSTransition
+            in={infoModal}
+            timeout={300}
+            classNames="modal"
+            unmountOnExit
+          >
+            <InfoModal setOpenModal={setInfoModal} modalData={modalData} formState={formState} />
           </CSSTransition>
         </div>
       </div>
