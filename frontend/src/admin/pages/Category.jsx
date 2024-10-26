@@ -39,7 +39,27 @@ const Category = () => {
       images: newImages,
     }));
   }
-  
+
+  const onChangeCat = e => {
+    const files = Array.from(e.target.files)
+    const newImages = [];
+    setImagesPreview([]);
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (reader.readyState === 2) {
+          setImagesPreview(oldArray => [...oldArray, reader.result])
+          newImages.push(reader.result);
+        }
+      }
+      reader.readAsDataURL(file)
+    })
+    setFormStateCat((prevState) => ({
+      ...prevState,
+      images: newImages,
+    }));
+  }
+
   // For Clothing Type
   const [apiData, setApiData] = useState([]);
   const [openModal, setOpenModal] = useState(false);
@@ -86,7 +106,6 @@ const Category = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log(formState)
     const response = await createFunc('type', formState);
     const newType = {
       _id: response.data.data._id,
@@ -96,7 +115,6 @@ const Category = () => {
       updatedAt: new Date().toLocaleString(),
       newData: true
     };
-
     addToTable(setApiData, newType)
     fetchData('type', setTypeOps);
     setOpenModal(false);
@@ -165,31 +183,49 @@ const Category = () => {
   const [editModalCat, setEditModalCat] = useState(false);
   const [formStateCat, setFormStateCat] = useState({});
   const [foreignPHolder, setforeignPHolder] = useState('');
+  const [infoModalCat, setInfoModalCat] = useState(false);
 
-  const loadModalCreateCat = () => {
-    setFormStateCat({title: '', description: '', clothing_type: ''})
-    setOpenModalCat(true)
+  const resetFormstateCat = () => {
+    setforeignPHolder('')
+    setFormStateCat({ title: '', description: '', clothing_type: '', images: [] });
+    setImagesPreview([])
   }
 
-  const loadDataByIdCat = async (id) => {
-    setFormState({_id: '', title: '', description: '', clothing_type: ''})
-    setforeignPHolder('')
+  const loadDataGenCat = async(id) => {
     const response = await fetchDataN('category', id) 
     setFormStateCat({
       _id: id,
       title: response.data.data.title, 
       description: response.data.data.description,
-      clothing_type: response.data.data.clothing_type[0]._id
+      clothing_type: response.data.data.clothing_type[0]._id,
+      images: response.data.data.images
     });
     setforeignPHolder(response.data.data.clothing_type[0].title)
+
+    response.data.data.images.map((image) => (
+      setImagesPreview(oldArray => [...oldArray, image.url])
+    ))
+  }
+
+  const loadModalCreateCat = () => {
+    resetFormstateCat()
+    setOpenModalCat(true)
+  }
+  const loadDataByIdInfoCat = async (id) => {
+    resetFormstateCat()
+    loadDataGenCat(id)
+    setInfoModalCat(true)
+  }
+
+  const loadDataByIdCat = async (id) => {
+    resetFormstateCat()
+    loadDataGenCat(id)
     setEditModalCat(true)
   }
 
   const handleSubmitCat = async (event) => {
     event.preventDefault();
-    console.log(formStateCat)
     const response = await createFunc('category', formStateCat);
-
     const newCat = {
       _id: response.data.data._id,
       title: formStateCat.title,
@@ -197,9 +233,7 @@ const Category = () => {
       clothing_type: foreignPHolder,
       newData: true
     };
-
     addToTable(setApiDataCat, newCat)
-    setFormStateCat({title: '', description: '', category: ''});
     setOpenModalCat(false);
   };
 
@@ -215,7 +249,6 @@ const Category = () => {
       addAndRemoveToTable(setApiDataCat, newCat)
       setFormStateCat({_id: '',title: '', description: '', clothing_type: ''})
       setEditModalCat(false);
-      setforeignPHolder('')
       fetchData('type', setTypeOps);
   };
 
@@ -264,6 +297,14 @@ const Category = () => {
         options: typeOps,
         requestFor: 'title',
         withForeign: false,
+      },
+      {
+        label: 'Images',
+        type: 'file',
+        name: 'images',
+        id: 'custom_file',
+        onChange: (e) => onChangeCat(e),
+        required: false,
       },
     ]
   };
@@ -406,6 +447,12 @@ const Category = () => {
                   >
                     <DeleteIcon sx={{ width: 15, height: 15 }}/>
                   </Fab>
+                  &nbsp;
+                  <Fab onClick={() => loadDataByIdInfoCat(rowData.id)}
+                    color="info" aria-label="info" size="small" sx={{ zIndex: 0, width: 32, height: 10 }}
+                  >
+                    <IoMdEye sx={{ width: 15, height: 15 }} />
+                  </Fab>
                 </>
               )}
             />
@@ -425,7 +472,7 @@ const Category = () => {
               classNames="modal"
               unmountOnExit
           >
-              <CreateModal setOpenModal={setOpenModalCat} modalData={modalDataCat} handleSubmit={handleSubmitCat} />
+              <CreateModal setOpenModal={setOpenModalCat} modalData={modalDataCat} handleSubmit={handleSubmitCat} imagesPreview={imagesPreview} setImagesPreview={setImagesPreview} />
           </CSSTransition>
 
           <CSSTransition
@@ -434,7 +481,17 @@ const Category = () => {
               classNames="modal"
               unmountOnExit
           >
-              <EditModal setOpenModal={setEditModalCat} modalData={modalDataCat} handleUpdate={handleUpdateCat} formState={formStateCat} />
+              <EditModal setOpenModal={setEditModalCat} modalData={modalDataCat} handleUpdate={handleUpdateCat} formState={formStateCat} imagesPreview={imagesPreview} setImagesPreview={setImagesPreview} />
+          </CSSTransition>
+
+          
+          <CSSTransition
+            in={infoModalCat}
+            timeout={300}
+            classNames="modal"
+            unmountOnExit
+          >
+            <InfoModal setOpenModal={setInfoModalCat} modalData={modalDataCat} formState={formStateCat} />
           </CSSTransition>
         </div>
       </div>
