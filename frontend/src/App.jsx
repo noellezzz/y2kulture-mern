@@ -17,13 +17,14 @@ function App() {
   const [userLoggedIn, setUserLoggedIn] = useState(false)
   useEffect(() => {
     checkLogin()
-    console.log(userLoggedIn)
   }, [])
 
 const checkLogin = async(request, response) => {
   try {
-    const response = await axios.get('http://localhost:8000/auth')
-    console.log(response.data)
+    if (userLoggedIn) {
+      await axios.get('http://localhost:8000/auth')
+    }
+    
     setUserLoggedIn(true)
   } catch {
     setUserLoggedIn(false)

@@ -20,37 +20,30 @@ const Product = () => {
   const [openModal, setOpenModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
   const [infoModal, setInfoModal] = useState(false);
-  const [images, setImages] = useState([]);
   const [imagesPreview, setImagesPreview] = useState([])
   const [foreignHolder, setForeignHolder] = useState('')
-
   const [formState, setFormState] = useState({_id: '', title: '', description: '', category: '', categoryId: ''});
+
   const onChange = e => {
     const files = Array.from(e.target.files)
     const newImages = [];
     setImagesPreview([]);
-    setImages([])
     files.forEach(file => {
         const reader = new FileReader();
-        
         reader.onload = () => {
             if (reader.readyState === 2) {
                 setImagesPreview(oldArray => [...oldArray, reader.result])
-                setImages(oldArray => [...oldArray, reader.result])
                 newImages.push(reader.result);
             }
         }
         reader.readAsDataURL(file)
-
-        // console.log(reader)
     })
     setFormState((prevState) => ({
       ...prevState,
       images: newImages,
   }));
-    console.log(images)
-    console.log(formState)
 }
+
   const modalData = {
     title: 'Product',
     content: 'product.',
@@ -96,19 +89,14 @@ const Product = () => {
         name: 'images',
         id: 'custom_file',
         onChange: (e) => onChange(e),
-        required: true,
+        required: false,
       },
     ]
   };
   
-
   useEffect(() => {
     fetchData('product', setApiData);
     fetchData('category', setCategoryOps);
-  }, []);
-  
-  useEffect(() => {
-    console.log(categoryOps)
   }, []);
 
   useEffect(() => {
@@ -126,29 +114,22 @@ const Product = () => {
         updatedAt: new Date(product.updatedAt).toLocaleString(),
       }));
       setFlattenData(flattened);
-      console.log(flattened);
     }
   }, [apiData]);
 
-  const loadModalCreate = () => {
+  const resetFormstate = () => {
     setForeignHolder('')
     setFormState({title: '', description: '', category: '', images: []}); 
+    setImagesPreview([])
+  }
+
+  const loadModalCreate = () => {
+    resetFormstate()
     setOpenModal(true)
   }
 
   const handleSubmit = async (event) => {
-    event.preventDefault();
-    console.log(foreignHolder)
-    const formData = new FormData();
-    
-    formData.append('title', formState.title);
-    formData.append('description', formState.description);
-    formData.append('category', formState.category);
-    images.forEach((image) => {
-      formData.append('images', image)
-    });
-
-    console.log(formState)
+    event.preventDefault()
 
     const response = await createFunc('product', formState);
     const newProduct = {
@@ -162,23 +143,28 @@ const Product = () => {
     };
 
     addToTable(setApiData, newProduct)
-    setFormState({title: '', description: '', category: ''}); 
     setOpenModal(false);
   };
 
   const loadDataByIdEdit = async (id) => {
-    setForeignHolder('')
+    resetFormstate()
     const response = await fetchDataN('product', id) 
     setFormState({
       _id: id,
       title: response.data.data.title, 
       description: response.data.data.description, 
-      category: response.data.data.category[0]._id, });
+      category: response.data.data.category[0]._id, 
+      images: response.data.data.images, });
+
+      response.data.data.images.map((image) => (
+        setImagesPreview(oldArray => [...oldArray, image.url])
+      ))
+    console.log('images',response.data.data.images)
     setEditModal(true)
   }
 
   const loadDataByIdInfo = async (id) => {
-    setForeignHolder('')
+    resetFormstate()
     const response = await fetchDataN('product', id) 
     setFormState({
       _id: id,
@@ -196,12 +182,13 @@ const Product = () => {
         _id: response.data.data._id,
         title: formState.title,
         description: formState.description,
-        categoryId: formState.categoryId,
+        category: foreignHolder,
+        createdAt: new Date().toLocaleString(),
+        updatedAt: new Date().toLocaleString(),
         newData: true,
       };
 
       addAndRemoveToTable(setApiData, newProduct)
-      setFormState({_id: '',title: '', description: '', categoryId: '', category: ''})
       setEditModal(false);
   };
   
@@ -217,35 +204,35 @@ const Product = () => {
             value={flattenData} 
             tableStyle={{ minWidth: '50rem' }}
             scrollable 
-            scrollHeight="320px" 
+            scrollHeight="290px" 
             style={{ zIndex: 1 }} 
           >
-            <Column field="id" header="ID" />
-            <Column field="title" header="Title" />
-            <Column field="description" header="Description" />
-            <Column field="categoryTitle" header="Category" />
-            {/* <Column field="clothingType" header="Clothing Type" /> */}
-            <Column field="createdAt" header="Created At" />
-            <Column field="updatedAt" header="Updated At" />
+            <Column style={{zIndex: 2}} field="id" header="ID" />
+            <Column style={{zIndex: 2}} field="title" header="Title" />
+            <Column style={{zIndex: 2}} field="description" header="Description" />
+            <Column style={{zIndex: 2}} field="categoryTitle" header="Category" />
+            <Column style={{zIndex: 2}} field="createdAt" header="Created At" />
+            <Column style={{zIndex: 2}} field="updatedAt" header="Updated At" />
             <Column 
+              style={{zIndex: 2}}
               field="controls" 
               header="Controls" 
               body={(rowData) => (
                 <div className='gap-10'>
                   <Fab onClick={() => loadDataByIdEdit(rowData.id)} 
-                    color="primary" aria-label="edit" size="small" sx={{ width: 32, height: 10 }}
+                    color="primary" aria-label="edit" size="small" sx={{ zIndex: 0, width: 32, height: 10 }}
                   >
                     <EditIcon sx={{ width: 15, height: 15 }}/>
                   </Fab>
                   &nbsp;
                   <Fab onClick={() => handleDelete(rowData.id)} 
-                    color="secondary" aria-label="delete" size="small" sx={{ width: 32, height: 10 }}
+                    color="secondary" aria-label="delete" size="small" sx={{ zIndex: 0, width: 32, height: 10 }}
                   >
                     <DeleteIcon sx={{ width: 15, height: 15 }}/>
                   </Fab>
                   &nbsp;
                   <Fab onClick={() => loadDataByIdInfo(rowData.id)} 
-                    color="info" aria-label="info" size="small" sx={{ width: 32, height: 10 }}
+                    color="info" aria-label="info" size="small" sx={{ zIndex: 0,width: 32, height: 10 }}
                   >
                     <IoMdEye sx={{ width: 15, height: 15 }}/>
                   </Fab>
@@ -267,7 +254,7 @@ const Product = () => {
               classNames="modal"
               unmountOnExit
           >
-              <CreateModal setOpenModal={setOpenModal} modalData={modalData} handleSubmit={handleSubmit} />
+              <CreateModal setOpenModal={setOpenModal} modalData={modalData} handleSubmit={handleSubmit} imagesPreview={imagesPreview} setImagesPreview={setImagesPreview}/>
           </CSSTransition>
 
           <CSSTransition
@@ -276,7 +263,7 @@ const Product = () => {
               classNames="modal"
               unmountOnExit
           >
-              <EditModal setOpenModal={setEditModal} modalData={modalData} handleUpdate={handleUpdate} formState={formState} />
+              <EditModal setOpenModal={setEditModal} modalData={modalData} handleUpdate={handleUpdate} formState={formState}  imagesPreview={imagesPreview} setImagesPreview={setImagesPreview}/>
           </CSSTransition>
 
           <CSSTransition

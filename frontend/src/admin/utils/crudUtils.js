@@ -75,3 +75,4 @@ export const deleteFunc = async (object, id, setForm) => {
       console.log("Error in User Delete", error)
     })
 }
+

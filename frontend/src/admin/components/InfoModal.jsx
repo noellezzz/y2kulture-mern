@@ -40,13 +40,13 @@ const InfoModal = ({ setOpenModal, modalData: { title, content, fields }, formSt
                         
                 {
                     imagesToDisplay.map((image, index) => (
-                            <img src={image.url} key={index} alt={`Image ${index + 1}`} />
+                        <img src={image.url} key={index} alt={`Image ${index + 1}`} />
                     ))
                 }
             </Carousel>
         </div>
         {fields.map((field, index) => (            
-            <div key={index}>{field.label}: {field.value}</div>
+            <div class="detail-container" key={index}>{field.label}: {field.value}</div>
         ))
         }
         </div>
