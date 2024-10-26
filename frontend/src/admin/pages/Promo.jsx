@@ -109,7 +109,6 @@ const Promo = () => {
 
   const handleUpdate = async () => {
     const response = await updateFunc('promo', formState._id, formState)
-    console.log(formState)
     const newPromo = {
         _id: response.data.data._id,
         title: formState.title,

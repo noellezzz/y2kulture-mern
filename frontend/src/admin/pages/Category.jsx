@@ -1,29 +1,125 @@
 import React, { useState, useEffect } from 'react';
-import { DataTable } from 'primereact/datatable';
-import { Column } from 'primereact/column';
 import "primereact/resources/themes/lara-light-cyan/theme.css";
-import Button from '@mui/material/Button';
+
+// Utils
 import { fetchData, fetchDataN, createFunc, addToTable, updateFunc, addAndRemoveToTable, deleteFunc } from '../utils/crudUtils';
-import { CSSTransition } from 'react-transition-group';
-import CreateModal from '../components/CreateModal';
-import EditModal from '../components/EditModal';
-import Fab from '@mui/material/Fab'; 
+
+// Icons and Imported Components
+import Fab from '@mui/material/Fab';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { IoMdEye } from "react-icons/io";
+import Button from '@mui/material/Button';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+import { CSSTransition } from 'react-transition-group';
+
+// Modals
+import EditModal from '../components/EditModal';
+import InfoModal from '../components/InfoModal';
+import CreateModal from '../components/CreateModal';
 
 const Category = () => {
+  const onChange = e => {
+    const files = Array.from(e.target.files)
+    const newImages = [];
+    setImagesPreview([]);
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (reader.readyState === 2) {
+          setImagesPreview(oldArray => [...oldArray, reader.result])
+          newImages.push(reader.result);
+        }
+      }
+      reader.readAsDataURL(file)
+    })
+    setFormState((prevState) => ({
+      ...prevState,
+      images: newImages,
+    }));
+  }
+  
+  // For Clothing Type
   const [apiData, setApiData] = useState([]);
-  const [apiDataCat, setApiDataCat] = useState([]);
-  const [typeOps, setTypeOps] = useState([]);
-  const [flattenData, setFlattenData] = useState([]);
   const [openModal, setOpenModal] = useState(false);
-  const [openModalCat, setOpenModalCat] = useState(false);
   const [editModal, setEditModal] = useState(false);
-  const [editModalCat, setEditModalCat] = useState(false);
-
   const [formState, setFormState] = useState({});
-  const [formStateCat, setFormStateCat] = useState({});
-  const [foreignPHolder, setforeignPHolder] = useState('');
+  const [infoModal, setInfoModal] = useState(false);
+  const [imagesPreview, setImagesPreview] = useState([])
+
+  const resetFormstate = () => {
+    setFormState({ title: '', description: '', images: [] });
+    setImagesPreview([])
+  }
+
+  const loadDataGen = async(id) => {
+    const response = await fetchDataN('type', id) 
+    setFormState({
+      _id: id,
+      title: response.data.data.title, 
+      description: response.data.data.description,
+      images: response.data.data.images,
+    });
+
+    response.data.data.images.map((image) => (
+      setImagesPreview(oldArray => [...oldArray, image.url])
+    ))
+  }
+
+  const loadModalCreate = () => {
+    resetFormstate()
+    setOpenModal(true)
+  }
+
+  const loadDataById = async (id) => {
+    resetFormstate()
+    loadDataGen(id)
+    setEditModal(true)
+  }
+
+  const loadDataByIdInfo = async (id) => {
+    resetFormstate()
+    loadDataGen(id)
+    setInfoModal(true)
+  }
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    console.log(formState)
+    const response = await createFunc('type', formState);
+    const newType = {
+      _id: response.data.data._id,
+      title: formState.title,
+      description: formState.description,
+      createdAt: new Date().toLocaleString(),
+      updatedAt: new Date().toLocaleString(),
+      newData: true
+    };
+
+    addToTable(setApiData, newType)
+    fetchData('type', setTypeOps);
+    setOpenModal(false);
+  };
+
+  const handleUpdate = async () => {
+    const response = await updateFunc('type', formState._id, formState)
+    const newType = {
+        _id: response.data.data._id,
+        title: formState.title,
+        description: formState.description,
+        createdAt: new Date().toLocaleString(),
+        updatedAt: new Date().toLocaleString(),
+        newData: true,
+      };
+      addAndRemoveToTable(setApiData, newType)
+      setEditModal(false);
+  };
+
+  const handleDelete = (id) => {
+    deleteFunc('type', id, setApiData)
+    fetchData('type', setTypeOps);
+  };
 
   const modalData = {
     title: 'Clothing Type',
@@ -49,7 +145,82 @@ const Category = () => {
         onChange: (e) => setFormState({ ...formState, description: e.target.value }),
         required: true,
       },
+      {
+        label: 'Images',
+        type: 'file',
+        name: 'images',
+        id: 'custom_file',
+        onChange: (e) => onChange(e),
+        required: false,
+      },
     ]
+  };
+
+  // For Clothing Category
+  
+  const [apiDataCat, setApiDataCat] = useState([]);
+  const [typeOps, setTypeOps] = useState([]);
+  const [flattenData, setFlattenData] = useState([]);
+  const [openModalCat, setOpenModalCat] = useState(false);
+  const [editModalCat, setEditModalCat] = useState(false);
+  const [formStateCat, setFormStateCat] = useState({});
+  const [foreignPHolder, setforeignPHolder] = useState('');
+
+  const loadModalCreateCat = () => {
+    setFormStateCat({title: '', description: '', clothing_type: ''})
+    setOpenModalCat(true)
+  }
+
+  const loadDataByIdCat = async (id) => {
+    setFormState({_id: '', title: '', description: '', clothing_type: ''})
+    setforeignPHolder('')
+    const response = await fetchDataN('category', id) 
+    setFormStateCat({
+      _id: id,
+      title: response.data.data.title, 
+      description: response.data.data.description,
+      clothing_type: response.data.data.clothing_type[0]._id
+    });
+    setforeignPHolder(response.data.data.clothing_type[0].title)
+    setEditModalCat(true)
+  }
+
+  const handleSubmitCat = async (event) => {
+    event.preventDefault();
+    console.log(formStateCat)
+    const response = await createFunc('category', formStateCat);
+
+    const newCat = {
+      _id: response.data.data._id,
+      title: formStateCat.title,
+      description: formStateCat.description,
+      clothing_type: foreignPHolder,
+      newData: true
+    };
+
+    addToTable(setApiDataCat, newCat)
+    setFormStateCat({title: '', description: '', category: ''});
+    setOpenModalCat(false);
+  };
+
+  const handleUpdateCat = async () => {
+    const response = await updateFunc('category', formStateCat._id, formStateCat)
+    const newCat = {
+        _id: response.data.data._id,
+        title: formStateCat.title,
+        description: formStateCat.description,
+        clothing_type: foreignPHolder,
+        newData: true,
+      };
+      addAndRemoveToTable(setApiDataCat, newCat)
+      setFormStateCat({_id: '',title: '', description: '', clothing_type: ''})
+      setEditModalCat(false);
+      setforeignPHolder('')
+      fetchData('type', setTypeOps);
+  };
+
+  const handleDeleteCat = (id) => {
+    deleteFunc('category', id, setApiDataCat)
   };
 
   const modalDataCat = {
@@ -122,118 +293,6 @@ const Category = () => {
     }
   }, [apiDataCat]);
 
-  const loadModalCreate = () => {
-    setFormState({title: '', description: '',})
-    setOpenModal(true)
-  }
-
-  const loadDataById = async (id) => {
-    setFormState({_id: '', title: '', description: ''})
-
-    const response = await fetchDataN('type', id) 
-    setFormState({
-      _id: id,
-      title: response.data.data.title, 
-      description: response.data.data.description});
-    setEditModal(true)
-  }
-
-  const loadDataByIdCat = async (id) => {
-    setFormState({_id: '', title: '', description: '', clothing_type: ''})
-    setforeignPHolder('')
-    const response = await fetchDataN('category', id) 
-    setFormStateCat({
-      _id: id,
-      title: response.data.data.title, 
-      description: response.data.data.description,
-      clothing_type: response.data.data.clothing_type[0]._id
-    });
-    setforeignPHolder(response.data.data.clothing_type[0].title)
-    setEditModalCat(true)
-  }
-
-  const handleUpdate = async () => {
-    const response = await updateFunc('type', formState._id, formState)
-    console.log(formState)
-    const newType = {
-        _id: response.data.data._id,
-        title: formState.title,
-        description: formState.description,
-        newData: true,
-      };
-
-      addAndRemoveToTable(setApiData, newType)
-      setFormState({_id: '',title: '', description: '',})
-      setEditModal(false);
-  };
-
-  const handleUpdateCat = async () => {
-    // console.log('pholder', foreignPHolder)
-    const response = await updateFunc('category', formStateCat._id, formStateCat)
-    const newCat = {
-        _id: response.data.data._id,
-        title: formStateCat.title,
-        description: formStateCat.description,
-        clothing_type: foreignPHolder,
-        newData: true,
-      };
-      addAndRemoveToTable(setApiDataCat, newCat)
-      setFormStateCat({_id: '',title: '', description: '', clothing_type: ''})
-      setEditModalCat(false);
-      setforeignPHolder('')
-      fetchData('type', setTypeOps);
-  };
-
-  const loadModalCreateCat = () => {
-    setFormStateCat({title: '', description: '', clothing_type: ''})
-    setOpenModalCat(true)
-  }
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    console.log(formState)
-    const response = await createFunc('type', formState);
-
-    const newType = {
-      _id: response.data.data._id,
-      title: formState.title,
-      description: formState.description,
-      newData: true
-    };
-
-    addToTable(setApiData, newType)
-    setFormState({title: '', description: ''}); 
-    fetchData('type', setTypeOps);
-    setOpenModal(false);
-  };
-
-  const handleSubmitCat = async (event) => {
-    event.preventDefault();
-    console.log(formStateCat)
-    const response = await createFunc('category', formStateCat);
-
-    const newCat = {
-      _id: response.data.data._id,
-      title: formStateCat.title,
-      description: formStateCat.description,
-      clothing_type: foreignPHolder,
-      newData: true
-    };
-
-    addToTable(setApiDataCat, newCat)
-    setFormStateCat({title: '', description: '', category: ''});
-    setOpenModalCat(false);
-  };
-  
-  const handleDelete = (id) => {
-    deleteFunc('type', id, setApiData)
-    fetchData('type', setTypeOps);
-  };
-  
-  const handleDeleteCat = (id) => {
-    deleteFunc('category', id, setApiDataCat)
-  };
-
   return (
     <div className="main-container__admin double-holder">
       <div className="container sub-container__double-lg">
@@ -264,6 +323,12 @@ const Category = () => {
                   >
                     <DeleteIcon sx={{ width: 15, height: 15 }}/>
                   </Fab>
+                  &nbsp;
+                  <Fab onClick={() => loadDataByIdInfo(rowData._id)}
+                    color="info" aria-label="info" size="small" sx={{ zIndex: 0, width: 32, height: 10 }}
+                  >
+                    <IoMdEye sx={{ width: 15, height: 15 }} />
+                  </Fab>
                 </>
               )}
             />
@@ -282,7 +347,7 @@ const Category = () => {
               classNames="modal"
               unmountOnExit
           >
-              <CreateModal setOpenModal={setOpenModal} modalData={modalData} handleSubmit={handleSubmit} />
+              <CreateModal setOpenModal={setOpenModal} modalData={modalData} handleSubmit={handleSubmit} imagesPreview={imagesPreview} setImagesPreview={setImagesPreview} />
           </CSSTransition>
 
           <CSSTransition
@@ -291,7 +356,16 @@ const Category = () => {
               classNames="modal"
               unmountOnExit
           >
-              <EditModal setOpenModal={setEditModal} modalData={modalData} handleUpdate={handleUpdate} formState={formState} />
+              <EditModal setOpenModal={setEditModal} modalData={modalData} handleUpdate={handleUpdate} formState={formState} imagesPreview={imagesPreview} setImagesPreview={setImagesPreview} />
+          </CSSTransition>
+
+          <CSSTransition
+            in={infoModal}
+            timeout={300}
+            classNames="modal"
+            unmountOnExit
+          >
+            <InfoModal setOpenModal={setInfoModal} modalData={modalData} formState={formState} />
           </CSSTransition>
         </div>
       </div>
