@@ -19,10 +19,6 @@ const Welcome = () => {
         </div>
       </div>
     </section>
-
-
-
-
       <section className='carousel-shop'>
         <div className="content-container">
           <div className="shop-container">

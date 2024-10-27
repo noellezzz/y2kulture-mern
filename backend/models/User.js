@@ -19,7 +19,73 @@ const UserSchema = mongoose.Schema({
         type:String,
         required: true,
         default: 'active'
-    }
+    },
+    first_name: {
+        type: String,
+        required: false,
+        default: ''
+    },
+    last_name: {
+        type: String,
+        required: false,
+        default: ''
+    },
+    address: [
+        {
+            street_address: {
+                type: String,
+                required: false,
+                default: ''
+            },
+            city: {
+                type: String,
+                required: false,
+                default: ''
+            },
+            state: {
+                type: String,
+                required: false,
+                default: ''
+            },
+            country: {
+                type: String,
+                required: false,
+                default: ''
+            },
+            zip_code: {
+                type: String,
+                required: false,
+                default: ''
+            },
+        },
+    ],
+    birthday: {
+        type: String,
+        required: false,
+        default: ''
+    },
+    gender : {
+        type: String,
+        required: false,
+        default: ''
+    },
+    contact_number: {
+        type: String,
+        required: false,
+        default: ''
+    },
+    avatar: [
+        {
+            public_id: {
+                type: String,
+                required:true
+            },
+            url: {
+                type:String,
+                required: true
+            }
+        }
+    ] 
     }, {
         timestamps: true,
 });

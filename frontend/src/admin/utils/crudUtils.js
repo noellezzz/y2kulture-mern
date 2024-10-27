@@ -26,7 +26,6 @@ export const createFunc = async (object, formState) => {
         console.log(`${object} created successfully.`, response);
         toast.success(response.data.message, { position: "top-right" })
         return response
-  
       } catch (error) {
         console.log(`Error creating ${object}:`, error);
       }

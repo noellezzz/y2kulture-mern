@@ -10,6 +10,7 @@ import NoteAltIcon from '@mui/icons-material/NoteAlt';
 import DescriptionIcon from '@mui/icons-material/Description';
 import LoyaltyIcon from '@mui/icons-material/Loyalty';
 import CheckroomIcon from '@mui/icons-material/Checkroom'; 
+import { IoPersonSharp } from "react-icons/io5";
 import CategoryIcon from '@mui/icons-material/Category';
 import LayersIcon from '@mui/icons-material/Layers';
 import { AppProvider } from '@toolpad/core/AppProvider';
@@ -34,11 +35,16 @@ const NAVIGATION = [
     icon: <ShoppingCartIcon />,
   },
   {
+    segment: 'admin/users',
+    title: 'Users',
+    icon: <IoPersonSharp />,
+  },
+  {
     kind: 'divider',
   },
   {
     kind: 'header',
-    title: 'Analytics',
+    title: 'Management',
   },
   {
     segment: 'admin/crud',
@@ -61,11 +67,6 @@ const NAVIGATION = [
         icon: <LoyaltyIcon />,
       },
     ],
-  },
-  {
-    segment: 'integrations',
-    title: 'Integrations',
-    icon: <LayersIcon />,
   },
 ];
 
@@ -90,7 +91,7 @@ const demoTheme = createTheme({
       main: '#4caf50',
     },
     background: {
-      default: '#fbfbfb',
+      default: '#f0f0f0',
       paper: '#ffffff',
     },
   },

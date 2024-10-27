@@ -6,13 +6,18 @@ import { FaSearch, FaShoppingBag , FaUser  } from "react-icons/fa";
 import LoginModal from './LoginModal'
 import { CSSTransition } from 'react-transition-group';
 import axios from 'axios'
+import UserForm from './UserForm'
 
 const Header = () => {
   const [formActive, setFormActive] = useState('login')
   const [modalOpen, setModalOpen] = useState(false)
+  const [modalOpenUser, setModalOpenUser] = useState(false)
   axios.defaults.withCredentials = true;
   const [userLoggedIn, setUserLoggedIn] = useState(false)
   const [userEmail, setUserEmail] = useState('')
+  const [basicInfo, setBasicInfo] = useState({id: '', email: ''})
+  const [userId, setUserId] = useState('')
+  
   useEffect(() => {
       checkLogin()
       console.log(userLoggedIn)
@@ -21,7 +26,6 @@ const Header = () => {
   const checkLogin = async(request, response) => {
     try {
       const response = await axios.get('http://localhost:8000/auth')
-      console.log(response.data)
       setUserLoggedIn(true)
       setUserEmail(response.data.user.email)
     } catch {
@@ -85,10 +89,20 @@ const Header = () => {
                   classNames="modal"
                   unmountOnExit
                 >
-                  <LoginModal setModalOpen={setModalOpen} formActive={formActive} setFormActive={setFormActive}/>
+                  <LoginModal setBasicInfo={setBasicInfo} setModalOpen={setModalOpen} formActive={formActive} setFormActive={setFormActive} setUserModal={setModalOpenUser} />
+                </CSSTransition>
+
+                <CSSTransition
+                  in={modalOpenUser}
+                  timeout={300}
+                  classNames="modal"
+                  unmountOnExit
+                >
+                  <UserForm modalOpen={modalOpenUser} basicInfo={basicInfo} setModalOpen={setModalOpenUser}/>
                 </CSSTransition>
               </>
             )}
+            
           </div>
         </div>
       </nav>
