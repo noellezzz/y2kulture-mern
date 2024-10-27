@@ -96,7 +96,7 @@ const Product = () => {
     const response = await createFunc('product', formState);
     const newProduct = {
       _id: response.data.data._id,
-      title: formState.description,
+      title: formState.title,
       description: formState.description,
       category: foreignHolder,
       createdAt: new Date().toLocaleString(),
@@ -211,32 +211,32 @@ const Product = () => {
             scrollHeight="290px"
             style={{ zIndex: 1 }}
           >
-            <Column style={{ zIndex: 2 }} field="id" header="ID" />
-            <Column style={{ zIndex: 2 }} field="title" header="Title" />
-            <Column style={{ zIndex: 2 }} field="description" header="Description" />
-            <Column style={{ zIndex: 2 }} field="categoryTitle" header="Category" />
-            <Column style={{ zIndex: 2 }} field="createdAt" header="Created At" />
-            <Column style={{ zIndex: 2 }} field="updatedAt" header="Updated At" />
+            <Column style={{ zIndex: 2, verticalAlign: "top", verticalAlign: "top" }} field="id" header="ID" />
+            <Column style={{ zIndex: 2, verticalAlign: "top", verticalAlign: "top" }} field="title" header="Title" />
+            <Column style={{ zIndex: 2, minWidth: '200px', verticalAlign: "top", verticalAlign: "top" }} field="description" header="Description" />
+            <Column style={{ zIndex: 2, verticalAlign: "top", verticalAlign: "top" }} field="categoryTitle" header="Category" />
+            <Column style={{ zIndex: 2, verticalAlign: "top", verticalAlign: "top" }} field="createdAt" header="Created At" />
+            <Column style={{ zIndex: 2, verticalAlign: "top", verticalAlign: "top" }} field="updatedAt" header="Updated At" />
             <Column
-              style={{ zIndex: 2 }}
+              style={{ zIndex: 2, verticalAlign: "top" }}
               field="controls"
               header="Controls"
               body={(rowData) => (
                 <div className='gap-10'>
                   <Fab onClick={() => loadDataByIdEdit(rowData.id)}
-                    color="primary" aria-label="edit" size="small" sx={{ zIndex: 0, width: 32, height: 10 }}
+                    color="primary" aria-label="edit" size="small" sx={{ zIndex: 0, width: 32, height: 10,  marginBottom:1 }}
                   >
                     <EditIcon sx={{ width: 15, height: 15 }} />
                   </Fab>
                   &nbsp;
                   <Fab onClick={() => handleDelete(rowData.id)}
-                    color="secondary" aria-label="delete" size="small" sx={{ zIndex: 0, width: 32, height: 10 }}
+                    color="secondary" aria-label="delete" size="small" sx={{ zIndex: 0, width: 32, height: 10,  marginBottom:1 }}
                   >
                     <DeleteIcon sx={{ width: 15, height: 15 }} />
                   </Fab>
                   &nbsp;
                   <Fab onClick={() => loadDataByIdInfo(rowData.id)}
-                    color="info" aria-label="info" size="small" sx={{ zIndex: 0, width: 32, height: 10 }}
+                    color="info" aria-label="info" size="small" sx={{ zIndex: 0, width: 32, height: 10, marginBottom:1 }}
                   >
                     <IoMdEye sx={{ width: 15, height: 15 }} />
                   </Fab>

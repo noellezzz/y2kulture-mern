@@ -1,6 +1,6 @@
 .login-modal__container {
-    height: 680px;
-    width: 540px;
+    height: 580px;
+    width: 500px;
     border-radius: 20px;
     animation: dropLogin 0.8s forwards; 
     background-color: white;
@@ -81,10 +81,20 @@
     box-sizing: border-box;
 }
 
+.mt-20 {
+    margin-top: 50px;
+}
+
 .between-utils {
     display: flex;
     justify-content: space-between;
     /* border:1px solid red; */
+    font-size: 13px;
+    margin:30px 0 0 0;
+}
+
+.between-utils a {
+    font-size: 13px;
 }
 
 .remember-me__checkbox {
@@ -98,6 +108,7 @@
 .alt-login {
     display: flex;
     justify-content: space-between;
+    gap:10px;
 }
 
 .prime-button {
@@ -219,12 +230,12 @@ width: 100%;
 }
 
 .register-active .login-form {
-    transform: translateX(-458px);
+    transform: translateX(-420px);
     transition: transform .5s;
 }
 
 .register-active .register-form {
-    transform: translateX(-458px);
+    transform: translateX(-420px);
     transition: transform .5s;
 }
 
@@ -236,4 +247,95 @@ width: 100%;
 .login-active .register-form {
     transform: translateX(0px);
     transition: transform .5s;
+}
+
+.user-form__container {
+    height: 690px !important;
+    width: 830px;
+    border-radius: 20px;
+    animation: dropLogin 0.8s forwards; 
+    background-color: white;
+    padding:20px 40px;
+    overflow: hidden;
+    z-index: 10;
+    box-shadow: 0px 0px 10px 3px rgba(0,0,0,0.12);
+}
+
+.user-form__container input, .user-form__container label {
+    font-size: var(--small-font);
+}
+
+.user-form__container .backdrop {
+    top:0;
+    left:0;
+    position: absolute;
+    width: 100%;
+    height: 100px;
+    background-color: var(--pale-primary-color);
+    z-index: 1;
+}
+
+.user-form__container .user-avatar {
+    /* border: 10px solid white; */
+    height: 125px;
+    width: 125px;
+    margin:0;
+    border-radius: 20px;
+    
+}
+
+
+.form-row-new {
+    margin-top: 10px;
+    display: flex;
+    align-items: baseline;
+    gap:20px;
+}
+
+.user-avatar img{
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+    overflow: hidden;   
+    border-radius: 20px;
+}
+
+.user-form__container .form-container {
+    /* border:1px solid rgb(200, 200, 200); */
+    border-radius: 20px;
+    height: 100px;
+    width: 100px;
+    padding:10px;
+    margin-top: 0px;
+    width: 100%;
+    height: fit-content;
+    padding:20px;
+}
+
+.user-form__container .form-control {
+    margin:20px 0px;
+    display: flex;
+    justify-content: end;
+    gap:10px;
+}
+
+.form-container .form-row {
+    display: flex;
+    flex-direction: row;
+    gap:10px;
+    margin: 10px 0px 10px 0;
+}
+
+.form-container .form-divider {
+    font-weight: 800;
+    border-bottom:1px solid gray;
+    width: 100%;
+    margin: 0px 0px;
+    padding: 10px 0px;
+    text-transform: uppercase;
+    font-size: var(--small-font);
+}
+
+.mb-20 {
+    margin-bottom: 20px;
 }

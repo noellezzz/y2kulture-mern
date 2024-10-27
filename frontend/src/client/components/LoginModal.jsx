@@ -6,10 +6,16 @@ import { BiLogoGmail } from "react-icons/bi";
 import mainLogo from '../../assets/main-logo.png'
 import { createFunc } from '../../admin/utils/crudUtils'
 import axios from 'axios'
+import TextField from '@mui/material/TextField';
 
-const LoginModal = ({ setModalOpen, formActive, setFormActive  }) => {
+const LoginModal = ({ setModalOpen, formActive, setFormActive, setUserModal, setBasicInfo  }) => {
   const [loggedIn, setLoggedIn] = useState(false)
   const [formState, setFormState] = useState({email:'', password:''})
+
+  const resetForm = () => {
+    setFormState({email:'', password:''})
+  }
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormState((prevState) => ({
@@ -17,25 +23,25 @@ const LoginModal = ({ setModalOpen, formActive, setFormActive  }) => {
       [name]: value,
     }
     ));
-  console.log(formState)
   };
 
   const loginAttempt = async(request, response) => {
     try {
       const data = await axios.post("http://localhost:8000/auth", formState)
-      console.log(data)
       setLoggedIn(true)
-      window.location.reload()
     } catch (e) {
       console.log("Error logging in.", e)
       setLoggedIn(false)
     }
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
-    createFunc('user', formState)
+    const response = await createFunc('user', formState)
+    setBasicInfo({id: response.data.data._id, email: response.data.data.email})
     loginAttempt()
+    setModalOpen(false)
+    setUserModal(true)
   }
 
   const handleLogin = (e) => {
@@ -53,14 +59,20 @@ const LoginModal = ({ setModalOpen, formActive, setFormActive  }) => {
           <div className="form-selection">
             <button
                 className={`styled-button ${formActive === 'login' ? 'active' : ''}`}
-                onClick={() => setFormActive('login')}
+                onClick={() => {
+                  setFormActive('login')
+                  resetForm()
+                }}
               >
                 Sign In
             </button>
 
             <button
                 className={`styled-button ${formActive === 'register' ? 'active' : ''}`}
-                onClick={() => setFormActive('register')}
+                onClick={() => {
+                  setFormActive('register')
+                  resetForm()
+                }}
               >
                 Sign Up
             </button>
@@ -68,25 +80,44 @@ const LoginModal = ({ setModalOpen, formActive, setFormActive  }) => {
           <div className={`form-panel ${formActive === 'login' ? 'login-active' : 'register-active'}`}>
             <form onSubmit={handleLogin} className="login-form">
               <div className="input-group">
-                <label htmlFor="email">Email Address</label> 
-                <input 
+                {/* <label htmlFor="email">Email Address</label>  */}
+                <TextField 
+                  label="Email" 
+                  variant="standard"
                   name="email" 
-                  id="email" 
-                  type="text" 
-                  placeholder='Enter your Email Address'
+                  // id="email" 
+                  type="email" 
                   value={formState.email}
                   onChange={handleChange}
+                  sx={{
+                    "& .MuiInputLabel-root.Mui-focused": {
+                      color: "var(--primary-color)" 
+                    },
+                    "& .MuiInput-underline:after": {
+                      borderBottomColor: "var(--primary-color)" 
+                    }
+                }}
                 />
               </div>
               <div className="input-group">
-                <label htmlFor="Password">Password</label> 
-                <input 
+                {/* <label htmlFor="Password">Password</label>  */}
+                <TextField 
+                  label="Password" 
+                  variant="standard"
                   name="password" 
-                  id="password" 
+                  // id="password" 
                   type="password" 
                   placeholder='Enter your Password'
                   value={formState.password}
                   onChange={handleChange}
+                  sx={{
+                    "& .MuiInputLabel-root.Mui-focused": {
+                      color: "var(--primary-color)" 
+                    },
+                    "& .MuiInput-underline:after": {
+                      borderBottomColor: "var(--primary-color)" 
+                    }
+                }}
                 />
               </div>
               <div className="between-utils">
@@ -104,28 +135,48 @@ const LoginModal = ({ setModalOpen, formActive, setFormActive  }) => {
             </form>
             <form onSubmit={handleSubmit} className="register-form">
               <div className="input-group">
-                <label htmlFor="email">Email Address</label> 
-                <input 
+                {/* <label htmlFor="email">Email Address</label>  */}
+                <TextField 
+                  label="Email" 
+                  variant="standard"
                   name="email" 
-                  id="email" 
-                  type="text" 
+                  // id="email" 
+                  type="email" 
                   placeholder='Enter your Email Address'
                   value={formState.email}
                   onChange={handleChange}
+                  sx={{
+                    "& .MuiInputLabel-root.Mui-focused": {
+                      color: "var(--primary-color)" 
+                    },
+                    "& .MuiInput-underline:after": {
+                      borderBottomColor: "var(--primary-color)" 
+                    }
+                }}
                 />
               </div>
               <div className="input-group">
-                <label htmlFor="Password">Password</label> 
-                <input 
+                {/* <label htmlFor="Password">Password</label>  */}
+                <TextField 
+                  label="Password" 
+                  variant="standard"
                   name="password" 
-                  id="password" 
+                  // id="password" 
                   type="password" 
                   placeholder='Enter your Password'
                   value={formState.password}
                   onChange={handleChange}
+                  sx={{
+                      "& .MuiInputLabel-root.Mui-focused": {
+                        color: "var(--primary-color)" 
+                      },
+                      "& .MuiInput-underline:after": {
+                        borderBottomColor: "var(--primary-color)" 
+                      }
+                  }}
                 />
               </div>
-              <button type="submit" className='full-width prime-button'>
+              <button type="submit" className='mt-20 full-width prime-button'>
                 Sign Up
               </button>
             </form>

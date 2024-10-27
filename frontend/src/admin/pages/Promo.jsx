@@ -96,7 +96,7 @@ const Promo = () => {
     const response = await createFunc('promo', formState);
     const newPromo = {
       _id: response.data.data._id,
-      title: formState.description,
+      title: formState.title,
       description: formState.description,
       promo_for: foreignHolder,
       createdAt: new Date().toLocaleString(),
@@ -212,34 +212,35 @@ const Promo = () => {
             value={flattenData} 
             tableStyle={{ minWidth: '50rem' }}
             scrollable 
-            scrollHeight="320px" 
+            scrollHeight="290px" 
             style={{ zIndex: 1 }} 
           >
-            <Column field="id" header="ID" />
-            <Column field="title" header="Title" />
-            <Column field="description" header="Description" />
-            <Column field="promo_for" header="Promo For" />
-            <Column field="createdAt" header="Created At" />
-            <Column field="updatedAt" header="Updated At" />
+            <Column style={{ verticalAlign: "top" }} field="id" header="ID" />
+            <Column style={{ verticalAlign: "top" }} field="title" header="Title" />
+            <Column style={{ verticalAlign: "top" }} field="description" header="Description" />
+            <Column style={{ verticalAlign: "top" }} field="promo_for" header="Promo For" />
+            <Column style={{ verticalAlign: "top" }} field="createdAt" header="Created At" />
+            <Column style={{ verticalAlign: "top" }} field="updatedAt" header="Updated At" />
             <Column 
+            style={{ verticalAlign: "top" }}
               field="controls" 
               header="Controls" 
               body={(rowData) => (
                 <>
                   <Fab onClick={() => loadDataById(rowData.id)} 
-                    color="primary" aria-label="edit" size="small" sx={{ width: 32, height: 10 }}
+                    color="primary" aria-label="edit" size="small" sx={{ zIndex: 0, width: 32, height: 10, marginBottom:1 }}
                   >
                     <EditIcon sx={{ width: 15, height: 15 }}/>
                   </Fab>
                   &nbsp;
                   <Fab onClick={() => handleDelete(rowData.id)} 
-                    color="secondary" aria-label="edit" size="small" sx={{ width: 32, height: 10 }}
+                    color="secondary" aria-label="edit" size="small" sx={{ zIndex: 0, width: 32, height: 10, marginBottom:1 }}
                   >
                     <DeleteIcon sx={{ width: 15, height: 15 }}/>
                   </Fab>
                   &nbsp;
                   <Fab onClick={() => loadDataByIdInfo(rowData.id)}
-                    color="info" aria-label="info" size="small" sx={{ zIndex: 0, width: 32, height: 10 }}
+                    color="info" aria-label="info" size="small" sx={{ zIndex: 0, width: 32, height: 10, marginBottom:1 }}
                   >
                     <IoMdEye sx={{ width: 15, height: 15 }} />
                   </Fab>

@@ -12,26 +12,22 @@
 
 .sub-container__single-lg {
     /* border: 1px solid red; */
-    border-radius: 20px;
+    border-radius: 10px;
     height: 50vh;
     width: 100%;
     background-color: white;
-    box-shadow: 2px 2px 0px 5px rgba(0,0,0,0.75);
-    -webkit-box-shadow: 2px 2px 0px 5px rgba(0,0,0,0.75);
-    -moz-box-shadow: 2px 2px 0px 5px rgba(0,0,0,0.75);
+    box-shadow: 0px 0px 10px 3px rgba(0,0,0,0.12);
 
     overflow: hidden;
 }
 
 .sub-container__double-lg {
     /* border: 1px solid red; */
-    border-radius: 20px;
+    border-radius: 10px;
     height: 50vh;
     width: 100%;
     background-color: white;
-    box-shadow: 2px 2px 0px 5px rgba(0,0,0,0.75);
-    -webkit-box-shadow: 2px 2px 0px 5px rgba(0,0,0,0.75);
-    -moz-box-shadow: 2px 2px 0px 5px rgba(0,0,0,0.75);
+    box-shadow: 0px 0px 10px 3px rgba(0,0,0,0.12);
 
     overflow: hidden;
 }
@@ -70,7 +66,20 @@
     z-index:5000;
 }
 
+.p-datatable-description {
+    max-width: 150px !important;         /* Adjust maximum width as needed */
+    width: 150px !important;             /* Fixed width */
+    overflow: hidden !important;         /* Hide overflow */
+    display: -webkit-box !important;     /* Use flexible box layout */
+    -webkit-box-orient: vertical !important; /* Set box orientation to vertical */
+    -webkit-line-clamp: 4 !important;    /* Limit to 3 lines */
+    text-overflow: ellipsis !important;  /* Show ellipsis for overflow text */
+    white-space: normal !important;      /* Allow wrapping */
+}
+
+
 .p-datatable-table td,th {
+    max-height: 50px;
     max-width: 50px;
     white-space: normal;  
     word-wrap: break-word; 

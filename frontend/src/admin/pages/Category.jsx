@@ -344,31 +344,31 @@ const Category = () => {
             scrollHeight="290px" 
             style={{ zIndex: 1 }} 
           >
-            <Column style={{zIndex: 2}} field="_id" header="ID" />
-            <Column style={{zIndex: 2}} field="title" header="Title" />
-            <Column style={{zIndex: 2}} field="description" header="Description" />
+            <Column style={{zIndex: 2, verticalAlign: "top"}} field="_id" header="ID" />
+            <Column style={{zIndex: 2, verticalAlign: "top"}} field="title" header="Title" />
+            <Column style={{zIndex: 2, minWidth: '100px', verticalAlign: "top"}} field="description" header="Description" />
             <Column 
-              style={{zIndex: 2}}
+              style={{zIndex: 2, verticalAlign: "top"}}
               field="controls" 
               header="Controls" 
               body={(rowData) => (
                 <>
                   <Fab onClick={() => loadDataById(rowData._id)} 
-                    color="primary" aria-label="edit" size="small" sx={{ zIndex: 0, width: 32, height: 10 }}
+                    color="primary" aria-label="edit" size="small" sx={{ zIndex: 0, width: 32, height: 10, marginBottom:1 }}
                   >
-                    <EditIcon sx={{ width: 15, height: 15 }}/>
+                    <EditIcon sx={{ width: 12, height: 12 }}/>
                   </Fab>
                   &nbsp;
                   <Fab onClick={() => handleDelete(rowData._id)} 
-                    color="secondary" aria-label="edit" size="small" sx={{ zIndex: 0, width: 32, height: 10 }}
+                    color="secondary" aria-label="edit" size="small" sx={{ zIndex: 0, width: 32, height: 10,  marginBottom:1 }}
                   >
-                    <DeleteIcon sx={{ width: 15, height: 15 }}/>
+                    <DeleteIcon sx={{ width: 12, height: 12 }}/>
                   </Fab>
                   &nbsp;
                   <Fab onClick={() => loadDataByIdInfo(rowData._id)}
-                    color="info" aria-label="info" size="small" sx={{ zIndex: 0, width: 32, height: 10 }}
+                    color="info" aria-label="info" size="small" sx={{ zIndex: 0, width: 32, height: 10,  marginBottom:1 }}
                   >
-                    <IoMdEye sx={{ width: 15, height: 15 }} />
+                    <IoMdEye sx={{ width: 12, height: 12 }} />
                   </Fab>
                 </>
               )}
@@ -418,12 +418,12 @@ const Category = () => {
             scrollHeight="290px" 
             style={{ zIndex: 1 }} 
         >
-            <Column style={{zIndex: 2}} field="id" header="ID" />
-            <Column style={{zIndex: 2, minWidth:80}} field="title" header="Title" />
-            <Column style={{zIndex: 2}} field="description" header="Description" />
-            <Column style={{zIndex: 2}} field="clothingType" header="Type" />
+            <Column style={{zIndex: 2, verticalAlign: "top"}} field="id" header="ID" />
+            <Column style={{zIndex: 2, minWidth:80, verticalAlign: "top"}} field="title" header="Title" />
+            <Column style={{zIndex: 2, minWidth: '100px', textOverflow: 'ellipsis', verticalAlign: "top"}} field="description" header="Description" />
+            <Column style={{zIndex: 2, verticalAlign: "top"}} field="clothingType" header="Type" />
             <Column 
-              style={{zIndex: 2}}
+              style={{zIndex: 2, minWidth: '70px', verticalAlign: "top"}}
               field="controls" 
               header="Controls" 
               body={(rowData) => (
@@ -433,7 +433,7 @@ const Category = () => {
                     color="primary" 
                     aria-label="edit" 
                     size="small" 
-                    sx={{ zIndex: 0, width: 32, height: 10 }}  
+                    sx={{ zIndex: 0, width: 32, height: 10, marginBottom:1 }}  
                   >
                     <EditIcon sx={{ width: 15, height: 15 }}/>
                   </Fab>
@@ -443,13 +443,13 @@ const Category = () => {
                     color="secondary" 
                     aria-label="delete" 
                     size="small" 
-                    sx={{ zIndex: 0, width: 32, height: 10 }}  
+                    sx={{ zIndex: 0, width: 32, height: 10,  marginBottom:1 }}  
                   >
                     <DeleteIcon sx={{ width: 15, height: 15 }}/>
                   </Fab>
                   &nbsp;
                   <Fab onClick={() => loadDataByIdInfoCat(rowData.id)}
-                    color="info" aria-label="info" size="small" sx={{ zIndex: 0, width: 32, height: 10 }}
+                    color="info" aria-label="info" size="small" sx={{ zIndex: 0, width: 32, height: 10,  marginBottom:1 }}
                   >
                     <IoMdEye sx={{ width: 15, height: 15 }} />
                   </Fab>
