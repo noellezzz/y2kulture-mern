@@ -76,7 +76,7 @@ const Header = () => {
             <Link><FaShoppingBag /></Link>
   
             { userLoggedIn ? (
-              <div onClick={() => {logoutUser()}}>{userEmail}</div>
+              <div onClick={() => {logoutUser()}}>Logout</div>
             ) : (
               <>
                 <Link onClick={() => { setModalOpen(true) }}>
