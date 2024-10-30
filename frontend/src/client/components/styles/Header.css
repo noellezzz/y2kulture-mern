@@ -1,15 +1,36 @@
 .client-header {
-    position: fixed;
-    width: 100%;
 
+    width: 100%;
+    z-index: 1000;
     height: 75px;
-    top: 0;
-    left: 0;
+
     box-shadow: 0px 0px 14px 0px rgba(0,0,0,0.24);
     -webkit-box-shadow: 0px 0px 14px 0px rgba(0,0,0,0.24);
     -moz-box-shadow: 0px 0px 14px 0px rgba(0,0,0,0.24);
-    background-color: var(--tertiary-color);
+    background-color: white;
     /* border-bottom: 1px solid black; */
+}
+
+.not-scrolled {
+    position: relative;
+    top:0;
+    left:0;
+}
+
+.scrolled {
+    position: sticky;
+    top: 0;
+    left: 0;
+    animation: slowDrop .5s;
+}
+
+@keyframes slowDrop {
+    0% {
+        transform: translateY(-75px);
+    }       
+    100% {
+        transform: translateY(0px);
+    }
 }
 
 .client-navigation {

@@ -17,6 +17,23 @@ const Header = () => {
   const [userEmail, setUserEmail] = useState('')
   const [basicInfo, setBasicInfo] = useState({id: '', email: ''})
   const [userId, setUserId] = useState('')
+  const [isScrolled, setIsScrolled] = useState(false);
+
+    const handleScroll = () => {
+        if (window.scrollY >= 800) {
+            setIsScrolled(true);
+        } else {
+            setIsScrolled(false);
+        }
+    };
+
+    useEffect(() => {
+        window.addEventListener('scroll', handleScroll);
+        
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []); 
   
   useEffect(() => {
       checkLogin()
@@ -55,7 +72,7 @@ const Header = () => {
   }, [modalOpen])
 
   return (
-    <div className='client-header'>
+    <div id="navbar" className={`client-header ${isScrolled ? 'scrolled' : 'not-scrolled'}`}>
       <nav className='client-navigation'>
         <div className="title-container">
           <img src={mainLogo} alt="main-logo" />
