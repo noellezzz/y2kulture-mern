@@ -7,7 +7,10 @@ section {
 
 .hero-section {
     margin-top: 20px;
-    border-bottom: 1px solid black;
+    /* border-bottom: 1px solid black; */
+    mask-image: linear-gradient(to bottom, rgb(255, 255, 255) 80%, rgb(255, 255, 255) 100%);
+    -webkit-mask-image: linear-gradient(to bottom, rgb(255, 255, 255) 80%, rgba(255, 255, 255, 0) 100%);
+    
 }
 
 /* Content Layout */
@@ -71,46 +74,175 @@ section {
     position: absolute;
     height: 90%;
     width: 90%;
-    background-image: url('../../../assets/heroimage.png');
-    background-size: cover;      /* Ensures the image covers the entire container */
-    background-position: center; /* Centers the image within the container */
-    background-repeat: no-repeat; /* Prevents tiling of the background */
-    display: flex;               /* Ensure inner elements align properly */
-    justify-content: center;     /* Centers content horizontally */
-    align-items: flex-end;       /* Aligns content to the bottom */
+    /* background-image: url('../../../assets/heroimage.png');
+    background-size: cover;  
+    background-position: center; 
+    background-repeat: no-repeat;  */
+    display: flex;             
+    justify-content: center;   
+    align-items: flex-end;     
     gap: 15px;
     z-index: -1;
     right: 0;
 }
 
-/* Carousel Shop Styling */
-.carousel-shop {
+.hero-images img {
+    filter: drop-shadow(-3px -1px 5px #000000);
+}
+
+/* Main Shop Design */
+.light-section {
     background-color: white;
-}
-
-.shop-container {
-    height: 80%;
-    max-height: 80%;
-    width: 100%;
     display: flex;
+    flex-direction: column;
+    align-items: start;
+    justify-content: start;
+    height: 130vh;
+}
+
+.section-header {
+    margin-top: 100px;
+    display: flex;
+    /* border:1px solid red; */
+    width: 100%;
+    margin-bottom: 50px;
+}
+
+.section-texts {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
     justify-content: center;
+
+}
+
+.section-categories {
+    /* border: 1px solid red; */
+    width: 50%;
+    display: flex;
+    justify-content: end;
+    gap:10px;
+    align-items: center;
+}
+
+.section-categories .prime-button {
+    height: 50px;
+    width: 150px;
+}
+
+.section-header .section-header__title {
+    font-size: var(--large-font);
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.section-sub__header {
+    font-size: var(--semi-font);
+}
+
+
+
+.store-primary {
+    /* border:1px solid red; */
+    height: fit-content;
+    width: 100%;
+
+    display: flex;
+    gap:20px;
     flex-wrap: wrap;
-    gap: 20px;
-    overflow-y: scroll;
+    justify-content: center;
 }
 
-.shop-container .product-tile {
-    border: 1px solid black;
-    border-radius: 20px;
-    height: 270px;
-    width: 270px;
+.product-tile__primary {
+    /* border: 1px solid red; */
+    height: 280px;
+    width: 470px;
+    flex-grow: 1;
+    box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.5);
+    border-radius: 10px;
+    display: flex;
+    /* border: 2px solid var(--primary-color); */
 }
 
-/* Alternating Tile Colors */
-.product-tile:nth-child(odd) {
+.tile-img__container {
+    height: 100%;
+    width: 40%;
+    /* border:1px solid red; */
+}
+
+.tile-img__container .product-badge {
+    position:absolute;
+    margin-top: 10px;
+    margin-left: 10px;
+    border-radius: 10px;
+    z-index: 2;
     background-color: var(--primary-color);
+    padding:5px 10px;
+    font-size: 11px;
+    color:white;
+    font-weight: 800;
+    text-transform: uppercase;
 }
 
-.product-tile:nth-child(even) {
-    background-color: var(--fourth-color);
+.tile-img__container img{
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    overflow: hidden;
+}
+
+.tile-body__container {
+    height: 100%;
+    width: 60%;
+    /* border:1px solid red; */
+    padding:20px;
+}
+
+.tile-body__container {
+    display: flex;
+    flex-direction: column;
+}
+
+.product-title {
+    width: 100%;
+    height: 8%;
+    /* border:1px solid red; */
+    font-weight: 600;
+    font-size: var(--medium-font);
+}
+
+.product-category {
+    width: 100%;
+    height: 8%;
+    /* border:1px solid red; */
+    color:gray;
+    font-size: var(--small-font);
+}
+
+.product-description {
+    width: 100%;
+    height: 70%;
+    overflow: hidden;
+    /* white-space: nowrap; */
+    text-overflow: ellipsis;
+    /* border:1px solid red; */
+}
+
+.tile-controls {
+    margin-top: 10px;
+    height: 15%;
+    /* border:1px solid red; */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.tile-controls .product-price {
+    font-weight: 800;
+}
+
+.tile-controls .tile-button {
+    width: 100px;
+    height: 40px;
+    font-size: var(--small-font);
 }

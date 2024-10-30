@@ -35,6 +35,11 @@ const LoginModal = ({ setModalOpen, formActive, setFormActive, setUserModal, set
     }
   }
 
+  const login = async() => {
+    loginAttempt()
+    window.location.reload()
+  }
+
   const handleSubmit = async(e) => {
     e.preventDefault();
     const response = await createFunc('user', formState)
@@ -78,7 +83,7 @@ const LoginModal = ({ setModalOpen, formActive, setFormActive, setUserModal, set
             </button>
           </div>
           <div className={`form-panel ${formActive === 'login' ? 'login-active' : 'register-active'}`}>
-            <form onSubmit={handleLogin} className="login-form">
+            <form onSubmit={login} className="login-form">
               <div className="input-group">
                 {/* <label htmlFor="email">Email Address</label>  */}
                 <TextField 
