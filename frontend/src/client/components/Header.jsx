@@ -90,7 +90,7 @@ const Header = () => {
         <div className="side-navigation">
           <div className="navigation-line">
             <Link><FaSearch /></Link>
-            <Link><FaShoppingBag /></Link>
+            <Link to="/cart"><FaShoppingBag /></Link>
   
             { userLoggedIn ? (
               <div onClick={() => {logoutUser()}}>Logout</div>

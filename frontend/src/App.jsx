@@ -11,6 +11,7 @@ import { Toaster } from 'react-hot-toast';
 import ClientLayout from './client/components/ClientLayout'
 import Welcome from './client/pages/Welcome'
 import axios from 'axios'
+import Cart from './client/pages/Cart'
 
 function App() {
   axios.defaults.withCredentials = true;
@@ -51,6 +52,7 @@ const checkLogin = async(request, response) => {
       <Routes>
         <Route path="/" element={<ClientLayout />}>
           <Route index element={<Welcome />} />
+          <Route path="cart" element={<Cart />} />
         </Route>
 
         <Route path="/admin" element={<AdminLayout />}>
