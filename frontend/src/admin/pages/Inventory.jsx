@@ -138,7 +138,7 @@ const Inventory = () => {
                 <form onSubmit={() => {handleSubmit()}}>
                     <div className="input-group__b">
                         <label htmlFor="">Product ID</label>
-                        <input readonly value={selectedProduct.productId} type="text" />
+                        <input value={selectedProduct.productId} onChange={handleInputChange} name="productId" type="text" />
                     </div>
                     <div className="input-group__b">
                         <label htmlFor="">Stock ID</label>
@@ -150,11 +150,11 @@ const Inventory = () => {
                     </div>
                     <div className="input-group__b">
                         <label htmlFor="">Product Color</label>
-                        <input readonly value={selectedProduct.color} type="text" />
+                        <input  value={selectedProduct.color} onChange={handleInputChange} name="color" type="text" />
                     </div>
                     <div className="input-group__b">
                         <label htmlFor="">Product Size</label>
-                        <input readonly value={selectedProduct.size} type="text" />
+                        <input  value={selectedProduct.size} onChange={handleInputChange} name="size" type="text" />
                     </div>
                     <div className="input-group__b">
                         <label htmlFor="">In Stock</label>

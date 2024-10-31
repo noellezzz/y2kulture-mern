@@ -93,6 +93,7 @@ const Promo = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    console.log(foreignHolder)
     const response = await createFunc('promo', formState);
     const newPromo = {
       _id: response.data.data._id,
@@ -162,7 +163,7 @@ const Promo = () => {
             const selectedText = e.target.options[selectedIndex].text; 
         
             setFormState({ ...formState, promo_for: e.target.value, categoryTitle: e.target.title });
-            setforeignPHolder(selectedText); 
+            setForeignHolder(selectedText); 
         },
         required: true,
         options: categoryOps,

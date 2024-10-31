@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'
+import mongoose,  { Schema } from 'mongoose'
 import jwt from 'jsonwebtoken'
 
 const UserSchema = mongoose.Schema({
@@ -85,7 +85,21 @@ const UserSchema = mongoose.Schema({
                 required: true
             }
         }
-    ] 
+    ],
+    cart: [
+        {
+            productId: {
+                type: Schema.Types.ObjectId,
+                ref: 'Product',
+                required: true
+            },
+            quantity: {
+                type: Number,
+                required: true,
+                default: 1
+            }
+        }
+    ]
     }, {
         timestamps: true,
 });

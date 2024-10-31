@@ -1,6 +1,7 @@
 import User from "../models/User.js"
 import mongoose from 'mongoose'
 import cloudinary from 'cloudinary'
+import { request } from "express";
 
 export const getUser = async (request, response) => {
     try {
@@ -137,3 +138,39 @@ export const deleteUser = async (request, response) => {
         response.status(500).json({ success: false, message: "Server Error: Error in Deleting User." })
     }
 }
+
+export const addToCart = async (req, res) => {
+    const { userId } = req.params; // Changed 'id' to 'userId' for clarity
+    const { productId, quantity } = req.body;
+
+    if (!productId || !quantity) {
+        return res.status(400).json({ message: "Product ID and quantity are required." });
+    }
+
+    try {
+        // Find the user by their ID
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found." });
+        }
+
+        // Check if the product is already in the cart
+        const existingCartItem = user.cart.find(item => item.productId.toString() === productId);
+
+        if (existingCartItem) {
+            // If it exists, update the quantity
+            existingCartItem.quantity += quantity;
+        } else {
+            // If it doesn't exist, add a new item to the cart
+            user.cart.push({ productId, quantity });
+        }
+
+        // Save the updated user document
+        await user.save();
+
+        res.status(200).json({ message: "Product added to cart successfully.", cart: user.cart });
+    } catch (error) {
+        res.status(500).json({ message: "Failed to add product to cart", error });
+    }
+};

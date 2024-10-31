@@ -36,7 +36,7 @@ const Cart = () => {
             <div className="checkbox">Item</div>
             <div className="product">Product</div>
             <div className="quantity">Quantity</div>
-            <div className="price">Price</div>
+            <div className="price">Subtotal</div>
           </div>
           <div className="cart-list">
             {items.map((item, index) => (
