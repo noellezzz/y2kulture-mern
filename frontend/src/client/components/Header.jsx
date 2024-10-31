@@ -80,7 +80,7 @@ const Header = () => {
   
         <div className="main-navigation">
           <div className="navigation-line">
-            <Link>Home</Link>
+            <Link to="/">Home</Link>
             <Link>Store</Link>
             <Link>About Us</Link>
             <Link>Support</Link>

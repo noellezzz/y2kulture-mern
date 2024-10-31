@@ -16,6 +16,7 @@ import LayersIcon from '@mui/icons-material/Layers';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { MdInventory } from "react-icons/md";
 import '../styles/Shared.css'
 import mainLogo from '../../assets/main-logo.png'
 
@@ -38,6 +39,11 @@ const NAVIGATION = [
     segment: 'admin/users',
     title: 'Users',
     icon: <IoPersonSharp />,
+  },
+  {
+    segment: 'admin/inventory',
+    title: 'Inventory',
+    icon: <MdInventory />,
   },
   {
     kind: 'divider',

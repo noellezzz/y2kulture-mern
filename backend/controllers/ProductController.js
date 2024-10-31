@@ -1,6 +1,7 @@
 import Product from "../models/Product.js"
 import mongoose from 'mongoose'
 import cloudinary from 'cloudinary'
+import express from "express";
 
 export const getProduct = async (request, response) => {
     try {
@@ -66,7 +67,7 @@ export const createProduct = async (request, response) => {
 
     request.body.images = imagesLinks
 
-    if (!product.title || !product.description || !product.category) {
+    if (!product.title || !product.description || !product.category || !product.price ) {
         return response.status(400).json({ success: false, message: "Please provide all fields." });
     }
 
@@ -149,5 +150,104 @@ export const deleteProduct = async (request, response) => {
         response.status(200).json({ success: true, message: "Product Deleted." })
     } catch (error) {
         response.status(500).json({ success: false, message: "Server Error: Error in Deleting Product." })
+    }
+}
+
+// Stock Controller 
+
+export const createStock = async (req, res) => {
+    const { productId } = req.params;
+    const { color, size, quantity } = req.body;
+
+    if (!color || !size ) {
+        return res.status(400).json({ success: false, message: "Please provide all fields." });
+    }
+
+    try {
+        const existingProduct = await Product.findOne({
+            _id: productId,
+            "stock.color": color,
+            "stock.size": size,
+        });
+
+        if (existingProduct) {
+            return res.status(400).json({ message: "Stock with this color and size already exists." });
+        }
+
+        const product = await Product.findByIdAndUpdate(
+            productId,
+            {
+                $push: {
+                    stock: {
+                        color,
+                        size,
+                        quantity,
+                    }
+                }
+            },
+            { new: true }
+        );
+
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+
+        res.status(201).json(product);
+    } catch (error) {
+        res.status(500).json({ message: "Failed to create stock", error });
+    }
+};
+
+export const deductStock = async (req, res) => {
+    const { deductions } = req.body;  // Expecting [{ productId, stockId, deductQuantity }]
+
+    try {
+        // Loop through each product and its respective stock deduction
+        for (const { productId, stockId, deductQuantity } of deductions) {
+            const product = await Product.findById(productId);
+            
+            if (!product) {
+                return res.status(404).json({ message: `Product with ID ${productId} not found` });
+            }
+
+            const stock = product.stock.id(stockId);
+            
+            if (!stock) {
+                return res.status(404).json({ message: `Stock with ID ${stockId} not found for Product ID ${productId}` });
+            }
+
+            if (stock.quantity < deductQuantity) {
+                return res.status(400).json({ message: `Insufficient stock quantity for Stock ID ${stockId} in Product ID ${productId}` });
+            }
+
+            stock.quantity -= deductQuantity;  // Deduct the quantity
+            await product.save();  // Save changes for each product
+        }
+
+        res.status(200).json({ message: "All stock deductions processed successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Failed to deduct stock", error });
+    }
+};
+
+export const deleteStock = async(req, res) => {
+    const { productId, stockId } = req.body;
+
+    try {
+        const updatedProduct = await Product.findByIdAndUpdate(
+            productId,
+            {
+                $pull: { stock: { _id: stockId } }  
+            },
+            { new: true }  
+        );
+
+        if (!updatedProduct) {
+            return res.status(404).json({ message: "Product or Stock not found" });
+        }
+
+        res.status(200).json({ message: "Stock deleted successfully", product: updatedProduct });
+    } catch(error) {
+        res.status(500).json({ message: "Error in deleting stock", error })
     }
 }
