@@ -12,6 +12,7 @@ import ClientLayout from './client/components/ClientLayout'
 import Welcome from './client/pages/Welcome'
 import axios from 'axios'
 import Cart from './client/pages/Cart'
+import Inventory from './admin/pages/Inventory'
 
 function App() {
   axios.defaults.withCredentials = true;
@@ -35,6 +36,7 @@ const checkLogin = async(request, response) => {
   const adminRoutes = [
     { path: "", element: <Dashboard /> },
     { path: "orders", element: <Orders /> },
+    { path: "inventory", element: <Inventory /> },
     { path: "crud/product", element: <Product /> },
     { path: "crud/category", element: <Category /> },
     { path: "crud/promo", element: <Promo /> },

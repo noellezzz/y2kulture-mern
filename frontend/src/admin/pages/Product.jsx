@@ -18,6 +18,8 @@ import { CSSTransition } from 'react-transition-group';
 import EditModal from '../components/EditModal';
 import InfoModal from '../components/InfoModal';
 import CreateModal from '../components/CreateModal';
+import StockModal from '../components/StockModal'
+import { MdInventory } from "react-icons/md";
 
 const Product = () => {
   // Product Isolate
@@ -29,9 +31,10 @@ const Product = () => {
   const [openModal, setOpenModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
   const [infoModal, setInfoModal] = useState(false);
+  const [stockModal, setStockModal] = useState(false);
   const [imagesPreview, setImagesPreview] = useState([])
   const [foreignHolder, setForeignHolder] = useState('')
-  const [formState, setFormState] = useState({ _id: '', title: '', description: '', category: '', categoryId: '' });
+  const [formState, setFormState] = useState({ _id: '', title: '', description: '', category: '', price: '', material: '', categoryId: '' });
 
   const onChange = e => {
     const files = Array.from(e.target.files)
@@ -55,7 +58,7 @@ const Product = () => {
 
   const resetFormstate = () => {
     setForeignHolder('')
-    setFormState({ title: '', description: '', category: '', images: [] });
+    setFormState({ title: '', description: '', category: '', price: '', material: '', images: [] });
     setImagesPreview([])
   }
 
@@ -70,6 +73,8 @@ const Product = () => {
       _id: id,
       title: response.data.data.title,
       description: response.data.data.description,
+      price: response.data.data.price,
+      material: response.data.data.material,
       category: response.data.data.category[0]._id,
       images: response.data.data.images,
     });
@@ -98,6 +103,8 @@ const Product = () => {
       _id: response.data.data._id,
       title: formState.title,
       description: formState.description,
+      price: formState.price,
+      material: formState.material,
       category: foreignHolder,
       createdAt: new Date().toLocaleString(),
       updatedAt: new Date().toLocaleString(),
@@ -114,6 +121,8 @@ const Product = () => {
       _id: response.data.data._id,
       title: formState.title,
       description: formState.description,
+      price: formState.price,
+      material: formState.material,
       category: foreignHolder,
       createdAt: new Date().toLocaleString(),
       updatedAt: new Date().toLocaleString(),
@@ -132,10 +141,10 @@ const Product = () => {
     content: 'product.',
     fields: [
       {
-        label: 'Product',
+        label: 'Title',
         type: 'text',
         name: 'product',
-        placeholder: 'Enter Product',
+        placeholder: 'Enter Title',
         className: 'input-field',
         value: formState.title,
         onChange: (e) => setFormState({ ...formState, title: e.target.value }),
@@ -149,6 +158,24 @@ const Product = () => {
         placeholder: 'Enter Description',
         value: formState.description,
         onChange: (e) => setFormState({ ...formState, description: e.target.value }),
+        required: true,
+      },
+      {
+        label: 'Price',
+        type: 'number',
+        name: 'price',
+        placeholder: 'Enter Price',
+        value: formState.price,
+        onChange: (e) => setFormState({ ...formState, price: e.target.value }),
+        required: true,
+      },
+      {
+        label: 'Material',
+        type: 'text',
+        name: 'material',
+        placeholder: 'Enter Material',
+        value: formState.material,
+        onChange: (e) => setFormState({ ...formState, material: e.target.value }),
         required: true,
       },
       {
@@ -188,6 +215,8 @@ const Product = () => {
         id: product._id,
         title: product.title,
         description: product.description,
+        price: product.price,
+        material: product.material,
         categoryTitle: (typeof product.category === 'string')
           ? product.category
           : (Array.isArray(product.category) && product.category.length > 0)
@@ -214,6 +243,8 @@ const Product = () => {
             <Column style={{ zIndex: 2, verticalAlign: "top", verticalAlign: "top" }} field="id" header="ID" />
             <Column style={{ zIndex: 2, verticalAlign: "top", verticalAlign: "top" }} field="title" header="Title" />
             <Column style={{ zIndex: 2, minWidth: '200px', verticalAlign: "top", verticalAlign: "top" }} field="description" header="Description" />
+            <Column style={{ zIndex: 2, verticalAlign: "top", verticalAlign: "top" }} field="price" header="Price" />
+            <Column style={{ zIndex: 2, verticalAlign: "top", verticalAlign: "top" }} field="material" header="Material" />
             <Column style={{ zIndex: 2, verticalAlign: "top", verticalAlign: "top" }} field="categoryTitle" header="Category" />
             <Column style={{ zIndex: 2, verticalAlign: "top", verticalAlign: "top" }} field="createdAt" header="Created At" />
             <Column style={{ zIndex: 2, verticalAlign: "top", verticalAlign: "top" }} field="updatedAt" header="Updated At" />
@@ -239,6 +270,12 @@ const Product = () => {
                     color="info" aria-label="info" size="small" sx={{ zIndex: 0, width: 32, height: 10, marginBottom:1 }}
                   >
                     <IoMdEye sx={{ width: 15, height: 15 }} />
+                  </Fab>
+                  &nbsp;
+                  <Fab onClick={() => {setStockModal(true)}}
+                    color="success" aria-label="success" size="small" sx={{ color:'white', zIndex: 0, width: 32, height: 10, marginBottom:1 }}
+                  >
+                    <MdInventory sx={{ width: 15, height: 15 }} />
                   </Fab>
                 </div>
               )}
@@ -277,6 +314,15 @@ const Product = () => {
             unmountOnExit
           >
             <InfoModal setOpenModal={setInfoModal} modalData={modalData} formState={formState} />
+          </CSSTransition>
+
+          <CSSTransition
+            in={stockModal}
+            timeout={300}
+            classNames="modal"
+            unmountOnExit
+          >
+            <StockModal setOpenModal={setStockModal} modalData={modalData}/>
           </CSSTransition>
         </div>
       </div>

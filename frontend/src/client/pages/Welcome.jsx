@@ -1,9 +1,47 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import './styles/Shared.css'
-import LoginModal from '../components/LoginModal'
 import heroImage from '../../assets/heroimage.png'
+import { fetchData } from '../../admin/utils/crudUtils'
+import Cookies from 'js-cookie';
+import axios from 'axios'
 
 const Welcome = () => {
+  const [userId, setUserId] = useState('')
+  // const [cartInfo, setCartInfo] = useState({})
+  const [userLoggedIn, setUserLoggedIn] = useState(false)
+  const checkLogin = async(request, response) => {
+    try {
+      const response = await axios.get('http://localhost:8000/auth')
+      setUserLoggedIn(true)
+      setUserId(response.data.user._id)
+    } catch {
+      setUserLoggedIn(false)
+    }
+  }
+
+  const [productList, setProductList] = useState([])
+  useEffect(() => {
+    fetchData('product', setProductList)
+    checkLogin()
+  }, [])
+  useEffect(() => {
+    console.log(productList)
+  }, [productList])
+
+  const addToCart = async(productId) => {
+    console.log(userId)
+    let cartInfo = {
+      productId: productId,
+      quantity: 1,
+    };
+    try {
+      const result = await axios.post(`http://localhost:8000/api/user/addToCart/${userId}`, cartInfo)
+      console.log(result)
+    } catch(e) {
+      console.log("Error adding to cart", e)
+    }
+  }
+
   return (
     <>
       <section className="hero-section">
@@ -34,96 +72,32 @@ const Welcome = () => {
           </div>
         </div>
         <div className="store-primary">
-          <div className="product-tile__primary">
-            <div className="tile-img__container">
-              <div className="product-badge">New</div>
-              <img src="https://placehold.co/200x800" alt="Product" />
-            </div>
-            <div className="tile-body__container">
-              <div className="product-title">Sample Title</div>
-              <div className="product-category">Sample Category</div>
-              <div className="product-description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit</div>
-              <div className="tile-controls">
-                <div className="product-price">Price: $ 9.99</div>
-                <button className="prime-button tile-button">Add to Cart</button>
-              </div>
-            </div>
-          </div>
-          <div className="product-tile__primary">
-            <div className="tile-img__container">
-              <div className="product-badge">New</div>
-              <img src="https://placehold.co/200x800" alt="Product" />
-            </div>
-            <div className="tile-body__container">
-              <div className="product-title">Sample Title</div>
-              <div className="product-category">Sample Category</div>
-              <div className="product-description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit</div>
-              <div className="tile-controls">
-                <div className="product-price">Price: $ 9.99</div>
-                <button className="prime-button tile-button">Add to Cart</button>
-              </div>
-            </div>
-          </div>
-          <div className="product-tile__primary">
-            <div className="tile-img__container">
-              <div className="product-badge">New</div>
-              <img src="https://placehold.co/200x800" alt="Product" />
-            </div>
-            <div className="tile-body__container">
-              <div className="product-title">Sample Title</div>
-              <div className="product-category">Sample Category</div>
-              <div className="product-description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit</div>
-              <div className="tile-controls">
-                <div className="product-price">Price: $ 9.99</div>
-                <button className="prime-button tile-button">Add to Cart</button>
-              </div>
-            </div>
-          </div>
-          <div className="product-tile__primary">
-            <div className="tile-img__container">
-              <div className="product-badge">New</div>
-              <img src="https://placehold.co/200x800" alt="Product" />
-            </div>
-            <div className="tile-body__container">
-              <div className="product-title">Sample Title</div>
-              <div className="product-category">Sample Category</div>
-              <div className="product-description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit</div>
-              <div className="tile-controls">
-                <div className="product-price">Price: $ 9.99</div>
-                <button className="prime-button tile-button">Add to Cart</button>
-              </div>
-            </div>
-          </div>
-          <div className="product-tile__primary">
-            <div className="tile-img__container">
-              <div className="product-badge">New</div>
-              <img src="https://placehold.co/200x800" alt="Product" />
-            </div>
-            <div className="tile-body__container">
-              <div className="product-title">Sample Title</div>
-              <div className="product-category">Sample Category</div>
-              <div className="product-description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit</div>
-              <div className="tile-controls">
-                <div className="product-price">Price: $ 9.99</div>
-                <button className="prime-button tile-button">Add to Cart</button>
-              </div>
-            </div>
-          </div>
-          <div className="product-tile__primary">
-            <div className="tile-img__container">
-              <div className="product-badge">New</div>
-              <img src="https://placehold.co/200x800" alt="Product" />
-            </div>
-            <div className="tile-body__container">
-              <div className="product-title">Sample Title</div>
-              <div className="product-category">Sample Category</div>
-              <div className="product-description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit</div>
-              <div className="tile-controls">
-                <div className="product-price">Price: $ 9.99</div>
-                <button className="prime-button tile-button">Add to Cart</button>
-              </div>
-            </div>
-          </div>
+          {
+            productList.length == 0 ? (
+              <div className="d">No Available Products</div>
+            ) : (
+              productList.map((product, index) => {
+                return (
+                  <div key={index} className="product-tile__primary">
+                    <div className="tile-img__container">
+                      <div className="product-badge">New</div>
+                      <img src="https://placehold.co/200x800" alt="Product" />
+                    </div>
+                    <div className="tile-body__container">
+                      <div className="product-title">{product.title}</div>
+                      <div className="product-category">{product.category[0].title}</div>
+                      <div className="product-description">{product.description}</div>
+                      <div className="tile-controls">
+                        <div className="product-price">Price: ${product.price}</div>
+                        <button onClick={() => {addToCart(product._id)}} className="prime-button tile-button">Add to Cart</button>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })
+            )
+          }
+
         </div>
       </section>
     </>

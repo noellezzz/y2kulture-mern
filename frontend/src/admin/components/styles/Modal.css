@@ -27,6 +27,7 @@
     flex-direction: column;
     padding: 25px;
     animation: drop 0.8s forwards; 
+    box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.5);
 }
 
 .crud-form {
@@ -256,3 +257,9 @@
     
 }
 
+.modal-container__inventory {
+    height: 600px;
+    width: 1200px;
+    background-color: white;
+    box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.5);
+}
