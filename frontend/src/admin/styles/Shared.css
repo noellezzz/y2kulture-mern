@@ -33,6 +33,7 @@
     flex-direction: column;
     justify-content: start;
     gap:20px;
+    padding:20px
 }
 
 .sub-container__side {
@@ -42,6 +43,7 @@
     overflow: hidden;
     border-radius: 10px;
     height: 83vh;
+    padding:20px;
 }
 
 .sub-container__double-lg {
@@ -153,6 +155,11 @@
 	padding: 15px;
 	background-color: rgba(255, 255, 255, 0.2);
 	color: #fff;
+    font-size: var(--small-font);
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
 }
 
 .custom-table td {
@@ -176,4 +183,13 @@
 
 .custom-table tbody td {
 	position: relative;
+}
+
+.input-group__b {
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.input-group__b label {
+    width: 40%;
 }

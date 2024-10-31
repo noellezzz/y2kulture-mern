@@ -159,44 +159,42 @@ export const createStock = async (req, res) => {
     const { productId } = req.params;
     const { color, size, quantity } = req.body;
 
-    if (!color || !size ) {
+    if (!color || !size || quantity === undefined) {
         return res.status(400).json({ success: false, message: "Please provide all fields." });
     }
 
     try {
-        const existingProduct = await Product.findOne({
-            _id: productId,
-            "stock.color": color,
-            "stock.size": size,
-        });
-
-        if (existingProduct) {
-            return res.status(400).json({ message: "Stock with this color and size already exists." });
-        }
-
-        const product = await Product.findByIdAndUpdate(
-            productId,
-            {
-                $push: {
-                    stock: {
-                        color,
-                        size,
-                        quantity,
-                    }
-                }
-            },
-            { new: true }
-        );
+        const product = await Product.findById(productId);
 
         if (!product) {
             return res.status(404).json({ message: "Product not found" });
         }
 
-        res.status(201).json(product);
+        const existingStock = product.stock.find(stock => stock.color === color && stock.size === size);
+
+        if (existingStock) {
+
+            existingStock.quantity = quantity;
+            await product.save(); 
+
+            return res.status(200).json({ message: "Stock quantity updated successfully", product });
+        } else {
+          
+            product.stock.push({
+                color,
+                size,
+                quantity,
+            });
+
+            await product.save(); 
+
+            return res.status(201).json({ message: "New stock created successfully", product });
+        }
     } catch (error) {
-        res.status(500).json({ message: "Failed to create stock", error });
+        res.status(500).json({ message: "Failed to create or update stock", error });
     }
 };
+
 
 export const deductStock = async (req, res) => {
     const { deductions } = req.body;  // Expecting [{ productId, stockId, deductQuantity }]

@@ -1,6 +1,94 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { fetchData } from '../utils/crudUtils'
+import axios from 'axios'
 
 const Inventory = () => {
+    const [invData, setInvData] = useState([])
+    const [stockList, setStockList] = useState([])
+    const [selectedProduct, setSelectedProduct] = useState({
+        productId: '',
+        stockId: '',
+        productName: '',
+        color: '',
+        size: '',
+        status: '',
+        quantity: '',
+    });
+
+    useEffect(() => {
+        fetchData('product', setInvData)
+    }, [])
+
+    useEffect(() => {
+        const tempList = []
+        let productId = ''
+        let productName = ''
+        let status = 'In Stock'
+
+        if (!(invData === undefined)) {
+            invData.map((product) => {
+                productId = product._id
+                productName = product.title
+                product.stock.map((stock) => {
+                    if (stock.quantity < 10) {
+                        status = 'Running Out'
+                    }
+                    if (stock.quantity == 0) {
+                        status = 'Out of Stock'
+                    }
+
+                    if (stock.quantity > 10) {
+                        status = 'In Stock'
+                    }
+                    tempList.push({ 'productId': productId, 'stockId': stock._id, 'productName': productName, 'color': stock.color, 'size': stock.size, 'quantity': stock.quantity, 'status': status })
+                })
+            })
+        }
+        // console.log(tempList)
+        setStockList(tempList)
+    }, [invData])
+
+    const gatherInfo = (info) => {
+        setSelectedProduct({
+            productId: info.productId,
+            stockId: info.stockId,
+            productName: info.productName,
+            color: info.color,
+            size: info.size,
+            status: info.status,
+            quantity: info.quantity,
+        });
+    }
+
+    const clearForm = () => {
+        setSelectedProduct({
+            productId: '',
+            stockId: '',
+            productName: '',
+            color: '',
+            size: '',
+            status: '',
+            quantity: '',
+        })
+    }
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setSelectedProduct((prevState) => ({
+            ...prevState,
+            [name]: value
+        }));
+    };
+
+    const handleSubmit = async() => {
+        try {
+            const result = await axios.post(`http://localhost:8000/api/product/addStock/${selectedProduct.productId}`, selectedProduct)
+        } catch (e) {
+            console.log("Error in submitting stock info", e)
+        }
+        clearForm()
+    }
+
     return (
         <div className="main-container__admin">
             <div className="sub-container__double-semi">
@@ -17,139 +105,64 @@ const Inventory = () => {
                     <table className='custom-table'>
                         <thead>
                             <tr>
+                                <th>Product ID</th>
                                 <th>Stock ID</th>
                                 <th>Title</th>
                                 <th>Color</th>
                                 <th>Size</th>
                                 <th>Inventory Status</th>
                                 <th>Quantity</th>
-                                <th>Supplier</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                            </tr>
-                            <tr>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                            </tr>
-                            <tr>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                            </tr>
-                            <tr>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                            </tr>
-                            <tr>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                            </tr>
-                            <tr>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                            </tr>
-                            <tr>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                            </tr>
-                            <tr>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                            </tr>
-                            <tr>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                            </tr>
-                            <tr>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                            </tr>
-                            <tr>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                            </tr>
-                            <tr>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                            </tr>
-                            <tr>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                                <td>Cell</td>
-                            </tr>
+                            {
+                                stockList.map((info, index) => {
+                                    return (
+                                        <tr onClick={() => {gatherInfo(info)}} key={index}>
+                                            <td>{info.productId}</td>
+                                            <td>{info.stockId}</td>
+                                            <td>{info.productName}</td>
+                                            <td>{info.color}</td>
+                                            <td>{info.size}</td>
+                                            <td>{info.status}</td>
+                                            <td>{info.quantity}</td>
+                                        </tr>
+                                    )
+                                })
+                            }
                         </tbody>
                     </table>
                 </div>
             </div>
             <div className="sub-container__side">
-
+                <form onSubmit={() => {handleSubmit()}}>
+                    <div className="input-group__b">
+                        <label htmlFor="">Product ID</label>
+                        <input readonly value={selectedProduct.productId} type="text" />
+                    </div>
+                    <div className="input-group__b">
+                        <label htmlFor="">Stock ID</label>
+                        <input readonly value={selectedProduct.stockId} type="text" />
+                    </div>
+                    <div className="input-group__b">
+                        <label htmlFor="">Product Name</label>
+                        <input readonly value={selectedProduct.productName} type="text" />
+                    </div>
+                    <div className="input-group__b">
+                        <label htmlFor="">Product Color</label>
+                        <input readonly value={selectedProduct.color} type="text" />
+                    </div>
+                    <div className="input-group__b">
+                        <label htmlFor="">Product Size</label>
+                        <input readonly value={selectedProduct.size} type="text" />
+                    </div>
+                    <div className="input-group__b">
+                        <label htmlFor="">In Stock</label>
+                        <input value={selectedProduct.quantity} onChange={handleInputChange} name="quantity" type="text" />
+                    </div>
+                    <button type='button' onClick={() => {handleSubmit()}}>Save</button>
+                    <button type="button" onClick={() => {clearForm()}}>Clear</button>
+                </form>
             </div>
         </div>
     )
