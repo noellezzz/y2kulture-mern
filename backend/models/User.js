@@ -1,10 +1,10 @@
-import mongoose,  { Schema } from 'mongoose'
+import mongoose, { Schema } from 'mongoose'
 import jwt from 'jsonwebtoken'
 
 const UserSchema = mongoose.Schema({
     email: {
         type: String,
-        required:true
+        required: true
     },
     password: {
         type: String,
@@ -16,7 +16,7 @@ const UserSchema = mongoose.Schema({
         default: 'user'
     },
     status: {
-        type:String,
+        type: String,
         required: true,
         default: 'active'
     },
@@ -64,7 +64,7 @@ const UserSchema = mongoose.Schema({
         required: false,
         default: ''
     },
-    gender : {
+    gender: {
         type: String,
         required: false,
         default: ''
@@ -78,10 +78,10 @@ const UserSchema = mongoose.Schema({
         {
             public_id: {
                 type: String,
-                required:true
+                required: true
             },
             url: {
-                type:String,
+                type: String,
                 required: true
             }
         }
@@ -93,15 +93,76 @@ const UserSchema = mongoose.Schema({
                 ref: 'Product',
                 required: true
             },
+            stockId: {
+                type: Schema.Types.ObjectId,
+                required: true
+            },
+            color: {
+                type: String,
+                required: true
+            },
+            size: {
+                type: String,
+                required: true
+            },
             quantity: {
                 type: Number,
                 required: true,
                 default: 1
             }
         }
+    ],
+    checkout: [
+        {
+            order: {
+                items: [
+                    {
+                        productId: {
+                            type: Schema.Types.ObjectId,
+                            ref: 'Product',
+                            required: true
+                        },
+                        stockId: {
+                            type: Schema.Types.ObjectId,
+                            required: true
+                        },
+                        color: {
+                            type: String,
+                            required: true
+                        },
+                        size: {
+                            type: String,
+                            required: true
+                        },
+                        quantity: {
+                            type: Number,
+                            required: true,
+                            default: 1
+                        }
+                    }
+                ],
+                status: {
+                    type: String,
+                    enum: ['Pending', 'Shipped', 'Delivered', 'Cancelled'],
+                    default: 'Pending'
+                },
+                datePlaced: {
+                    type: Date,
+                    default: Date.now
+                },
+                dateShipped: {
+                    type: Date,
+                    required: false,
+                },
+                dateDelivered: {
+                    type: Date,
+                    required: false,
+                }
+            }
+        }
     ]
-    }, {
-        timestamps: true,
+}, {
+    timestamps: true,
 });
 
 UserSchema.methods.getJwtToken = function () {

@@ -1,11 +1,16 @@
 import User from "../models/User.js"
+import Product from "../models/Product.js";
 import mongoose from 'mongoose'
 import cloudinary from 'cloudinary'
 import { request } from "express";
 
 export const getUser = async (request, response) => {
     try {
-        const user = await User.find({});
+        const user = await User.find({})
+        .populate({
+            path: 'cart.productId', 
+            model: 'Product' 
+        });
         response.status(200).json({ success: true, message: "Users Retrieved.", data: user });
     } catch (error) {
         console.log("Error in fetching Users: ", error.message);
@@ -16,7 +21,10 @@ export const getUser = async (request, response) => {
 export const getOneUser = async (request, response) => {
     try {
         const { id } = request.params;
-        const user = await User.findById(id);
+        const user = await User.findById(id).populate({
+            path: 'cart.productId', 
+            model: 'Product' 
+        });;
         response.status(200).json({ success: true, message: "User Retrieved.", data: user });
     } catch (error) {
         console.log("Error in fetching User: ", error.message);
@@ -140,37 +148,96 @@ export const deleteUser = async (request, response) => {
 }
 
 export const addToCart = async (req, res) => {
-    const { userId } = req.params; // Changed 'id' to 'userId' for clarity
-    const { productId, quantity } = req.body;
+    const { userId } = req.params; 
+    const { productId, quantity, stockId, color, size } = req.body;
 
-    if (!productId || !quantity) {
+    if (!productId || !quantity || !stockId ) {
         return res.status(400).json({ message: "Product ID and quantity are required." });
     }
 
     try {
-        // Find the user by their ID
         const user = await User.findById(userId);
 
         if (!user) {
             return res.status(404).json({ message: "User not found." });
         }
 
-        // Check if the product is already in the cart
-        const existingCartItem = user.cart.find(item => item.productId.toString() === productId);
+        const existingCartItem = user.cart.find(item => item.stockId.toString() === stockId);
 
         if (existingCartItem) {
-            // If it exists, update the quantity
             existingCartItem.quantity += quantity;
         } else {
-            // If it doesn't exist, add a new item to the cart
-            user.cart.push({ productId, quantity });
+            user.cart.push({ productId, stockId, quantity, color, size });
         }
 
-        // Save the updated user document
         await user.save();
 
         res.status(200).json({ message: "Product added to cart successfully.", cart: user.cart });
     } catch (error) {
         res.status(500).json({ message: "Failed to add product to cart", error });
+    }
+};
+
+export const addToCheckout = async (req, res) => {
+    const { userId } = req.params;
+    const { items, status, datePlaced } = req.body;
+    const cartItemIds = items.map(item => item.cartItemId);
+
+    if (!userId || !items || !items.length) {
+        return res.status(400).json({ message: "User ID and items array are required." });
+    }
+
+    for (let item of items) {
+        const product = await Product.findById(item.productId);
+        if (!product) {
+            return res.status(404).json({ message: `Product with ID ${item.productId} not found.` });
+        }
+
+        const stockItem = product.stock.find(
+            (stock) => stock._id.toString() === item.stockId && stock.color === item.color && stock.size === item.size
+        );
+
+        if (!stockItem) {
+            return res.status(404).json({ message: `Stock with ID ${item.stockId} not found for product ${item.productId}.` });
+        }
+
+        if (item.quantity > stockItem.quantity) {
+            return res.status(400).json({ 
+                message: `Insufficient stock for ${product.title} (Color: ${item.color}, Size: ${item.size}). Available: ${stockItem.quantity}, Requested: ${item.quantity}.` 
+            });
+        }
+    }
+
+    try {
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found." });
+        }
+
+        const newOrder = {
+            order: {
+                items: items.map(item => ({
+                    productId: item.productId,
+                    stockId: item.stockId,
+                    color: item.color,
+                    size: item.size,
+                    quantity: item.quantity,
+                })),
+                status: status || 'Pending',
+                datePlaced: datePlaced || new Date(),
+                dateShipped: null, 
+                dateDelivered: null 
+            }
+        };
+
+        user.checkout.push(newOrder);
+        user.cart = user.cart.filter(cartItem => !cartItemIds.includes(cartItem._id.toString()));
+
+        await user.save();
+
+        res.status(200).json({ message: "Checkout added successfully.", checkout: user.checkout });
+    } catch (error) {
+        res.status(500).json({ message: "Failed to add to checkout", error });
     }
 };

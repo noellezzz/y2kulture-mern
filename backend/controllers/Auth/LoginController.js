@@ -21,37 +21,20 @@ import { sendToken } from '../../utils/jwtToken.js'
 
 
 export const checkUser = async (req, res) => {
-    // const cookies = request.cookies
-    // if (!cookies?.jwt) return response.status(401).json({ message: 'Unauthorized' })
-    // const refreshToken = cookies.jwt
-    // jwt.verify(
-    //     refreshToken,
-    //     process.env.REFRESH_TOKEN_SECRET,
-    //     asyncHandler(async (err, decoded) => {
-    //         if (err) return response.status(403).json({ message: "Forbidden" })
-    //         const user = await User.findOne({ email: decoded.email })
-    //         if (!user) return response.status(401).json({ message: 'Unatuhorized.' })
-    //         const accessToken = jwt.sign({
-    //             "UserInfo": {
-    //                 "email": user.email,
-    //                 "role": user.role,
-    //                 "status": user.status
-    //             }
-    //             },
-    //             process.env.ACCESS_TOKEN_SECRET,
-    //             { expiresIn: '1d' }
-    //         )
+    try {
+        const user = await User.findById(req.user.id);
 
-    //         response.json({ accessToken })
-    //     })
-    // )
+        return res.status(200).json({
+            success: true,
+            user
+        })
+    } catch(e) {
+        return res.status(500).json({
+            success: false,
+            message: "Server Error."
+        })
+    }
 
-    const user = await User.findById(req.user.id);
-
-    return res.status(200).json({
-        success: true,
-        user
-    })
 }
 
 export const login = async (req, res) => {

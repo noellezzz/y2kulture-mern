@@ -282,3 +282,23 @@ section {
 .pale-text {
     color:gray;
 }
+
+.toggle-group {
+    display: flex;
+    gap: 10px;
+  }
+  .toggle-button {
+    padding: 10px 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #f0f0f0;
+    transition: background-color 0.3s, color 0.3s;
+    margin-right: 5px;
+    margin-bottom: 5px;
+  }
+  .toggle-button.active {
+    background-color: #4CAF50;
+    color: white;
+    border-color: #4CAF50;
+  }
