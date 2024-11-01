@@ -7,6 +7,7 @@ import axios from 'axios'
 import ConfirmModal from '../components/ConfirmModal';
 import { CSSTransition } from 'react-transition-group';
 import { fetchDataN } from '../../admin/utils/crudUtils';
+import toast from 'react-hot-toast';
 
 const Welcome = () => {
   const [userId, setUserId] = useState('')
@@ -34,6 +35,10 @@ const Welcome = () => {
   }, [productList])
 
   const addToCart = async (productId) => {
+    if(!userLoggedIn) {
+      toast.error('Please Log In First!');
+      return
+    }
     const result = await fetchDataN('product', productId)
     setProductInfo(result.data.data)
     setOpenModal(true)

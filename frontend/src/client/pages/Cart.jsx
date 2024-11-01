@@ -17,8 +17,8 @@ const Cart = () => {
         console.log("cartItem", cartItem)
         tempList.push({
           cartItemId: cartItem._id,
-          productId:cartItem.productId._id,
-          stockId:cartItem.stockId,
+          productId: cartItem.productId._id,
+          stockId: cartItem.stockId,
           name: cartItem.productId.title,
           price: cartItem.productId.price,
           color: cartItem.color,
@@ -38,7 +38,7 @@ const Cart = () => {
     const newItems = [...items];
 
     newCounters[index] += 1;
-    newItems[index].quantity += 1; 
+    newItems[index].quantity += 1;
 
     setCounters(newCounters);
     setItems(newItems);
@@ -71,12 +71,12 @@ const Cart = () => {
     checkLogin();
   }, []);
 
-  const handleCheckout = async() => {
+  const handleCheckout = async () => {
     try {
       // console.log(checkoutInfo)
       const result = await axios.post(`http://localhost:8000/api/user/${userId}/checkout`, checkoutInfo)
       console.log(result)
-    } catch(e) {
+    } catch (e) {
       console.log(e)
     }
   }
@@ -94,44 +94,50 @@ const Cart = () => {
       <div className="main">
         <div className="section-title">Shopping Cart</div>
         <div className="quick-info">{items.length} items in your bag</div>
-
         <div className="cart-container">
-          <div className="cart-header">
-            <div className="checkbox">Item</div>
-            <div className="product">Product</div>
-            <div className="quantity">Quantity</div>
-            <div className="price">Subtotal</div>
-          </div>
-          <div className="cart-list">
-            {items.map((item, index) => (
-              <div className="cart-item" key={index}>
-                <div className="checkbox d-center">
-                  <input className="cart-check" type="checkbox" />
+        {items.length < 1 ? (
+          <div>No Items Added to Cart</div>
+        ) : (
+          <><div className="cart-header">
+          <div className="checkbox">Item</div>
+          <div className="product">Product</div>
+          <div className="quantity">Quantity</div>
+          <div className="price">Subtotal</div>
+        </div>
+        <div className="cart-list">
+          {items.map((item, index) => (
+            <div className="cart-item" key={index}>
+              <div className="checkbox d-center">
+                <input className="cart-check" type="checkbox" />
+              </div>
+              <div className="product">
+                <div className="product-img">
+                  <img src="https://placehold.co/400x400" alt="" />
                 </div>
-                <div className="product">
-                  <div className="product-img">
-                    <img src="https://placehold.co/400x400" alt="" />
-                  </div>
-                  <div className="product-info">
-                    <div className="category-holder">Sample Category</div>
-                    <div className="title-holder">{item.name}</div>
-                    <div className="color-holder">Color: <span className="pale-text">{item.color}</span></div>
-                    <div className="size-holder">Size: <span className="pale-text">{item.size}</span></div>
-                  </div>
-                </div>
-                <div className="quantity">
-                  <button className='prime-button' onClick={() => handleMinus(index)} style={{ margin: '5px' }}>-</button>
-                  <span>{counters[index]}</span>
-                  <button className='prime-button' onClick={() => handleAdd(index)} style={{ margin: '5px' }}>+</button>
-                </div>
-                <div className="price">
-                  <span>${item.price}</span>
+                <div className="product-info">
+                  <div className="category-holder">Sample Category</div>
+                  <div className="title-holder">{item.name}</div>
+                  <div className="color-holder">Color: <span className="pale-text">{item.color}</span></div>
+                  <div className="size-holder">Size: <span className="pale-text">{item.size}</span></div>
                 </div>
               </div>
-            ))}
-          </div>
-          <button onClick={handleCheckout}>Submit</button>
-          <button onClick={confirmItems}>Confirm Items</button>
+              <div className="quantity">
+                <button className='prime-button' onClick={() => handleMinus(index)} style={{ margin: '5px' }}>-</button>
+                <span>{counters[index]}</span>
+                <button className='prime-button' onClick={() => handleAdd(index)} style={{ margin: '5px' }}>+</button>
+              </div>
+              <div className="price">
+                <span>${item.price}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="d-flex">
+          <button onClick={handleCheckout} className='prime-button'>Submit</button>
+          <button onClick={confirmItems} className='prime-button'>Confirm Items</button>
+        </div></>
+        )}
+          
         </div>
       </div>
       <div className="side">

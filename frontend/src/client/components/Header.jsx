@@ -17,11 +17,8 @@ const Header = () => {
   const [userLoggedIn, setUserLoggedIn] = useState(false)
   const [userEmail, setUserEmail] = useState('')
   const [basicInfo, setBasicInfo] = useState({ id: '', email: '' })
-  const [userId, setUserId] = useState('')
   const [isScrolled, setIsScrolled] = useState(false);
   const [cartNums, setCartNums] = useState(0)
-
-
 
   const handleScroll = () => {
     if (window.scrollY >= 800) {

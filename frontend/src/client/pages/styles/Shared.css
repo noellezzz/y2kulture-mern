@@ -51,19 +51,19 @@ section {
     font-size: var(--herosize-font);
     font-weight: 700;
     color: var(--primary-color);
-    text-shadow: rgb(0, 0, 0) 1px 0px 0px, rgb(0, 0, 0) 0.54px 0.84px 0px, 
-                 rgb(0, 0, 0) -0.41px 0.91px 0px, rgb(0, 0, 0) -0.99px 0.14px 0px,
-                 rgb(0, 0, 0) -0.65px -0.75px 0px, rgb(0, 0, 0) 0.28px -0.96px 0px, 
-                 rgb(0, 0, 0) 0.96px -0.28px 0px;
+    text-shadow: rgb(0, 0, 0) 1px 0px 0px, rgb(0, 0, 0) 0.54px 0.84px 0px,
+        rgb(0, 0, 0) -0.41px 0.91px 0px, rgb(0, 0, 0) -0.99px 0.14px 0px,
+        rgb(0, 0, 0) -0.65px -0.75px 0px, rgb(0, 0, 0) 0.28px -0.96px 0px,
+        rgb(0, 0, 0) 0.96px -0.28px 0px;
 }
 
 .hero-tagline .tagline-body {
     font-size: var(--large-font);
     color: var(--fifth-color);
-    text-shadow: rgb(0, 0, 0) 1px 0px 0px, rgb(0, 0, 0) 0.54px 0.84px 0px, 
-                 rgb(0, 0, 0) -0.41px 0.91px 0px, rgb(0, 0, 0) -0.99px 0.14px 0px,
-                 rgb(0, 0, 0) -0.65px -0.75px 0px, rgb(0, 0, 0) 0.28px -0.96px 0px, 
-                 rgb(0, 0, 0) 0.96px -0.28px 0px;
+    text-shadow: rgb(0, 0, 0) 1px 0px 0px, rgb(0, 0, 0) 0.54px 0.84px 0px,
+        rgb(0, 0, 0) -0.41px 0.91px 0px, rgb(0, 0, 0) -0.99px 0.14px 0px,
+        rgb(0, 0, 0) -0.65px -0.75px 0px, rgb(0, 0, 0) 0.28px -0.96px 0px,
+        rgb(0, 0, 0) 0.96px -0.28px 0px;
 }
 
 /* Centering Images */
@@ -84,11 +84,11 @@ section {
     background-size: cover;  
     background-position: center; 
     background-repeat: no-repeat;  */
-    display: flex;             
-    justify-content: center;   
-    align-items: flex-end;     
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
     gap: 15px;
-    
+
     right: 0;
 }
 
@@ -127,7 +127,7 @@ section {
     width: 50%;
     display: flex;
     justify-content: end;
-    gap:10px;
+    gap: 10px;
     align-items: center;
 }
 
@@ -154,7 +154,7 @@ section {
     width: 100%;
 
     display: flex;
-    gap:20px;
+    gap: 20px;
     flex-wrap: wrap;
     justify-content: center;
 }
@@ -164,7 +164,7 @@ section {
     height: 280px;
     width: 470px;
     flex-grow: 1;
-    box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.5);
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
     border-radius: 10px;
     display: flex;
     /* border: 2px solid var(--primary-color); */
@@ -177,20 +177,20 @@ section {
 }
 
 .tile-img__container .product-badge {
-    position:absolute;
+    position: absolute;
     margin-top: 10px;
     margin-left: 10px;
     border-radius: 10px;
     z-index: 2;
     background-color: var(--primary-color);
-    padding:5px 10px;
+    padding: 5px 10px;
     font-size: 11px;
-    color:white;
+    color: white;
     font-weight: 800;
     text-transform: uppercase;
 }
 
-.tile-img__container img{
+.tile-img__container img {
     height: 100%;
     width: 100%;
     object-fit: cover;
@@ -201,7 +201,7 @@ section {
     height: 100%;
     width: 60%;
     /* border:1px solid red; */
-    padding:20px;
+    padding: 20px;
 }
 
 .tile-body__container {
@@ -221,7 +221,7 @@ section {
     width: 100%;
     height: 8%;
     /* border:1px solid red; */
-    color:gray;
+    color: gray;
     font-size: var(--small-font);
 }
 
@@ -280,14 +280,15 @@ section {
 }
 
 .pale-text {
-    color:gray;
+    color: gray;
 }
 
 .toggle-group {
     display: flex;
     gap: 10px;
-  }
-  .toggle-button {
+}
+
+.toggle-button {
     padding: 10px 20px;
     border: 1px solid #ddd;
     border-radius: 4px;
@@ -296,9 +297,21 @@ section {
     transition: background-color 0.3s, color 0.3s;
     margin-right: 5px;
     margin-bottom: 5px;
-  }
-  .toggle-button.active {
-    background-color: #4CAF50;
+}
+
+.count-button {
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #f0f0f0;
+    transition: background-color 0.3s, color 0.3s;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+
+.toggle-button.active {
+    background-color: var(--primary-color);
     color: white;
-    border-color: #4CAF50;
-  }
+    border-color: var(--primary-color);
+}
