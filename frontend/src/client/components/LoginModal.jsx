@@ -134,7 +134,7 @@ const LoginModal = ({ setModalOpen, formActive, setFormActive, setUserModal, set
                   <Link>Forgot Password</Link>
                 </div>
               </div>
-              <button className='full-width prime-button'>
+              <button type="submit" className='full-width prime-button'>
                 Login
               </button>
             </form>

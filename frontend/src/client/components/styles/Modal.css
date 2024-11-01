@@ -21,13 +21,19 @@ gap:10px;
     /* border:1px solid red; */
 }
 
+.modal-content .title{
+    font-weight: 600;
+}
+
 .modal-content .category-stock {
+    font-size: var(--small-font);
     display: flex;
     justify-content: space-between;
 }
 
 .modal-content .size, .modal-content .color {
-    height: 30%;
+    height: fit-content;
+    max-height: 30%;
     /* border:1px solid red; */
 }
 
@@ -36,11 +42,19 @@ gap:10px;
     width: 40%;
 }
 
-.modal-body .controls {
-    /* border:1px solid red; */
-    height: 20%;
+.d-flex {
     display: flex;
-    justify-content: end;
+    gap:5px
+}
+
+.modal-body .controls {
+    position: absolute;
+    bottom:10px;
+    width: 300px;
+    /* border:1px solid red; */
+    display: flex;
+    flex-grow: 1;
+    justify-content: space-between;
     align-items: center;
     gap:10px;
 }
@@ -168,58 +182,6 @@ gap:10px;
     display: flex;
     justify-content: space-between;
     gap:10px;
-}
-
-.prime-button {
-display: inline-block;
-color: #fff;
-transition: all 0.3s;
-position: relative; 
-overflow: hidden;
-z-index: 1;
-}
-
-.prime-button::after {
-content: '';
-position: absolute;
-top: 0; 
-left: 0;
-width: 100%;
-height: 100%; 
-border-radius: 20px;
-z-index: -2;
-}
-
-.prime-button::before {
-content: '';
-position: absolute;
-top: 0; 
-left: 0;
-width: 0%;
-height: 100%; 
-background-color: #c52400;
-transition: all 0.3s;
-border-radius: 10px;
-z-index: -1;
-}
-
-.prime-button:hover::before {
-width: 100%;
-}
-  
-
-.prime-button {
-    background-color: var(--primary-color);
-    padding: 15px 0px;
-    color:white;
-    border-radius: 20px;
-    border: 0px solid black;
-    margin: 10px 0px;
-    width: 210px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap:10px
 }
 
 .facebook-button {

@@ -113,3 +113,8 @@
     height: 30px;
     width: 30px;
 }
+
+.d-flex {
+    /* border:1px solid red; */
+    justify-content: end;
+}

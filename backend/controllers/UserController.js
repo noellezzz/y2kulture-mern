@@ -177,7 +177,6 @@ export const addToCart = async (req, res) => {
         res.status(500).json({ message: "Failed to add product to cart", error });
     }
 };
-
 export const addToCheckout = async (req, res) => {
     const { userId } = req.params;
     const { items, status, datePlaced } = req.body;
@@ -187,33 +186,42 @@ export const addToCheckout = async (req, res) => {
         return res.status(400).json({ message: "User ID and items array are required." });
     }
 
-    for (let item of items) {
-        const product = await Product.findById(item.productId);
-        if (!product) {
-            return res.status(404).json({ message: `Product with ID ${item.productId} not found.` });
-        }
-
-        const stockItem = product.stock.find(
-            (stock) => stock._id.toString() === item.stockId && stock.color === item.color && stock.size === item.size
-        );
-
-        if (!stockItem) {
-            return res.status(404).json({ message: `Stock with ID ${item.stockId} not found for product ${item.productId}.` });
-        }
-
-        if (item.quantity > stockItem.quantity) {
-            return res.status(400).json({ 
-                message: `Insufficient stock for ${product.title} (Color: ${item.color}, Size: ${item.size}). Available: ${stockItem.quantity}, Requested: ${item.quantity}.` 
-            });
-        }
-    }
-
     try {
         const user = await User.findById(userId);
 
         if (!user) {
             return res.status(404).json({ message: "User not found." });
         }
+
+        for (let item of items) {
+            const product = await Product.findById(item.productId);
+            if (!product) {
+                return res.status(404).json({ message: `Product with ID ${item.productId} not found.` });
+            }
+
+            const stockItem = product.stock.find(
+                (stock) => stock._id.toString() === item.stockId && stock.color === item.color && stock.size === item.size
+            );
+
+            if (!stockItem) {
+                return res.status(404).json({ message: `Stock with ID ${item.stockId} not found for product ${item.productId}.` });
+            }
+
+            if (item.quantity > stockItem.quantity) {
+                return res.status(400).json({ 
+                    message: `Insufficient stock for ${product.title} (Color: ${item.color}, Size: ${item.size}). Available: ${stockItem.quantity}, Requested: ${item.quantity}.` 
+                });
+            }
+            stockItem.quantity -= item.quantity;
+
+            await product.save();
+        }
+
+        // After deducting stock quantities, save the product updates
+        await Promise.all(items.map(async (item) => {
+            const product = await Product.findById(item.productId);
+            await product.save();
+        }));
 
         const newOrder = {
             order: {

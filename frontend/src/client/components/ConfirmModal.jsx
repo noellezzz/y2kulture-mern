@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './styles/Modal.css';
 import axios from 'axios'
+import toast, { Toaster } from 'react-hot-toast';
 
 const ConfirmModal = ({ setModalOpen, productInfo }) => {
     const [selectedSize, setSelectedSize] = useState(null);
@@ -12,17 +13,22 @@ const ConfirmModal = ({ setModalOpen, productInfo }) => {
 
     const colors = [];
     const sizes = [];
-    const combos = new Set(); 
+    const combos = new Set();
+
+    const [count, setCount] = useState(0);
+
+    const handleIncrement = () => setCount(count + 1);
+    const handleDecrement = () => count > 0 && setCount(count - 1);
 
     const checkLogin = async (request, response) => {
         try {
-          const response = await axios.get('http://localhost:8000/auth')
-        //   setUserLoggedIn(true)
-          setUserId(response.data.user._id)
+            const response = await axios.get('http://localhost:8000/auth')
+            //   setUserLoggedIn(true)
+            setUserId(response.data.user._id)
         } catch {
-        //   setUserLoggedIn(false)
+            //   setUserLoggedIn(false)
         }
-      }
+    }
 
     useEffect(() => {
         checkLogin()
@@ -30,8 +36,8 @@ const ConfirmModal = ({ setModalOpen, productInfo }) => {
 
     if (Array.isArray(productInfo.stock) && productInfo.stock.length !== 0) {
         productInfo.stock.forEach(item => {
-            if (!colors.includes(item.color)) colors.push(item.color); 
-            if (!sizes.includes(item.size)) sizes.push(item.size); 
+            if (!colors.includes(item.color)) colors.push(item.color);
+            if (!sizes.includes(item.size)) sizes.push(item.size);
 
             combos.add(`${item.color}-${item.size}`);
         });
@@ -58,24 +64,27 @@ const ConfirmModal = ({ setModalOpen, productInfo }) => {
         }
     };
 
-    const addToCart = async() => {
-        // console.log(userId)
+    const addToCart = async () => {
+        if( count > stockQuantity ){
+            toast.error('Insufficient Stock!');
+            return;
+        }
         let cartInfo = {
-          stockId: stockId,
-          productId: productId,
-          quantity: 1,
-          color: selectedColor,
-          size: selectedSize
+            stockId: stockId,
+            productId: productId,
+            quantity: count,
+            color: selectedColor,
+            size: selectedSize
         };
         console.log(cartInfo)
         try {
-          const result = await axios.post(`http://localhost:8000/api/user/addToCart/${userId}`, cartInfo)
-          console.log(result)
-          setModalOpen(false)
-        } catch(e) {
-          console.log("Error adding to cart", e)
+            const result = await axios.post(`http://localhost:8000/api/user/addToCart/${userId}`, cartInfo)
+            console.log(result)
+            setModalOpen(false)
+        } catch (e) {
+            console.log("Error adding to cart", e)
         }
-      }
+    }
 
     return (
         <div onClick={() => { setModalOpen(false); }} className="modal-background">
@@ -113,9 +122,29 @@ const ConfirmModal = ({ setModalOpen, productInfo }) => {
                                 </button>
                             ))}
                         </div>
+
                         <div className="controls">
-                            <div className="prime-button" onClick={() => setModalOpen(false)}>Close</div>
-                            <div className="prime-button" onClick={addToCart}>Confirm</div>
+                            <div className="quantity">
+                                <div className="count-group">
+                                    <button
+                                        onClick={handleDecrement}
+                                        className="count-button"
+                                    >
+                                        -
+                                    </button>
+                                    &nbsp; <span className="count-display">{count}</span> &nbsp;
+                                    <button
+                                        onClick={handleIncrement}
+                                        className="count-button"
+                                    >
+                                        +
+                                    </button>
+                                </div>
+                            </div>
+                            <div className='d-flex'>
+                                <button className="prime-button" onClick={() => setModalOpen(false)}>Close</button>
+                                <button className="prime-button" onClick={addToCart} disabled={selectedSize === null || count === 0}>Confirm</button>
+                            </div>
                         </div>
                     </div>
                 </div>

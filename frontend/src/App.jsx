@@ -48,6 +48,7 @@ const checkLogin = async(request, response) => {
           toastOptions={{
             style: {
               zIndex: 9999,
+              fontFamily: 'ITCAvantGardeBK, sans-serif',
             },
           }}
         />
