@@ -4,12 +4,17 @@ import heroImage from '../../assets/heroimage.png'
 import { fetchData } from '../../admin/utils/crudUtils'
 import Cookies from 'js-cookie';
 import axios from 'axios'
+import ConfirmModal from '../components/ConfirmModal';
+import { CSSTransition } from 'react-transition-group';
+import { fetchDataN } from '../../admin/utils/crudUtils';
 
 const Welcome = () => {
   const [userId, setUserId] = useState('')
+  const [productInfo, setProductInfo] = useState([])
   // const [cartInfo, setCartInfo] = useState({})
   const [userLoggedIn, setUserLoggedIn] = useState(false)
-  const checkLogin = async(request, response) => {
+  const [openModal, setOpenModal] = useState(false)
+  const checkLogin = async (request, response) => {
     try {
       const response = await axios.get('http://localhost:8000/auth')
       setUserLoggedIn(true)
@@ -28,18 +33,10 @@ const Welcome = () => {
     console.log(productList)
   }, [productList])
 
-  const addToCart = async(productId) => {
-    console.log(userId)
-    let cartInfo = {
-      productId: productId,
-      quantity: 1,
-    };
-    try {
-      const result = await axios.post(`http://localhost:8000/api/user/addToCart/${userId}`, cartInfo)
-      console.log(result)
-    } catch(e) {
-      console.log("Error adding to cart", e)
-    }
+  const addToCart = async (productId) => {
+    const result = await fetchDataN('product', productId)
+    setProductInfo(result.data.data)
+    setOpenModal(true)
   }
 
   return (
@@ -89,7 +86,7 @@ const Welcome = () => {
                       <div className="product-description">{product.description}</div>
                       <div className="tile-controls">
                         <div className="product-price">Price: ${product.price}</div>
-                        <button onClick={() => {addToCart(product._id)}} className="prime-button tile-button">Add to Cart</button>
+                        <button onClick={() => { addToCart(product._id) }} className="prime-button tile-button">Add to Cart</button>
                       </div>
                     </div>
                   </div>
@@ -99,6 +96,14 @@ const Welcome = () => {
           }
 
         </div>
+        <CSSTransition
+          in={openModal}
+          timeout={300}
+          classNames="modal"
+          unmountOnExit
+        >
+          <ConfirmModal setModalOpen={setOpenModal} productInfo={productInfo} />
+        </CSSTransition>
       </section>
     </>
 

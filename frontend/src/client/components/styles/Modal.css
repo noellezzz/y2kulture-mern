@@ -8,6 +8,65 @@
 
 }
 
+.landscape .modal-body {
+    /* border:1px solid red; */
+    height: 100%;
+    width: 100%;
+gap:10px;
+    display: flex;
+}
+
+.modal-content .title, .modal-content .category-stock {
+    height: 10%;
+    /* border:1px solid red; */
+}
+
+.modal-content .category-stock {
+    display: flex;
+    justify-content: space-between;
+}
+
+.modal-content .size, .modal-content .color {
+    height: 30%;
+    /* border:1px solid red; */
+}
+
+.modal-body .img-container {
+    /* border:1px solid red; */
+    width: 40%;
+}
+
+.modal-body .controls {
+    /* border:1px solid red; */
+    height: 20%;
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    gap:10px;
+}
+
+.modal-body .controls .prime-button {
+    height: 36px;
+    width: 80px;
+    font-size: var(--small-font);
+}
+
+.modal-body .modal-content {
+    /* border:1px solid red; */
+    width: 60%;
+    padding:10px;
+}
+
+.landscape  {
+    height: 400px !important;
+    width: 600px !important;
+    border-radius: 20px;
+    animation: dropLogin 0.8s forwards; 
+    background-color: white;
+    padding:20px 40px;
+}
+
+
 .form-selection {
     margin: 20px 0px;
     display: flex;

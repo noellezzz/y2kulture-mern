@@ -7,7 +7,7 @@ export const fetchData = async (object, setForm) => {
         setForm(response.data.data)
         // console.log(`Working ${object}`, response.data.data)
       } catch (error) {
-        console.log("Error while fetching User Data", error)
+        console.log(`Error while fetching ${object} Data`, error)
       }
 }
 

@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react'
 import './styles/Header.css'
 import mainLogo from '../../assets/main-logo.png'
 import { Link } from 'react-router-dom'
-import { FaSearch, FaShoppingBag , FaUser  } from "react-icons/fa";
+import { FaSearch, FaShoppingBag, FaUser } from "react-icons/fa";
 import LoginModal from './LoginModal'
 import { CSSTransition } from 'react-transition-group';
 import axios from 'axios'
 import UserForm from './UserForm'
+import { fetchData } from '../../admin/utils/crudUtils';
 
 const Header = () => {
   const [formActive, setFormActive] = useState('login')
@@ -15,42 +16,47 @@ const Header = () => {
   axios.defaults.withCredentials = true;
   const [userLoggedIn, setUserLoggedIn] = useState(false)
   const [userEmail, setUserEmail] = useState('')
-  const [basicInfo, setBasicInfo] = useState({id: '', email: ''})
+  const [basicInfo, setBasicInfo] = useState({ id: '', email: '' })
   const [userId, setUserId] = useState('')
   const [isScrolled, setIsScrolled] = useState(false);
+  const [cartNums, setCartNums] = useState(0)
 
-    const handleScroll = () => {
-        if (window.scrollY >= 800) {
-            setIsScrolled(true);
-        } else {
-            setIsScrolled(false);
-        }
-    };
 
-    useEffect(() => {
-        window.addEventListener('scroll', handleScroll);
-        
-        return () => {
-            window.removeEventListener('scroll', handleScroll);
-        };
-    }, []); 
-  
+
+  const handleScroll = () => {
+    if (window.scrollY >= 800) {
+      setIsScrolled(true);
+    } else {
+      setIsScrolled(false);
+    }
+  };
+
   useEffect(() => {
-      checkLogin()
-      console.log(userLoggedIn)
-    }, [])
+    window.addEventListener('scroll', handleScroll);
 
-  const checkLogin = async(request, response) => {
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  useEffect(() => {
+    checkLogin()
+    
+    // console.log(userLoggedIn)
+  }, [])
+
+  const checkLogin = async (request, response) => {
     try {
       const response = await axios.get('http://localhost:8000/auth')
       setUserLoggedIn(true)
       setUserEmail(response.data.user.email)
+      fetchCart(response.data.user._id)
     } catch {
       setUserLoggedIn(false)
     }
   }
 
-  const logoutUser =  async() => {
+  const logoutUser = async () => {
     try {
       await axios.get('http://localhost:8000/auth/logout')
       window.location.reload();
@@ -60,7 +66,7 @@ const Header = () => {
   }
 
   useEffect(() => {
-    if(modalOpen) {
+    if (modalOpen) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "auto";
@@ -71,13 +77,22 @@ const Header = () => {
     };
   }, [modalOpen])
 
+  const fetchCart = async (id) => {
+    try {
+      const response = await axios.get(`http://localhost:8000/api/user/${id}`)
+      setCartNums(response.data.data.cart.length)
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
   return (
     <div id="navbar" className={`client-header ${isScrolled ? 'scrolled' : 'not-scrolled'}`}>
       <nav className='client-navigation'>
         <div className="title-container">
           <img src={mainLogo} alt="main-logo" />
         </div>
-  
+
         <div className="main-navigation">
           <div className="navigation-line">
             <Link to="/">Home</Link>
@@ -86,20 +101,20 @@ const Header = () => {
             <Link>Support</Link>
           </div>
         </div>
-  
+
         <div className="side-navigation">
           <div className="navigation-line">
             <Link><FaSearch /></Link>
-            <Link to="/cart"><FaShoppingBag /></Link>
-  
-            { userLoggedIn ? (
-              <div onClick={() => {logoutUser()}}>Logout</div>
+            <Link to="/cart"><FaShoppingBag /><span className="custom-badge">{cartNums}</span></Link>
+
+            {userLoggedIn ? (
+              <div onClick={() => { logoutUser() }}>Logout</div>
             ) : (
               <>
                 <Link onClick={() => { setModalOpen(true) }}>
                   <FaUser />
                 </Link>
-  
+
                 <CSSTransition
                   in={modalOpen}
                   timeout={300}
@@ -115,17 +130,17 @@ const Header = () => {
                   classNames="modal"
                   unmountOnExit
                 >
-                  <UserForm modalOpen={modalOpenUser} basicInfo={basicInfo} setModalOpen={setModalOpenUser}/>
+                  <UserForm modalOpen={modalOpenUser} basicInfo={basicInfo} setModalOpen={setModalOpenUser} />
                 </CSSTransition>
               </>
             )}
-            
+
           </div>
         </div>
       </nav>
     </div>
   );
-  
+
 }
 
 export default Header
