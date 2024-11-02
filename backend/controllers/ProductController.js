@@ -197,10 +197,10 @@ export const createStock = async (req, res) => {
 
 
 export const deductStock = async (req, res) => {
-    const { deductions } = req.body;  // Expecting [{ productId, stockId, deductQuantity }]
+    const { deductions } = req.body;  
 
     try {
-        // Loop through each product and its respective stock deduction
+       
         for (const { productId, stockId, deductQuantity } of deductions) {
             const product = await Product.findById(productId);
             
@@ -218,8 +218,8 @@ export const deductStock = async (req, res) => {
                 return res.status(400).json({ message: `Insufficient stock quantity for Stock ID ${stockId} in Product ID ${productId}` });
             }
 
-            stock.quantity -= deductQuantity;  // Deduct the quantity
-            await product.save();  // Save changes for each product
+            stock.quantity -= deductQuantity;  
+            await product.save();  
         }
 
         res.status(200).json({ message: "All stock deductions processed successfully" });

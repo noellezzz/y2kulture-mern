@@ -179,8 +179,10 @@ export const addToCart = async (req, res) => {
 };
 export const addToCheckout = async (req, res) => {
     const { userId } = req.params;
-    const { items, status, datePlaced } = req.body;
+    const { items, status, datePlaced, shippingDetails, promoCode, total_cost } = req.body;
     const cartItemIds = items.map(item => item.cartItemId);
+
+    console.log(total_cost)
 
     if (!userId || !items || !items.length) {
         return res.status(400).json({ message: "User ID and items array are required." });
@@ -217,7 +219,6 @@ export const addToCheckout = async (req, res) => {
             await product.save();
         }
 
-        // After deducting stock quantities, save the product updates
         await Promise.all(items.map(async (item) => {
             const product = await Product.findById(item.productId);
             await product.save();
@@ -235,7 +236,9 @@ export const addToCheckout = async (req, res) => {
                 status: status || 'Pending',
                 datePlaced: datePlaced || new Date(),
                 dateShipped: null, 
-                dateDelivered: null 
+                dateDelivered: null,
+                total_cost: total_cost,
+                shippingDetails: shippingDetails
             }
         };
 

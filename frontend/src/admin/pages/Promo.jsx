@@ -31,7 +31,7 @@ const Promo = () => {
   const [infoModal, setInfoModal] = useState(false);
   const [imagesPreview, setImagesPreview] = useState([])
   const [foreignHolder, setForeignHolder] = useState('')
-  const [formState, setFormState] = useState({_id: '', title: '', description: '', promo_for: '', categoryTitle: ''});
+  const [formState, setFormState] = useState({_id: '', title: '', description: '', promo_for: '', discount: '', voucher_code: '', categoryTitle: ''});
 
   const onChange = e => {
     const files = Array.from(e.target.files)
@@ -55,7 +55,7 @@ const Promo = () => {
 
   const resetFormstate = () => {
     setForeignHolder('')
-    setFormState({ title: '', description: '', promo_for: '', images: [] });
+    setFormState({ title: '', description: '', promo_for: '', voucher_code: '', discount: '', images: [] });
     setImagesPreview([])
   }
 
@@ -71,6 +71,8 @@ const Promo = () => {
       title: response.data.data.title, 
       description: response.data.data.description, 
       promo_for: response.data.data.promo_for[0]._id,
+      voucher_code: response.data.data.voucher_code,
+      discount: response.data.data.discount,
       images: response.data.data.images,
     });
 
@@ -99,6 +101,8 @@ const Promo = () => {
       _id: response.data.data._id,
       title: formState.title,
       description: formState.description,
+      voucher_code: formState.voucher_code,
+      discount: formState.discount,
       promo_for: foreignHolder,
       createdAt: new Date().toLocaleString(),
       updatedAt: new Date().toLocaleString(),
@@ -115,6 +119,8 @@ const Promo = () => {
         title: formState.title,
         description: formState.description,
         promo_for: foreignHolder,
+        voucher_code: formState.voucher_code,
+        discount: formState.discount,
         createdAt: new Date().toLocaleString(),
         updatedAt: new Date().toLocaleString(),
         newData: true,
@@ -150,6 +156,26 @@ const Promo = () => {
         placeholder: 'Enter Description',
         value: formState.description, 
         onChange: (e) => setFormState({ ...formState, description: e.target.value }),
+        required: true,
+      },
+      {
+
+        label: 'Discount',
+        type: 'number',
+        name: 'discount',
+        placeholder: 'Enter Discount',
+        value: formState.discount, 
+        onChange: (e) => setFormState({ ...formState, discount: e.target.value }),
+        required: true,
+      },
+      {
+
+        label: 'Voucher Code',
+        type: 'text',
+        name: 'voucher_code',
+        placeholder: 'Enter voucher_code',
+        value: formState.voucher_code, 
+        onChange: (e) => setFormState({ ...formState, voucher_code: e.target.value }),
         required: true,
       },
       {
@@ -192,6 +218,8 @@ const Promo = () => {
         id: promo._id,
         title: promo.title,
         description: promo.description,
+        discount: promo.discount,
+        voucher_code: promo.voucher_code,
         promo_for: (Array.isArray(promo.promo_for) && promo.promo_for.length > 0)
                     ? promo.promo_for[0].title
                     : (typeof promo.promo_for === 'string' && promo.promo_for.trim() !== '')
@@ -219,6 +247,8 @@ const Promo = () => {
             <Column style={{ verticalAlign: "top" }} field="id" header="ID" />
             <Column style={{ verticalAlign: "top" }} field="title" header="Title" />
             <Column style={{ verticalAlign: "top" }} field="description" header="Description" />
+            <Column style={{ verticalAlign: "top" }} field="discount" header="Discount" />
+            <Column style={{ verticalAlign: "top" }} field="voucher_code" header="Voucher Code" />
             <Column style={{ verticalAlign: "top" }} field="promo_for" header="Promo For" />
             <Column style={{ verticalAlign: "top" }} field="createdAt" header="Created At" />
             <Column style={{ verticalAlign: "top" }} field="updatedAt" header="Updated At" />

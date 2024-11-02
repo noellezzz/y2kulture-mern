@@ -157,6 +157,19 @@ const UserSchema = mongoose.Schema({
                 dateDelivered: {
                     type: Date,
                     required: false,
+                },
+                shippingDetails: {
+                    type: String,
+                    required: true
+                },
+                applied_voucher: {
+                    type: Schema.Types.ObjectId,
+                    ref: 'Promo',
+                    required: false
+                },
+                total_cost: {
+                    type:Number,
+                    required: true
                 }
             }
         }

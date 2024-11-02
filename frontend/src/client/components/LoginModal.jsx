@@ -28,6 +28,7 @@ const LoginModal = ({ setModalOpen, formActive, setFormActive, setUserModal, set
   const loginAttempt = async(request, response) => {
     try {
       const data = await axios.post("http://localhost:8000/auth", formState)
+      console.log(data)
       setLoggedIn(true)
     } catch (e) {
       console.log("Error logging in.", e)
@@ -35,7 +36,8 @@ const LoginModal = ({ setModalOpen, formActive, setFormActive, setUserModal, set
     }
   }
 
-  const login = async() => {
+  const login = async(e) => {
+    e.preventDefault()
     loginAttempt()
     window.location.reload()
   }
