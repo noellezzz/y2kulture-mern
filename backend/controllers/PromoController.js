@@ -39,6 +39,10 @@ export const getOnePromo = async (request, response) => {
 export const createPromo = async (request, response) => {
     const promo = request.body;
 
+    if (!promo.title || !promo.description || !promo.promo_for || !promo.voucher_code || !promo.discount) {
+        return response.status(400).json({ success: false, message: "Please provide all fields." });
+    }
+
     let images = []
     if (typeof request.body.images === 'string') {
         images.push(request.body.images)
@@ -68,10 +72,6 @@ export const createPromo = async (request, response) => {
     }
 
     request.body.images = imagesLinks
-
-    if (!promo.title || !promo.description || !promo.promo_for) {
-        return response.status(400).json({ success: false, message: "Please provide all fields." });
-    }
 
     const newPromo = new Promo(promo);
 
@@ -147,3 +147,19 @@ export const deletePromo = async (request, response) => {
         response.status(500).json({ success: false, message: "Server Error: Error in Deleting Promo." })
     }
 }
+
+export const findPromo = async (req, res) => {
+    const { promoCode } = req.body; 
+
+    try {
+        const promo = await Promo.findOne({ voucher_code: promoCode });
+
+        if (!promo) {
+            return res.status(404).json({ success: false, message: "Promo code not found." });
+        }
+
+        res.status(200).json({ success: true, promo, message: "Promo Found." });
+    } catch (e) {
+        res.status(500).json({ success: false, message: "Server Error: Error in Finding Promo." });
+    }
+};
