@@ -38,7 +38,7 @@ const LoginModal = ({ setModalOpen, formActive, setFormActive, setUserModal, set
 
   const login = async(e) => {
     e.preventDefault()
-    loginAttempt()
+    await loginAttempt()
     window.location.reload()
   }
 

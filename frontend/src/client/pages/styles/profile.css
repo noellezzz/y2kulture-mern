@@ -1,0 +1,144 @@
+.profile-container {
+    /* border:1px solid red; */
+    width: 100%;
+    padding:50px;
+    display: grid;
+    grid-template-columns: 20% 80%;
+    gap:10px;
+}
+
+.profile-container .side {
+    /* border:1px solid red; */
+    display: flex;
+    flex-direction: column;
+    
+}
+
+.profile-container .profile-main {
+    /* border:1px solid red; */
+    /* overflow: hidden; */
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-main .profile-title {
+    width: 100%;
+    background-color: white;
+    height: 90px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px 3px rgba(0,0,0,0.1);
+    /* padding:20px; */
+    display: flex;
+    align-items: center;
+    padding-left: 20px;
+    box-sizing: border-box;
+}
+
+.profile-main .profile-content {
+    width: 100%;
+    background-color: white;
+    height: 80px;
+    border-radius: 5px;
+    height: 100%;
+    box-shadow: 0px 0px 5px 3px rgba(0,0,0,0.1);
+
+    padding:20px;
+}
+
+.side .main-info {
+    background-color: white;
+    height: 170px;
+    padding:10px;
+    display: flex;
+    align-items: center;
+    gap:10px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px 3px rgba(0,0,0,0.1);
+    margin-bottom: 10px;
+}
+
+.side .profile-nav {
+    background-color: white;
+    min-height: 170px;
+
+    /* height: fit-content; */
+    height: 100%;
+    padding:10px;
+    gap:10px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px 3px rgba(0,0,0,0.1);
+
+    padding: 20px 0px
+}
+
+.main-info .user-avatar__container {
+    height: 100px;
+    width: 100px;
+    border-radius: 50%;
+}
+
+.user-avatar__container img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    overflow: hidden;
+    border-radius: 50%;
+}
+
+.pale {
+    color:gray;
+    margin-bottom: 5px;
+}
+
+.spacer {
+    margin-bottom: 5px;
+    margin-left: 10px;
+}
+
+.profile-nav__item {
+    all:unset;
+    width: 100%;
+    min-height: 60px;
+    padding-left: 10px;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+.profile-nav__item:hover {
+    background-color: rgb(229, 229, 229);
+}
+
+.field-group {
+    margin: 10px 0px;
+    /* border:1px solid red; */
+}
+
+.field-group .row {
+    display: flex;
+    gap:5px;
+    margin:10px 0px
+}
+
+.primary-text {
+    color: var(--primary-color)
+}
+
+.order-list {
+    /* border:1px solid red; */
+    display: grid;
+    grid-template-columns: 25% 25% 25% 25%;
+}
+
+.order-img__container {
+    height: 50px;
+    width: 50px;
+    margin-bottom: 5px;
+}
+
+.order-img__container img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    overflow: hidden;
+}

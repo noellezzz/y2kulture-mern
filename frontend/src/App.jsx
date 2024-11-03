@@ -12,6 +12,7 @@ import ClientLayout from './client/components/ClientLayout'
 import Welcome from './client/pages/Welcome'
 import axios from 'axios'
 import Cart from './client/pages/Cart'
+import Profle from './client/pages/Profile'
 import Inventory from './admin/pages/Inventory'
 
 function App() {
@@ -56,6 +57,7 @@ const checkLogin = async(request, response) => {
         <Route path="/" element={<ClientLayout />}>
           <Route index element={<Welcome />} />
           <Route path="cart" element={<Cart />} />
+          <Route path="profile" element={<Profle />} />
         </Route>
 
         <Route path="/admin" element={<AdminLayout />}>
