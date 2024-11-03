@@ -11,9 +11,12 @@ import { fetchData } from '../../admin/utils/crudUtils';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import { useAuth } from '../../AuthContext';
 // import { FaUser } from "react-icons/fa";
 
 const Header = () => {
+  const { isAuthenticated } = useAuth();
+  
   const [formActive, setFormActive] = useState('login')
   const [modalOpen, setModalOpen] = useState(false)
   const [modalOpenUser, setModalOpenUser] = useState(false)
@@ -113,14 +116,13 @@ const Header = () => {
         </div>
 
         <div className="side-navigation">
-          <div className="navigation-line">
-            <Link><FaSearch /></Link>
-            <Link to="/cart"><FaShoppingBag />
-              
-            </Link>
-            <span className="custom-badge">{cartNums}</span>
+          {userLoggedIn ? (
+            <div className="navigation-line">
+              <Link><FaSearch /></Link>
+              <Link to="/cart"><FaShoppingBag />
 
-            {userLoggedIn ? (
+              </Link>
+              <span className="custom-badge">{cartNums}</span>
               <FaUser
                 className='icon-link'
                 id="basic-button"
@@ -129,49 +131,49 @@ const Header = () => {
                 aria-expanded={open ? 'true' : undefined}
                 onClick={handleClick}
               />
+            </div>
 
-            ) : (
-              <>
-                <Link onClick={() => { setModalOpen(true) }}>
-                  <FaUser />
-                </Link>
+          ) : (
+            <div className="navigation-line">
+              <Link><FaSearch /></Link>
+              <Link onClick={() => { setModalOpen(true) }}>
+                <FaUser />
+              </Link>
 
-                <CSSTransition
-                  in={modalOpen}
-                  timeout={300}
-                  classNames="modal"
-                  unmountOnExit
-                >
-                  <LoginModal setBasicInfo={setBasicInfo} setModalOpen={setModalOpen} formActive={formActive} setFormActive={setFormActive} setUserModal={setModalOpenUser} />
-                </CSSTransition>
+              <CSSTransition
+                in={modalOpen}
+                timeout={300}
+                classNames="modal"
+                unmountOnExit
+              >
+                <LoginModal setBasicInfo={setBasicInfo} setModalOpen={setModalOpen} formActive={formActive} setFormActive={setFormActive} setUserModal={setModalOpenUser} />
+              </CSSTransition>
 
-                <CSSTransition
-                  in={modalOpenUser}
-                  timeout={300}
-                  classNames="modal"
-                  unmountOnExit
-                >
-                  <UserForm modalOpen={modalOpenUser} basicInfo={basicInfo} setModalOpen={setModalOpenUser} />
-                </CSSTransition>
-              </>
-            )}
+              <CSSTransition
+                in={modalOpenUser}
+                timeout={300}
+                classNames="modal"
+                unmountOnExit
+              >
+                <UserForm modalOpen={modalOpenUser} basicInfo={basicInfo} setModalOpen={setModalOpenUser} />
+              </CSSTransition>
+            </div>
+          )}
 
-            <Menu
-              className='login-dropdown'
-              id="basic-menu"
-              anchorEl={anchorEl}
-              open={open}
-              onClose={handleClose}
-              MenuListProps={{
-                'aria-labelledby': 'basic-button',
-              }}
-            >
-              <Link to="/profile"><MenuItem onClick={handleClose}>Profile</MenuItem></Link>
-              {/* <MenuItem onClick={handleClose}>My account</MenuItem> */}
-              <MenuItem onClick={logoutUser}>Logout</MenuItem>
-            </Menu>
-
-          </div>
+          <Menu
+            className='login-dropdown'
+            id="basic-menu"
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleClose}
+            MenuListProps={{
+              'aria-labelledby': 'basic-button',
+            }}
+          >
+            <Link to="/profile"><MenuItem onClick={handleClose}>Profile</MenuItem></Link>
+            {/* <MenuItem onClick={handleClose}>My account</MenuItem> */}
+            <MenuItem onClick={logoutUser}>Logout</MenuItem>
+          </Menu>
         </div>
       </nav>
     </div>
