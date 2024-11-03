@@ -5,7 +5,7 @@ justify-content: start;
   
   .cta {
       display: flex;
-      padding: 15px 36px;
+      padding: 15px 30px;
       text-decoration: none;
       font-family: 'Poppins', sans-serif;
       font-size: 16px;
@@ -25,7 +25,7 @@ justify-content: start;
       box-shadow: 10px 10px 0 #FBC638;
   }
   
-  .cta span:nth-child(2) {
+  .cta .skeww:nth-child(2) {
       transition: 0.5s;
       margin-right: 0px;
   }
@@ -35,11 +35,11 @@ justify-content: start;
       margin-right: 45px;
   }
   
-    span {
+    .skeww {
       transform: skewX(15deg) 
     }
   
-    span:nth-child(2) {
+    .skeww:nth-child(2) {
       width: 20px;
       margin-left: 30px;
       position: relative;
