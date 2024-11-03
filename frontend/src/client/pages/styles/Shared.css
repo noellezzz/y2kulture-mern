@@ -42,9 +42,28 @@ section {
 /* Hero Tagline */
 .hero-tagline {
     display: flex;
-    justify-content: center;
+    /* justify-content: center; */
+    padding:100px 0px;
     flex-direction: column;
     max-width: 50%;
+    /* border:1px solid red; */
+}
+
+.hero-icons {
+    width: 100px;
+    display: flex;
+    gap:20px;
+    font-size: 18px;
+}
+
+.hero-controls {
+    width: 60%;
+    position: relative;
+    z-index: 10000;
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: 60% 40%;
+    /* border:1px solid red; */
 }
 
 .hero-tagline .tagline-title {
@@ -90,6 +109,97 @@ section {
     gap: 15px;
 
     right: 0;
+    /* border:1px solid red; */
+}
+
+.hover-tiles {
+    position: absolute;
+    z-index: 1001;
+    height: 160px;
+    width: 160px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0px 0px 30px 13px rgba(0,0,0,0.14);
+    border:none;
+    text-align: center;
+}
+
+.hover-tiles::after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-top: 12px solid #ffffff; 
+    bottom: -12px; 
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .square-one {
+    position: absolute;
+    z-index: 0;
+    height: 500px;
+    width: 600px;
+    /* border:1px solid red; */
+    background-color: var(--primary-color);
+    right: 0px;
+    top:-100px;
+  }
+
+  .square-two{
+    position: absolute;
+    z-index: 0;
+    height: 700px;
+    width: 700px;
+    /* border:1px solid red; */
+    background-color: var(--pale-primary-color);
+    right: 400px;
+    top:460px;
+  }
+
+.product-one {
+    top:120px;
+    left:730px;  
+}
+
+.product-two {
+    top:400px;
+    left:1350px;
+}
+
+.product-three {
+    top:340px;
+    left:470px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.product-three .hover-img__container {
+    height: 150px;
+    width: 150px;
+    margin-bottom: 10px;
+}
+
+.emph {
+    margin-top: 8px;
+    color: var(--primary-color);
+}
+
+.hover-img__container {
+    height: 170px;
+    width: 170px;
+    position: relative;
+    margin-top: -60px;
+}
+
+.hover-img__container img {
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+    overflow: hidden;
 }
 
 .hero-images img {
