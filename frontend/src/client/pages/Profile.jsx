@@ -139,7 +139,7 @@ const Orders = () => {
   
       if (Array.isArray(tempList) && tempList.length > 0) {
         const pendingOrders = await Promise.all(tempList.map(async (item) => {
-          if (item.order.status === "Pending") {
+          if (item.order.status == "Pending" || item.order.status == "Delivered" || item.order.status == "Shipped") {
             const tempItemsList = await Promise.all(item.order.items.map(async (product) => {
               const productInfo = await axios.get(`http://localhost:8000/api/product/${product.productId}`);
               return {
@@ -157,6 +157,7 @@ const Orders = () => {
               _id: item._id,
               datePlaced: item.order.datePlaced,
               totalCost: item.order.total_cost,
+              status: item.order.status,
               items: tempItemsList,
             };
           }
@@ -208,7 +209,7 @@ const Orders = () => {
           });
 
           let tempArray = order.items;
-          console.log(order.items)
+          // console.log(order.items)
           return (
             <Accordion key={index}>
               <AccordionSummary
@@ -223,6 +224,10 @@ const Orders = () => {
                   <strong>Total Cost:</strong> &nbsp;
                   $ {order.totalCost}
                 </div>
+                <div>
+                  <strong>Status:</strong> &nbsp;
+                  {order.status}
+                </div>
                 <br />
                 {
                   Array.isArray(order.items) && order.items.length > 0 ? (  
@@ -232,7 +237,7 @@ const Orders = () => {
                           <img src={item.image} alt={item.title} /> 
                         </div>
                         <div className="order-title">{item.title}</div>
-                        <div className="order-variant">Variant: {item.variant || 'N/A'}</div> 
+                        <div className="order-variant">Variant: {item.color || 'N/A'}, {item.size}</div> 
                         <div className="order-quantity">Quantity: {item.quantity}</div> 
                       </div>
                     ))
@@ -240,6 +245,9 @@ const Orders = () => {
                     <div>No items found for this order.</div>  
                   )
                 }
+                <div className="order-controls">
+                  <button className="prime-button" disabled={order.status !== "Delivered"} onClick={() => {console.log(order.status)}}>Confirm Delivery</button>
+                </div>
               </AccordionDetails>
             </Accordion>
           );
