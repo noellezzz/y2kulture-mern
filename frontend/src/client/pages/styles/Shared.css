@@ -106,6 +106,14 @@ section {
     height: 130vh;
 }
 
+.sub-spacer {
+    margin-bottom: 5px;
+}
+
+.top-spacer {
+    margin-top: 10px;
+}
+
 .section-header {
     margin-top: 100px;
     display: flex;
@@ -161,6 +169,12 @@ section {
 
 .align-center {
     align-items: center;
+}
+
+.grey-text {
+    color:rgb(168, 168, 168);
+    text-transform: uppercase;
+    font-size: var(--small-font);
 }
 
 .product-tile__primary {
