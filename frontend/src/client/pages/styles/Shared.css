@@ -43,7 +43,7 @@ section {
 .hero-tagline {
     display: flex;
     /* justify-content: center; */
-    padding:100px 0px;
+    padding:23px 0px;
     flex-direction: column;
     max-width: 50%;
     /* border:1px solid red; */
@@ -97,8 +97,8 @@ section {
 .hero-images {
     position: absolute;
     z-index: 1000;
-    height: 90%;
-    width: 90%;
+    height: 90vh;
+    width: 90vw;
     /* background-image: url('../../../assets/heroimage.png');
     background-size: cover;  
     background-position: center; 
@@ -115,8 +115,8 @@ section {
 .hover-tiles {
     position: absolute;
     z-index: 1001;
-    height: 160px;
-    width: 160px;
+    height: 20vh;
+    width: 10vw;
     background-color: white;
     border-radius: 10px;
     box-shadow: 0px 0px 30px 13px rgba(0,0,0,0.14);
@@ -140,8 +140,8 @@ section {
   .square-one {
     position: absolute;
     z-index: 0;
-    height: 500px;
-    width: 600px;
+    height: 80vh;
+    width: 30vw;
     /* border:1px solid red; */
     background-color: var(--primary-color);
     right: 0px;
@@ -151,35 +151,35 @@ section {
   .square-two{
     position: absolute;
     z-index: 0;
-    height: 700px;
-    width: 700px;
+    height: 40vh;
+    width: 40vw;
     /* border:1px solid red; */
     background-color: var(--pale-primary-color);
-    right: 400px;
-    top:460px;
+    right: 20vw;
+    top:50vh;
   }
 
 .product-one {
-    top:120px;
-    left:730px;  
+    top:15%;
+    left:48%;  
 }
 
 .product-two {
-    top:400px;
-    left:1350px;
+    top:55%;
+    right:2%;
 }
 
 .product-three {
-    top:340px;
-    left:470px;
+    top:50%;
+    left:30%;
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
 
 .product-three .hover-img__container {
-    height: 150px;
-    width: 150px;
+    height: 20vh;
+    width: 10vw;
     margin-bottom: 10px;
 }
 
@@ -189,8 +189,8 @@ section {
 }
 
 .hover-img__container {
-    height: 170px;
-    width: 170px;
+    height: 20vh;
+    width: 10vw;
     position: relative;
     margin-top: -60px;
 }
@@ -203,6 +203,9 @@ section {
 }
 
 .hero-images img {
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
     filter: drop-shadow(-3px -1px 5px #000000);
 }
 

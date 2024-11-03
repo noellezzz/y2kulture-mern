@@ -115,7 +115,10 @@ const Header = () => {
         <div className="side-navigation">
           <div className="navigation-line">
             <Link><FaSearch /></Link>
-            <Link to="/cart"><FaShoppingBag /><span className="custom-badge">{cartNums}</span></Link>
+            <Link to="/cart"><FaShoppingBag />
+              
+            </Link>
+            <span className="custom-badge">{cartNums}</span>
 
             {userLoggedIn ? (
               <FaUser
