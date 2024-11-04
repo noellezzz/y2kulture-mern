@@ -56,7 +56,7 @@
 
 # QUIZ 4
 - [ ] facebook or gmail login 15pts react-facebook-login or similar packages.
-- [ ] facebook or gmail login firebase 15pts
+- [x] facebook or gmail login firebase 15pts
 
 quiz 5 attendance 10pts
 2pts deduction for each meeting of being absent.
