@@ -7,6 +7,7 @@ import mainLogo from '../../assets/main-logo.png'
 import { createFunc } from '../../admin/utils/crudUtils'
 import axios from 'axios'
 import TextField from '@mui/material/TextField';
+import { firebaseLogin, firebaseRegister } from '../../auth/auth';
 
 const LoginModal = ({ setModalOpen, formActive, setFormActive, setUserModal, setBasicInfo  }) => {
   const [loggedIn, setLoggedIn] = useState(false)
@@ -26,24 +27,30 @@ const LoginModal = ({ setModalOpen, formActive, setFormActive, setUserModal, set
   };
 
   const loginAttempt = async(request, response) => {
-    try {
-      const data = await axios.post("http://localhost:8000/auth", formState)
-      console.log(data)
-      setLoggedIn(true)
-    } catch (e) {
-      console.log("Error logging in.", e)
-      setLoggedIn(false)
-    }
+    // try {
+    //   const data = await axios.post("http://localhost:8000/auth", formState)
+    //   console.log(data)
+    //   setLoggedIn(true)
+    // } catch (e) {
+    //   console.log("Error logging in.", e)
+    //   setLoggedIn(false)
+    // }
+    const user = await firebaseLogin(formState.email, formState.password)
+    const token = await user.getIdToken();
+    const res = await axios.post("http://localhost:8000/auth", { token });
+    // console.log(response.data);
   }
 
   const login = async(e) => {
     e.preventDefault()
+
     await loginAttempt()
     window.location.reload()
   }
 
   const handleSubmit = async(e) => {
     e.preventDefault();
+    firebaseRegister(formState.email, formState.password)
     const response = await createFunc('user', formState)
     setBasicInfo({id: response.data.data._id, email: response.data.data.email})
     loginAttempt()
@@ -53,7 +60,8 @@ const LoginModal = ({ setModalOpen, formActive, setFormActive, setUserModal, set
 
   const handleLogin = (e) => {
     e.preventDefault();
-    loginAttempt()
+    firebaseLogin(formState.email, formState.password)
+    // loginAttempt()
   }
 
   return (

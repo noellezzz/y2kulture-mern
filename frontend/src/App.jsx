@@ -15,6 +15,9 @@ import Cart from './client/pages/Cart'
 import Profle from './client/pages/Profile'
 import Inventory from './admin/pages/Inventory'
 
+import { AuthProvider } from './AuthContext';
+import ProtectedRoute from './ProtectedRoute';
+
 function App() {
   axios.defaults.withCredentials = true;
   const [userLoggedIn, setUserLoggedIn] = useState(false)
@@ -22,17 +25,17 @@ function App() {
     checkLogin()
   }, [])
 
-const checkLogin = async(request, response) => {
-  try {
-    if (userLoggedIn) {
-      await axios.get('http://localhost:8000/auth')
+  const checkLogin = async (request, response) => {
+    try {
+      if (userLoggedIn) {
+        await axios.get('http://localhost:8000/auth')
+      }
+
+      setUserLoggedIn(true)
+    } catch {
+      setUserLoggedIn(false)
     }
-    
-    setUserLoggedIn(true)
-  } catch {
-    setUserLoggedIn(false)
   }
-}
 
   const adminRoutes = [
     { path: "", element: <Dashboard /> },
@@ -44,20 +47,22 @@ const checkLogin = async(request, response) => {
   ];
 
   return (
-    <>
+    <AuthProvider>
       <Toaster
-          toastOptions={{
-            style: {
-              zIndex: 9999,
-              fontFamily: 'ITCAvantGardeBK, sans-serif',
-            },
-          }}
-        />
+        toastOptions={{
+          style: {
+            zIndex: 9999,
+            fontFamily: 'ITCAvantGardeBK, sans-serif',
+          },
+        }}
+      />
       <Routes>
         <Route path="/" element={<ClientLayout />}>
           <Route index element={<Welcome />} />
-          <Route path="cart" element={<Cart />} />
-          <Route path="profile" element={<Profle />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="cart" element={<Cart />} />
+            <Route path="profile" element={<Profle />} />
+          </Route>
         </Route>
 
         <Route path="/admin" element={<AdminLayout />}>
@@ -66,7 +71,7 @@ const checkLogin = async(request, response) => {
           ))}
         </Route>
       </Routes>
-    </>
+    </AuthProvider>
   )
 }
 

@@ -11,6 +11,7 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Button from '@mui/material/Button';
 import axios from 'axios'
+import { createFunc, updateFunc } from '../../admin/utils/crudUtils';
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
   '& .MuiOutlinedInput-root': {
@@ -32,11 +33,14 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
 }));
 
 const Profile = () => {
+
   const [contentPage, setContentPage] = useState('Account Overview')
+  const [userInfo, setUserInfo] = useState({})
   const checkLogin = async (request, response) => {
     try {
       const response = await axios.get('http://localhost:8000/auth')
-      console.log(response)
+      console.log(response.data.user)
+      setUserInfo(response.data.user)
     } catch (e) {
       console.log(e)
     }
@@ -51,11 +55,18 @@ const Profile = () => {
       <div className="side">
         <div className="main-info">
           <div className="user-avatar__container">
-            <img src="https://placehold.co/600x400" alt="" />
+            {userInfo.avatar && userInfo.avatar.length > 0 ? (
+              <img src={userInfo.avatar[0].url} alt={`${userInfo.first_name} ${userInfo.last_name}`} />
+            ) : (
+              <img
+                src={`https://ui-avatars.com/api/?name=${userInfo.first_name}+${userInfo.last_name}&size=512`}
+                alt={`${userInfo.first_name} ${userInfo.last_name}`}
+              />
+            )}
           </div>
           <div className="user-main__text">
             <h6 className='pale'>Welcome,</h6>
-            <h4>John Doe</h4>
+            <h4>{userInfo.first_name} {userInfo.last_name}</h4>
           </div>
         </div>
 
@@ -88,43 +99,110 @@ const Profile = () => {
 }
 
 const AccountOverview = () => {
+  const [basicInfo, setBasicInfo] = useState({})
+  const [userInfo, setUserInfo] = useState({
+    email: '',
+    first_name: '',
+    last_name: '',
+    gender: '',
+    birthday: '',
+
+    street: '',
+    city: '',
+    state: '',
+    country: '',
+    zip: ''
+  });
+
+  const checkLogin = async (request, response) => {
+    try {
+      const response = await axios.get('http://localhost:8000/auth')
+      console.log(response.data.user)
+      setUserInfo({
+        email: response.data.user.email,
+        first_name: response.data.user.first_name,
+        last_name: response.data.user.last_name,
+        gender: response.data.user.gender,
+        birthday: response.data.user.birthday,
+
+        street: response.data.user.address[0].street_address,
+        city: response.data.user.address[0].city,
+        state: response.data.user.address[0].state,
+        country: response.data.user.address[0].country,
+        zip: response.data.user.address[0].zip_code
+      })
+      setBasicInfo({ id: response.data.user._id })
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setUserInfo((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  useEffect(() => {
+    checkLogin()
+  }, [])
+
+  useEffect(() => {
+    console.log(userInfo)
+  }, [userInfo])
+
+  const handleSubmit = async () => {
+    // e.preventDefault();
+    try {
+      await updateFunc('user', basicInfo.id, userInfo)
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
   return (
     <div className="profile-content">
       <div className='spacer'>Account Information</div>
       <hr />
       <div className="field-group">
         <div className="row">
-          <StyledTextField label="Full Name" variant="outlined"
+          <StyledTextField label="Full Name" variant="outlined" value={userInfo.first_name + " " + userInfo.last_name}
             InputProps={{
               readOnly: true,
             }} />
         </div>
         <div className="row">
-          <StyledTextField label="First Name" variant="outlined" />
-          <StyledTextField label="Last Name" variant="outlined" />
+          <StyledTextField label="First Name" variant="outlined" value={userInfo.first_name} name="first_name" onChange={handleChange} />
+          <StyledTextField label="Last Name" variant="outlined" value={userInfo.last_name} name="last_name" onChange={handleChange} />
         </div>
         <div className="row">
-          <StyledTextField label="Birthday" variant="outlined" />
-          <StyledTextField label="Gender" variant="outlined" />
+          <StyledTextField label="Birthday" variant="outlined" value={userInfo.birthday} name="birthday" onChange={handleChange} />
+          <StyledTextField label="Gender" variant="outlined" value={userInfo.gender} name="gender" onChange={handleChange} />
         </div>
       </div>
       <div className='spacer'>Delivery Information</div>
       <hr />
       <div className="field-group">
         <div className="row">
-          <StyledTextField label="Address" variant="outlined"
+          <StyledTextField label="Address" variant="outlined" value={userInfo.street + " " + userInfo.city + " " + userInfo.state + " " + userInfo.country + " " + userInfo.zip}
             InputProps={{
               readOnly: true,
             }} />
         </div>
         <div className="row">
-          <StyledTextField label="Street" variant="outlined" />
-          <StyledTextField label="City" variant="outlined" />
-          <StyledTextField label="State" variant="outlined" />
-          <StyledTextField label="Country" variant="outlined" />
-          <StyledTextField label="Zip Code" variant="outlined" />
+          <StyledTextField label="Street" variant="outlined" value={userInfo.street} name="street" onChange={handleChange} />
+          <StyledTextField label="City" variant="outlined" value={userInfo.city} name="city" onChange={handleChange} />
+          <StyledTextField label="State" variant="outlined" value={userInfo.state} name="state" onChange={handleChange} />
+          <StyledTextField label="Country" variant="outlined" value={userInfo.country} name="country" onChange={handleChange} />
+          <StyledTextField label="Zip Code" variant="outlined" value={userInfo.zip} name="zip" onChange={handleChange} />
         </div>
       </div>
+      <Button variant="contained"
+        onClick={() => { handleSubmit() }}
+      >Save Info
+      </Button>
     </div>
   )
 }
@@ -136,10 +214,10 @@ const Orders = () => {
     try {
       const response = await axios.get('http://localhost:8000/auth');
       const tempList = response.data.user.checkout;
-  
+
       if (Array.isArray(tempList) && tempList.length > 0) {
         const pendingOrders = await Promise.all(tempList.map(async (item) => {
-          if (item.order.status === "Pending") {
+          if (item.order.status == "Pending" || item.order.status == "Delivered" || item.order.status == "Shipped") {
             const tempItemsList = await Promise.all(item.order.items.map(async (product) => {
               const productInfo = await axios.get(`http://localhost:8000/api/product/${product.productId}`);
               return {
@@ -147,21 +225,22 @@ const Orders = () => {
                 color: product.color,
                 size: product.size,
                 title: productInfo.data.data.title,
-                image: productInfo.data.data.images.length > 0 
-                  ? productInfo.data.data.images[0].url 
+                image: productInfo.data.data.images.length > 0
+                  ? productInfo.data.data.images[0].url
                   : "https://placehold.co/600x400"
               };
             }));
-  
+
             return {
               _id: item._id,
               datePlaced: item.order.datePlaced,
               totalCost: item.order.total_cost,
+              status: item.order.status,
               items: tempItemsList,
             };
           }
         }));
-  
+
         // Filter out undefined values
         const filteredOrders = pendingOrders.filter(order => order !== undefined);
         console.log("Pending orders:", filteredOrders);  // Log the pending orders
@@ -173,7 +252,7 @@ const Orders = () => {
       console.error(e);
     }
   };
-  
+
 
   const getInfo = async (id) => {
     try {
@@ -208,7 +287,7 @@ const Orders = () => {
           });
 
           let tempArray = order.items;
-          console.log(order.items)
+          // console.log(order.items)
           return (
             <Accordion key={index}>
               <AccordionSummary
@@ -223,23 +302,30 @@ const Orders = () => {
                   <strong>Total Cost:</strong> &nbsp;
                   $ {order.totalCost}
                 </div>
+                <div>
+                  <strong>Status:</strong> &nbsp;
+                  {order.status}
+                </div>
                 <br />
                 {
-                  Array.isArray(order.items) && order.items.length > 0 ? (  
+                  Array.isArray(order.items) && order.items.length > 0 ? (
                     order.items.map((item, index2) => (
                       <div key={index2} className="order-list">
                         <div className="order-img__container">
-                          <img src={item.image} alt={item.title} /> 
+                          <img src={item.image} alt={item.title} />
                         </div>
                         <div className="order-title">{item.title}</div>
-                        <div className="order-variant">Variant: {item.variant || 'N/A'}</div> 
-                        <div className="order-quantity">Quantity: {item.quantity}</div> 
+                        <div className="order-variant">Variant: {item.color || 'N/A'}, {item.size}</div>
+                        <div className="order-quantity">Quantity: {item.quantity}</div>
                       </div>
                     ))
                   ) : (
-                    <div>No items found for this order.</div>  
+                    <div>No items found for this order.</div>
                   )
                 }
+                <div className="order-controls">
+                  <button className="prime-button" disabled={order.status !== "Delivered"} onClick={() => { console.log(order.status) }}>Confirm Delivery</button>
+                </div>
               </AccordionDetails>
             </Accordion>
           );

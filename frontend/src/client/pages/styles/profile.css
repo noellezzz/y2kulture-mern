@@ -142,3 +142,9 @@
     object-fit: cover;
     overflow: hidden;
 }
+
+.order-controls {
+    width: 100%;
+    display: flex;
+    justify-content: end;
+}

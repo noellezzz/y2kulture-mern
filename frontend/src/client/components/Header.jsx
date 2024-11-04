@@ -8,8 +8,15 @@ import { CSSTransition } from 'react-transition-group';
 import axios from 'axios'
 import UserForm from './UserForm'
 import { fetchData } from '../../admin/utils/crudUtils';
+import Button from '@mui/material/Button';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import { useAuth } from '../../AuthContext';
+// import { FaUser } from "react-icons/fa";
 
 const Header = () => {
+  const { isAuthenticated } = useAuth();
+  
   const [formActive, setFormActive] = useState('login')
   const [modalOpen, setModalOpen] = useState(false)
   const [modalOpenUser, setModalOpenUser] = useState(false)
@@ -19,6 +26,15 @@ const Header = () => {
   const [basicInfo, setBasicInfo] = useState({ id: '', email: '' })
   const [isScrolled, setIsScrolled] = useState(false);
   const [cartNums, setCartNums] = useState(0)
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   const handleScroll = () => {
     if (window.scrollY >= 800) {
@@ -38,7 +54,7 @@ const Header = () => {
 
   useEffect(() => {
     checkLogin()
-    
+
     // console.log(userLoggedIn)
   }, [])
 
@@ -100,39 +116,64 @@ const Header = () => {
         </div>
 
         <div className="side-navigation">
-          <div className="navigation-line">
-            <Link><FaSearch /></Link>
-            <Link to="/cart"><FaShoppingBag /><span className="custom-badge">{cartNums}</span></Link>
+          {userLoggedIn ? (
+            <div className="navigation-line">
+              <Link><FaSearch /></Link>
+              <Link to="/cart"><FaShoppingBag />
 
-            {userLoggedIn ? (
-              <div onClick={() => { logoutUser() }}>Logout</div>
-            ) : (
-              <>
-                <Link onClick={() => { setModalOpen(true) }}>
-                  <FaUser />
-                </Link>
+              </Link>
+              <span className="custom-badge">{cartNums}</span>
+              <FaUser
+                className='icon-link'
+                id="basic-button"
+                aria-controls={open ? 'basic-menu' : undefined}
+                aria-haspopup="true"
+                aria-expanded={open ? 'true' : undefined}
+                onClick={handleClick}
+              />
+            </div>
 
-                <CSSTransition
-                  in={modalOpen}
-                  timeout={300}
-                  classNames="modal"
-                  unmountOnExit
-                >
-                  <LoginModal setBasicInfo={setBasicInfo} setModalOpen={setModalOpen} formActive={formActive} setFormActive={setFormActive} setUserModal={setModalOpenUser} />
-                </CSSTransition>
+          ) : (
+            <div className="navigation-line">
+              <Link><FaSearch /></Link>
+              <Link onClick={() => { setModalOpen(true) }}>
+                <FaUser />
+              </Link>
 
-                <CSSTransition
-                  in={modalOpenUser}
-                  timeout={300}
-                  classNames="modal"
-                  unmountOnExit
-                >
-                  <UserForm modalOpen={modalOpenUser} basicInfo={basicInfo} setModalOpen={setModalOpenUser} />
-                </CSSTransition>
-              </>
-            )}
+              <CSSTransition
+                in={modalOpen}
+                timeout={300}
+                classNames="modal"
+                unmountOnExit
+              >
+                <LoginModal setBasicInfo={setBasicInfo} setModalOpen={setModalOpen} formActive={formActive} setFormActive={setFormActive} setUserModal={setModalOpenUser} />
+              </CSSTransition>
 
-          </div>
+              <CSSTransition
+                in={modalOpenUser}
+                timeout={300}
+                classNames="modal"
+                unmountOnExit
+              >
+                <UserForm modalOpen={modalOpenUser} basicInfo={basicInfo} setModalOpen={setModalOpenUser} />
+              </CSSTransition>
+            </div>
+          )}
+
+          <Menu
+            className='login-dropdown'
+            id="basic-menu"
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleClose}
+            MenuListProps={{
+              'aria-labelledby': 'basic-button',
+            }}
+          >
+            <Link to="/profile"><MenuItem onClick={handleClose}>Profile</MenuItem></Link>
+            {/* <MenuItem onClick={handleClose}>My account</MenuItem> */}
+            <MenuItem onClick={logoutUser}>Logout</MenuItem>
+          </Menu>
         </div>
       </nav>
     </div>
