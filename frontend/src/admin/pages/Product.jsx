@@ -21,6 +21,12 @@ import CreateModal from '../components/CreateModal';
 import StockModal from '../components/StockModal'
 import { MdInventory } from "react-icons/md";
 
+import { DataGrid } from '@mui/x-data-grid';
+import Paper from '@mui/material/Paper';
+
+import { IconButton, Typography, Grid } from '@mui/material';
+import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
+
 const Product = () => {
   // Product Isolate
   const [categoryOps, setCategoryOps] = useState([]);
@@ -67,7 +73,7 @@ const Product = () => {
     setOpenModal(true)
   }
 
-  const loadDataGen = async(id) => {
+  const loadDataGen = async (id) => {
     const response = await fetchDataN('product', id)
     setFormState({
       _id: id,
@@ -134,6 +140,95 @@ const Product = () => {
 
   const handleDelete = (id) => {
     deleteFunc('product', id, setApiData)
+  };
+
+
+  const columns = [
+    {
+      field: 'expand',
+      headerName: '',
+      width: 50,
+      renderCell: (params) => (
+        <IconButton onClick={() => toggleRowExpansion(params.row.id)} size="small">
+          {expandedRowIds.has(params.row.id) ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+        </IconButton>
+      ),
+    },
+    { field: 'id', headerName: 'ID', width: 230 },
+    { field: 'title', headerName: 'Title', width: 130 },
+    { field: 'description', headerName: 'Description', width: 170 },
+    {
+      field: 'price',
+      headerName: 'Price',
+      type: 'number',
+      width: 90,
+    },
+    {
+      field: 'material',
+      headerName: 'Material',
+      description: 'This column has a value getter and is not sortable.',
+      sortable: false,
+      width: 80,
+    },
+    { field: 'categoryTitle', headerName: 'Category', width: 130 },
+    { field: 'createdAt', headerName: 'Created At', width: 130 },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 150,
+      renderCell: (params) => (
+        <>
+          <Button
+            onClick={() => loadDataByIdEdit(params.row.id)}
+            color="primary"
+            size="small"
+            sx={{ minWidth: 32, height: 32, padding: 0, marginRight: 1 }}
+          >
+            <EditIcon sx={{ width: 18, height: 18 }} />
+          </Button>
+          <Button
+            onClick={() => handleDelete(params.row.id)}
+            color="secondary"
+            size="small"
+            sx={{ minWidth: 32, height: 32, padding: 0 }}
+          >
+            <DeleteIcon sx={{ width: 18, height: 18 }} />
+          </Button>
+        </>
+      ),
+    },
+  ];
+
+  const paginationModel = { page: 0, pageSize: 5 };
+
+  const [selectedRowIds, setSelectedRowIds] = useState([]);
+  const [expandedRowIds, setExpandedRowIds] = useState(new Set());
+
+  const toggleRowExpansion = (id) => {
+    setExpandedRowIds((prev) => {
+      const newExpanded = new Set(prev);
+      if (newExpanded.has(id)) {
+        newExpanded.delete(id);
+      } else {
+        newExpanded.add(id);
+      }
+      return newExpanded;
+    });
+  };
+
+  const handleSelectionChange = (selectionModel) => {
+    console.log('Current Selection Model:', selectionModel); // Debugging line
+    setSelectedRowIds(selectionModel);
+  };
+
+  const printSelectedIds = async() => {
+    try {
+      selectedRowIds.map((ids) => {
+        handleDelete(ids)
+      })
+    } catch(e) {
+      console.log(e)
+    }
   };
 
   const modalData = {
@@ -209,6 +304,10 @@ const Product = () => {
     fetchData('category', setCategoryOps);
   }, []);
 
+  const logData = () => {
+    console.log(flattenData)
+  }
+
   useEffect(() => {
     if (apiData.length > 0) {
       const flattened = apiData.map(product => ({
@@ -233,57 +332,22 @@ const Product = () => {
     <div className="main-container__admin">
       <div className="container sub-container__single-lg">
         <div className="container-body">
-          <DataTable
-            value={flattenData}
-            tableStyle={{ minWidth: '50rem' }}
-            scrollable
-            scrollHeight="290px"
-            style={{ zIndex: 1 }}
-          >
-            <Column style={{ zIndex: 2, verticalAlign: "top", verticalAlign: "top" }} field="id" header="ID" />
-            <Column style={{ zIndex: 2, verticalAlign: "top", verticalAlign: "top" }} field="title" header="Title" />
-            <Column style={{ zIndex: 2, minWidth: '200px', verticalAlign: "top", verticalAlign: "top" }} field="description" header="Description" />
-            <Column style={{ zIndex: 2, verticalAlign: "top", verticalAlign: "top" }} field="price" header="Price" />
-            <Column style={{ zIndex: 2, verticalAlign: "top", verticalAlign: "top" }} field="material" header="Material" />
-            <Column style={{ zIndex: 2, verticalAlign: "top", verticalAlign: "top" }} field="categoryTitle" header="Category" />
-            <Column style={{ zIndex: 2, verticalAlign: "top", verticalAlign: "top" }} field="createdAt" header="Created At" />
-            <Column style={{ zIndex: 2, verticalAlign: "top", verticalAlign: "top" }} field="updatedAt" header="Updated At" />
-            <Column
-              style={{ zIndex: 2, verticalAlign: "top" }}
-              field="controls"
-              header="Controls"
-              body={(rowData) => (
-                <div className='gap-10'>
-                  <Fab onClick={() => loadDataByIdEdit(rowData.id)}
-                    color="primary" aria-label="edit" size="small" sx={{ zIndex: 0, width: 32, height: 10,  marginBottom:1 }}
-                  >
-                    <EditIcon sx={{ width: 15, height: 15 }} />
-                  </Fab>
-                  &nbsp;
-                  <Fab onClick={() => handleDelete(rowData.id)}
-                    color="secondary" aria-label="delete" size="small" sx={{ zIndex: 0, width: 32, height: 10,  marginBottom:1 }}
-                  >
-                    <DeleteIcon sx={{ width: 15, height: 15 }} />
-                  </Fab>
-                  &nbsp;
-                  <Fab onClick={() => loadDataByIdInfo(rowData.id)}
-                    color="info" aria-label="info" size="small" sx={{ zIndex: 0, width: 32, height: 10, marginBottom:1 }}
-                  >
-                    <IoMdEye sx={{ width: 15, height: 15 }} />
-                  </Fab>
-                  &nbsp;
-                  <Fab onClick={() => {setStockModal(true)}}
-                    color="success" aria-label="success" size="small" sx={{ color:'white', zIndex: 0, width: 32, height: 10, marginBottom:1 }}
-                  >
-                    <MdInventory sx={{ width: 15, height: 15 }} />
-                  </Fab>
-                </div>
-              )}
-            />
-          </DataTable>
+          <DataGrid
+            rows={flattenData}
+            columns={columns}
+            checkboxSelection
+            onRowSelectionModelChange={handleSelectionChange}
+            pageSizeOptions={[5, 10]}
+            sx={{ border: 0 }}
+          />
         </div>
 
         <div className="container-footer">
+          {/* <button onClick={printSelectedIds}>Print Selected IDs</button> */}
+          <Button variant="contained" className='invert-button'
+            onClick={() => { printSelectedIds() }}
+          >Delete Selected Rows
+          </Button>
           <Button variant="contained"
             onClick={() => { loadModalCreate() }}
           >Create New
@@ -322,7 +386,7 @@ const Product = () => {
             classNames="modal"
             unmountOnExit
           >
-            <StockModal setOpenModal={setStockModal} modalData={modalData}/>
+            <StockModal setOpenModal={setStockModal} modalData={modalData} />
           </CSSTransition>
         </div>
       </div>
