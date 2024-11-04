@@ -44,6 +44,38 @@ export const checkUser = async (req, res) => {
     }
 }
 
+export const loginWithGoogle = async (req, res) => {
+    try {
+        const { token } = req.body;
+        const decodedToken = await admin.auth().verifyIdToken(token);
+        const { email, name } = decodedToken;
+
+        let user = await User.findOne({ email });
+
+        if (!user) {
+            const hashedPassword = await bcrypt.hash("secret", 10);
+            const [firstName, lastName] = decodedToken.name.split(" ");
+            const photoURL = decodedToken.picture || "default_avatar_url"; // using `picture` as the photo URL field
+        
+            user = await User.create({
+                email: decodedToken.email,
+                name: decodedToken.name,
+                password: hashedPassword,
+                first_name: firstName,
+                last_name: lastName,
+                avatar: [{ public_id: "123", url: photoURL }],
+            });
+        
+            return sendToken(user, 200, res);
+        }
+
+        sendToken(user, 200, res);
+    } catch (e) {
+        console.log("Error in Google login: ", e.message);
+        res.status(500).json({ success: false, message: "Server Error." });
+    }
+};
+
 export const login = async (req, res) => {
     // try {
     //     const { email, password } = req.body;

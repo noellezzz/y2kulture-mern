@@ -7,9 +7,29 @@ import mainLogo from '../../assets/main-logo.png'
 import { createFunc } from '../../admin/utils/crudUtils'
 import axios from 'axios'
 import TextField from '@mui/material/TextField';
-import { firebaseLogin, firebaseRegister } from '../../auth/auth';
+import { firebaseLogin, firebaseRegister, signInWithGoogle } from '../../auth/auth';
+
 
 const LoginModal = ({ setModalOpen, formActive, setFormActive, setUserModal, setBasicInfo  }) => {
+  const loginWithGoogle = async() => {
+    try {
+      const user = await signInWithGoogle()
+      console.log(user)
+      const token = await user.getIdToken();
+      console.log("user", user)
+      console.log("token", token)
+      const res = await axios.post("http://localhost:8000/auth/google", { token });
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+      // if(res.response.data.message == "User not found") {
+      //   console.log("ooga")
+      // }
+    } catch(e) {
+      console.log(e)
+    }
+  }
+
   const [loggedIn, setLoggedIn] = useState(false)
   const [formState, setFormState] = useState({email:'', password:''})
 
@@ -204,7 +224,7 @@ const LoginModal = ({ setModalOpen, formActive, setFormActive, setUserModal, set
               <FaFacebook className='btn-icon'/>
               Facebook
             </button>
-            <button className='prime-button gmail-button'>
+            <button className='prime-button gmail-button' onClick={loginWithGoogle}>
               <BiLogoGmail className='btn-icon'/>
               Gmail
             </button>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import './styles/profile.css'
 import { FaRegUser } from "react-icons/fa";
 import { MdOutlineShoppingBag } from "react-icons/md";
@@ -12,6 +12,9 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Button from '@mui/material/Button';
 import axios from 'axios'
 import { createFunc, updateFunc } from '../../admin/utils/crudUtils';
+import { ref, uploadBytes, getDownloadURL, getStorage  } from "firebase/storage";
+
+const storage = getStorage();
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
   '& .MuiOutlinedInput-root': {
@@ -33,14 +36,51 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
 }));
 
 const Profile = () => {
+  const [avatarUrl, setAvatarUrl] = useState(null);
+  const fileInputRef = useRef(null);
+
+  const handleAvatarUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const avatarRef = ref(storage, `avatars/${id}`);
+    console.log("Uploading...")
+
+    try {
+      // Upload file
+      await uploadBytes(avatarRef, file);
+      console.log("Avatar uploaded successfully");
+
+      // Retrieve the download URL
+      const downloadUrl = await getDownloadURL(avatarRef);
+      setAvatarUrl(downloadUrl);
+
+      // Save the download URL to the database (optional)
+    } catch (error) {
+      console.error("Error uploading avatar:", error);
+    }
+  };
+
+  const handleImageClick = () => {
+    console.log("Image clicked"); // Ensure this is logged
+    fileInputRef.current.click(); // Trigger the file input click
+};
 
   const [contentPage, setContentPage] = useState('Account Overview')
   const [userInfo, setUserInfo] = useState({})
-  const checkLogin = async (request, response) => {
+  const [id, setId] = useState(null)
+  const checkLogin = async () => {
     try {
       const response = await axios.get('http://localhost:8000/auth')
-      console.log(response.data.user)
+      console.log("user", response.data.user.avatar[0].url)
       setUserInfo(response.data.user)
+      setId(response.data.user._id)
+      if (response.data.user.avatar && response.data.user.avatar.length > 0 ) {
+        setAvatarUrl(response.data.user.avatar[0].url)
+      } else {
+        setAvatarUrl(`https://ui-avatars.com/api/?name=${response.data.user.first_name}+${response.data.user.last_name}&size=512`)
+      }
+
     } catch (e) {
       console.log(e)
     }
@@ -50,19 +90,27 @@ const Profile = () => {
     checkLogin()
   }, [])
 
+  useEffect(() => {
+    console.log(avatarUrl)
+  }, [avatarUrl])
+
   return (
     <section className="profile-container">
       <div className="side">
         <div className="main-info">
-          <div className="user-avatar__container">
-            {userInfo.avatar && userInfo.avatar.length > 0 ? (
-              <img src={userInfo.avatar[0].url} alt={`${userInfo.first_name} ${userInfo.last_name}`} />
-            ) : (
-              <img
-                src={`https://ui-avatars.com/api/?name=${userInfo.first_name}+${userInfo.last_name}&size=512`}
-                alt={`${userInfo.first_name} ${userInfo.last_name}`}
-              />
-            )}
+          <div className="user-avatar__container" onClick={handleImageClick} >
+          <input
+                type="file"
+                ref={fileInputRef} // Set the ref to the input
+                onChange={handleAvatarUpload}
+                style={{ display: 'none' }} // Hide the input
+            />
+                <img 
+                    onClick={handleImageClick} 
+                    className='user-img__actual' 
+                    src={avatarUrl} 
+                    alt={`User Avatar`} 
+                />
           </div>
           <div className="user-main__text">
             <h6 className='pale'>Welcome,</h6>
@@ -125,7 +173,7 @@ const AccountOverview = () => {
         last_name: res.data.user.last_name || '',
         gender: res.data.user.gender || '',
         birthday: res.data.user.birthday || '',
-        
+
         street: res.data.user.address?.[0]?.street_address || '',
         city: res.data.user.address?.[0]?.city || '',
         state: res.data.user.address?.[0]?.state || '',
@@ -133,7 +181,7 @@ const AccountOverview = () => {
         zip: res.data.user.address?.[0]?.zip_code || ''
       })
       // setBasicInfo({ id: response.data.user._id })
-      
+
     } catch (e) {
       console.log(e)
     }
