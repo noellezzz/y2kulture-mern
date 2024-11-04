@@ -145,12 +145,19 @@ const Cart = () => {
       toast.error('No Product added for Checkout.')
     }
     else {
+      let checkedItems = []
+      items.map((item) => {
+        if (item.checked) {
+          checkedItems.push(item)
+        }
+      })
+      // console.log(checkedItems)
       setOpenModal(true)
       setCheckoutInfo({
         total_cost: total,
         shippingDetails: addData.address,
         promoCode: addData.promoCode,
-        items: items,
+        items: checkedItems,
         status: 'Pending',
         datePlaced: new Date()
       })
