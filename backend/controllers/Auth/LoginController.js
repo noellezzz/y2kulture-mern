@@ -6,6 +6,14 @@ import jwt from 'jsonwebtoken'
 import asyncHandler from 'express-async-handler';
 import { sendToken } from '../../utils/jwtToken.js'
 
+import admin from "firebase-admin";
+import serviceAccount from "../../firebase/serviceAccountKey.json" assert { type: "json" };
+
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
+
 // export const isAuthenticatedUser = async (req, res, next) => {
 //     const { token } = req.cookies.jwt
 //     console.log(token)
@@ -34,48 +42,42 @@ export const checkUser = async (req, res) => {
             message: "Server Error."
         })
     }
-
 }
 
 export const login = async (req, res) => {
+    // try {
+    //     const { email, password } = req.body;
+    //     const user = await User.findOne({ email: email, password: password });
+
+    //     if (!user) {
+    //         return res.status(404).json({ success: false, message: "User not found" });
+    //     }
+
+    //     sendToken(user, 200, res)
+    // } catch (e) {
+    //     console.log("Error in fetching Users: ", e.message);
+    //     res.status(500).json({ success: false, message: "Server Error."});
+    // }
     try {
-        const { email, password } = req.body;
-        const user = await User.findOne({ email: email, password: password });
+        const { token } = req.body; // Firebase ID token sent from the client
+
+        // Verify the Firebase ID token
+        const decodedToken = await admin.auth().verifyIdToken(token);
+        const { email } = decodedToken;
+
+        // Check if the user exists in MongoDB
+        const user = await User.findOne({ email: email });
 
         if (!user) {
             return res.status(404).json({ success: false, message: "User not found" });
         }
 
-        // const accessToken = jwt.sign({
-        //     "UserInfo": {
-        //         "email": user.email,
-        //         "role": user.role,
-        //         "status": user.status
-        //     }},
-        //     process.env.ACCESS_TOKEN_SECRET,
-        //     { expiresIn: '1d' }
-        // )
-
-        // const refreshToken = jwt.sign(
-        //     { "email": user.email },
-        //     process.env.REFRESH_TOKEN_SECRET,
-        //     { expiresIn: '1d' }
-        // )
-
-        // response.cookie('jwt', refreshToken, {
-        //     httpOnly: true,
-        //     secure: true,
-        //     sameSite: 'None',
-        //     maxAge: 8 * 24 * 60 * 60 * 1000
-        // })
-
-        sendToken(user, 200, res)
-        // response.status(200).json({ success: true, user, accessToken });
+        // Send a session token or proceed with additional login logic
+        sendToken(user, 200, res);
     } catch (e) {
         console.log("Error in fetching Users: ", e.message);
-        res.status(500).json({ success: false, message: "Server Error."});
+        res.status(500).json({ success: false, message: "Server Error." });
     }
-     
 }
 
 export const logout = (request, response) => {

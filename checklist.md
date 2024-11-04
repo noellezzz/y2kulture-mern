@@ -4,13 +4,13 @@
 
 - [x]   Product/Service CRUD MUI datatables (gregnb/mui-datatables). upload multiple photos. product/service details are on an expandable/collapsible rows 15pts 
 
-        Product/Service CRUD MUI datatables (gregnb/mui-datatables). upload multiple photos. product/service details are on an expandable/collapsible rows. bulk delete using checkboxes
+- [ ]   Product/Service CRUD MUI datatables (gregnb/mui-datatables). upload multiple photos. product/service details are on an expandable/collapsible rows. bulk delete using checkboxes
 
 # MP2 User Functions 20pts
 
 - [x] username and password authentication 5pts 
 - [x] user profile update with photo upload. 5pts 
-- [ ] username and password firebase authentication 10pts
+- [x] username and password firebase authentication 10pts
 - [ ] user profile update with photo upload using firebase storage. 10pts
 
 # MP3 Review Ratings 20pts
@@ -60,7 +60,6 @@
 
 quiz 5 attendance 10pts
 2pts deduction for each meeting of being absent.
-
 
 term test LEC
 functional requirements completeness 10pts
