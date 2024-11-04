@@ -99,7 +99,7 @@ const Profile = () => {
 }
 
 const AccountOverview = () => {
-  const [basicInfo, setBasicInfo] = useState({})
+  const [id, setId] = useState({ id: '' })
   const [userInfo, setUserInfo] = useState({
     email: '',
     first_name: '',
@@ -114,24 +114,26 @@ const AccountOverview = () => {
     zip: ''
   });
 
-  const checkLogin = async (request, response) => {
+  const checkLogin = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/auth')
-      console.log(response.data.user)
+      const res = await axios.get('http://localhost:8000/auth')
+      console.log("user", res.data.user.first_name)
+      setId({ id: res.data.user._id })
       setUserInfo({
-        email: response.data.user.email,
-        first_name: response.data.user.first_name,
-        last_name: response.data.user.last_name,
-        gender: response.data.user.gender,
-        birthday: response.data.user.birthday,
-
-        street: response.data.user.address[0].street_address,
-        city: response.data.user.address[0].city,
-        state: response.data.user.address[0].state,
-        country: response.data.user.address[0].country,
-        zip: response.data.user.address[0].zip_code
+        email: res.data.user.email || '',
+        first_name: res.data.user.first_name || '',
+        last_name: res.data.user.last_name || '',
+        gender: res.data.user.gender || '',
+        birthday: res.data.user.birthday || '',
+        
+        street: res.data.user.address?.[0]?.street_address || '',
+        city: res.data.user.address?.[0]?.city || '',
+        state: res.data.user.address?.[0]?.state || '',
+        country: res.data.user.address?.[0]?.country || '',
+        zip: res.data.user.address?.[0]?.zip_code || ''
       })
-      setBasicInfo({ id: response.data.user._id })
+      // setBasicInfo({ id: response.data.user._id })
+      
     } catch (e) {
       console.log(e)
     }
@@ -154,9 +156,10 @@ const AccountOverview = () => {
   }, [userInfo])
 
   const handleSubmit = async () => {
+    // console.log(userInfo)
     // e.preventDefault();
     try {
-      await updateFunc('user', basicInfo.id, userInfo)
+      await updateFunc('user', id.id, userInfo)
     } catch (e) {
       console.log(e)
     }
