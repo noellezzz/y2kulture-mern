@@ -55,7 +55,7 @@
 - [ ] infinite scroll on products list on homepage. 15pts
 
 # QUIZ 4
-- [ ] facebook or gmail login 15pts react-facebook-login or similar packages.
+- [x] facebook or gmail login 15pts react-facebook-login or similar packages.
 - [x] facebook or gmail login firebase 15pts
 
 quiz 5 attendance 10pts
