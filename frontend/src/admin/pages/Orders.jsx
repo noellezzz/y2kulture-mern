@@ -17,8 +17,10 @@ import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import Button from '@mui/material/Button';
 
 import '../styles/Orders.css'
+import axios from 'axios'
 
 const Orders = () => {
   const [tempData, setTempData] = useState()
@@ -39,9 +41,11 @@ const Orders = () => {
 
     if (Array.isArray(dataList)) {
       dataList.forEach((row) => {
+        console.log(row)
         if (row.checkout && row.checkout.length > 0) {
           row.checkout.forEach((order) => {
             const newData = {
+              userId: row._id,
               id: order._id,
               datePlaced: order.order.datePlaced,
               address: order.order.shippingDetails,
@@ -113,6 +117,19 @@ function Row(props) {
   const { row } = props;
   const [open, setOpen] = React.useState(false);
 
+  const handleUpdate = async (mode, userId, orderId) => {
+    try {
+      const form = {
+        userId,
+        orderId,
+        mode,
+      };
+      const res = await axios.post(`http://localhost:8000/api/user/update/stock`, form)
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
   return (
     <React.Fragment>
       <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
@@ -171,7 +188,22 @@ function Row(props) {
                 </TableBody>
               </Table>
               <div className="controls-collapsed">
-                  
+                <Button variant="contained" className='invert-button pending-button'
+                  onClick={() => { handleUpdate('Shipped', row.userId, row.id) }}
+                >Set Pending
+                </Button>
+                <Button variant="contained" className='invert-button shipped-button'
+                  onClick={() => { handleUpdate('Shipped', row.userId, row.id) }}
+                >Set Shipped
+                </Button>
+                <Button variant="contained" className='invert-button delivered-button'
+                  onClick={() => { handleUpdate('Delivered', row.userId, row.id) }}
+                >Set Delivered
+                </Button>
+                <Button variant="contained" className='invert-button cancelled-button'
+                  onClick={() => { handleUpdate('Cancelled', row.userId, row.id) }}
+                >Set Cancelled
+                </Button>
               </div>
             </Box>
           </Collapse>

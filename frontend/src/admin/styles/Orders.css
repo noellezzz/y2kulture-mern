@@ -25,7 +25,30 @@
 }
 
 .controls-collapsed {
-    border:1px solid red;
+    /* border:1px solid red; */
     width: 100%;
     height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+}
+
+.pending-button {
+    color: var(--fifth-color) !important;
+    border: 1px solid var(--fifth-color) !important;
+}
+
+.shipped-button {
+    color: var(--info-color) !important;
+    border: 1px solid var(--info-color) !important;
+}
+
+.delivered-button {
+    color: var(--success-color) !important;
+    border: 1px solid var(--success-color) !important;
+}
+
+.cancelled-button {
+    color: var(--error-color) !important;
+    border: 1px solid var(--error-color) !important;
 }

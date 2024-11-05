@@ -7,14 +7,14 @@ import { request } from "express";
 export const getUser = async (request, response) => {
     try {
         const user = await User.find({})
-        .populate({
-            path: 'cart.productId', 
-            model: 'Product' 
-        });
+            .populate({
+                path: 'cart.productId',
+                model: 'Product'
+            });
         response.status(200).json({ success: true, message: "Users Retrieved.", data: user });
     } catch (error) {
         console.log("Error in fetching Users: ", error.message);
-        response.status(500).json({ success: false, message: "Server Error."});
+        response.status(500).json({ success: false, message: "Server Error." });
     }
 };
 
@@ -22,13 +22,13 @@ export const getOneUser = async (request, response) => {
     try {
         const { id } = request.params;
         const user = await User.findById(id).populate({
-            path: 'cart.productId', 
-            model: 'Product' 
+            path: 'cart.productId',
+            model: 'Product'
         });;
         response.status(200).json({ success: true, message: "User Retrieved.", data: user });
     } catch (error) {
         console.log("Error in fetching User: ", error.message);
-        response.status(500).json({ success: false, message: "Server Error."});
+        response.status(500).json({ success: false, message: "Server Error." });
     }
 };
 
@@ -63,19 +63,19 @@ export const createUser = async (request, response) => {
     // }
 
     // request.body.avatar = imagesLinks
-    
-    if( !user.email || !user.password) {
-        return response.status(400).json({ success:false, message:"Please provide all fields."});
+
+    if (!user.email || !user.password) {
+        return response.status(400).json({ success: false, message: "Please provide all fields." });
     }
 
     const newUser = new User(user);
 
     try {
         await newUser.save();
-        response.status(201).json({ success:true, data: newUser, message: "User created Successfully!"});
+        response.status(201).json({ success: true, data: newUser, message: "User created Successfully!" });
     } catch (error) {
         console.error("Error in Create User:", error.message);
-        response.status(500).json({ success: false, message: "Server Error: Error in Creating User."});
+        response.status(500).json({ success: false, message: "Server Error: Error in Creating User." });
     }
 }
 
@@ -86,7 +86,7 @@ export const updateUser = async (request, response) => {
     // console.log('before', request.body.avatar)
     if (Array.isArray(request.body.avatar)) {
         if (typeof request.body.avatar[0] === 'string') {
-            
+
             images = request.body.avatar;
             let imagesLinks = [];
             for (let i = 0; i < images.length; i++) {
@@ -110,7 +110,7 @@ export const updateUser = async (request, response) => {
             }
             request.body.avatar = imagesLinks
         } else if (typeof request.body.avatar[0] === 'object') {
-            
+
         }
     } else if (typeof request.body.avatar === 'string') {
         console.log('detected')
@@ -120,15 +120,15 @@ export const updateUser = async (request, response) => {
     // console.log('after', request.body.avatar)
     const user = request.body;
 
-    if(!mongoose.Types.ObjectId.isValid(id)) {
-        return response.status(404).json({ success:false, message: "Invalid User ID" });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return response.status(404).json({ success: false, message: "Invalid User ID" });
     }
 
     try {
-        const updatedUser = await User.findByIdAndUpdate(id, user, {new:true});
-        response.status(200).json({ success:true, data:updatedUser });
+        const updatedUser = await User.findByIdAndUpdate(id, user, { new: true });
+        response.status(200).json({ success: true, data: updatedUser });
     } catch (error) {
-        response.status(500).json({ success: false, message: "Server Error: Error in Updating User."})
+        response.status(500).json({ success: false, message: "Server Error: Error in Updating User." })
     }
 }
 
@@ -138,7 +138,7 @@ export const deleteUser = async (request, response) => {
         const result = await User.findByIdAndDelete(id);
 
         if (!result) {
-            return response.status(404).send({ message: 'User not Found.'});
+            return response.status(404).send({ message: 'User not Found.' });
         }
 
         response.status(200).json({ success: true, message: "User Deleted." })
@@ -148,10 +148,10 @@ export const deleteUser = async (request, response) => {
 }
 
 export const addToCart = async (req, res) => {
-    const { userId } = req.params; 
+    const { userId } = req.params;
     const { productId, quantity, stockId, color, size } = req.body;
 
-    if (!productId || !quantity || !stockId ) {
+    if (!productId || !quantity || !stockId) {
         return res.status(400).json({ message: "Product ID and quantity are required." });
     }
 
@@ -210,8 +210,8 @@ export const addToCheckout = async (req, res) => {
             }
 
             if (item.quantity > stockItem.quantity) {
-                return res.status(400).json({ 
-                    message: `Insufficient stock for ${product.title} (Color: ${item.color}, Size: ${item.size}). Available: ${stockItem.quantity}, Requested: ${item.quantity}.` 
+                return res.status(400).json({
+                    message: `Insufficient stock for ${product.title} (Color: ${item.color}, Size: ${item.size}). Available: ${stockItem.quantity}, Requested: ${item.quantity}.`
                 });
             }
             stockItem.quantity -= item.quantity;
@@ -235,7 +235,7 @@ export const addToCheckout = async (req, res) => {
                 })),
                 status: status || 'Pending',
                 datePlaced: datePlaced || new Date(),
-                dateShipped: null, 
+                dateShipped: null,
                 dateDelivered: null,
                 total_cost: total_cost,
                 shippingDetails: shippingDetails
@@ -250,5 +250,47 @@ export const addToCheckout = async (req, res) => {
         res.status(200).json({ message: "Checkout added successfully.", checkout: user.checkout });
     } catch (error) {
         res.status(500).json({ message: "Failed to add to checkout", error });
+    }
+};
+
+export const updateOrderStatus = async (req, res) => {
+    try {
+        const { userId, orderId, mode } = req.body;
+
+        // Find the user by ID
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found." });
+        }
+
+        // Find the order in the checkout array
+        // console.log(user.checkout)
+        user.checkout.map((order) => {
+            if (order._id == orderId) {
+                order.order.status = mode;
+
+                // // Save the updated user document
+                user.save();
+            }
+        })
+
+        // console.log(selectOrder)
+        // const orderToUpdate = user.checkout.find(
+        //     // (checkoutItem) => checkoutItem.order._id.toString() === orderId
+        // );
+
+        // if (!orderToUpdate) {
+        //     return res.status(404).json({ message: "Order not found." });
+        // }
+
+        // // Update the status
+        // orderToUpdate.order.status = mode;
+
+        // // Save the updated user document
+        // await user.save();
+
+        res.status(200).json({ message: "Order status updated successfully." });
+    } catch (error) {
+        res.status(500).json({ message: "Failed to update order status.", error });
     }
 };
