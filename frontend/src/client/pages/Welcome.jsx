@@ -174,6 +174,27 @@ const Welcome = () => {
                       <div className="product-title">{product.title}</div>
                       <div className="product-category">{product.category[0].title}</div>
                       <div className="product-description">{product.description}</div>
+                      <div className="product-ratings">
+                        {
+                          product.reviews.length > 0 ? (
+                            (() => {
+                              let ratingTotal = 0;
+                              product.reviews.map((review) => {
+                                ratingTotal += review.rating;
+                              });
+                              const averageRating = ratingTotal / product.reviews.length;
+
+                              return (
+                                <div>
+                                  <p>Reviews: {averageRating} star/s</p>
+                                </div>
+                              );
+                            })()
+                          ) : (
+                            <div>No Reviews</div>
+                          )
+                        }
+                      </div>
                       <div className="tile-controls">
                         <div className="product-price">Price: ${product.price}</div>
                         <button onClick={() => { addToCart(product._id) }} className="prime-button tile-button">Add to Cart</button>
