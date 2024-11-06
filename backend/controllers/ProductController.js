@@ -14,6 +14,7 @@ export const getProduct = async (request, response) => {
                     model: 'Type'
                 }
             })
+            .sort({ createdAt: -1 })
             .exec();
         response.status(200).json({ success: true, message: "Product Retrieved.", data: product });
     } catch (error) {

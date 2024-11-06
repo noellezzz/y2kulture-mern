@@ -10,7 +10,8 @@ export const getUser = async (request, response) => {
             .populate({
                 path: 'cart.productId',
                 model: 'Product'
-            });
+            })
+            .sort({ createdAt: -1 });
         response.status(200).json({ success: true, message: "Users Retrieved.", data: user });
     } catch (error) {
         console.log("Error in fetching Users: ", error.message);

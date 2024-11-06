@@ -6,6 +6,7 @@ export const getCategory = async (request, response) => {
     try {
         const category = await Category.find({})
             .populate('clothing_type')
+            .sort({ createdAt: -1 })
             .exec();
 
         response.status(200).json({

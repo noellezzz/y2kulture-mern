@@ -4,7 +4,7 @@ import cloudinary from 'cloudinary'
 
 export const getType = async (request, response) => {
     try {
-        const type = await Type.find({});
+        const type = await Type.find({}).sort({ createdAt: -1 });
         response.status(200).json({ success: true, message: "Types Retrieved.", data: type });
     } catch (error) {
         console.log("Error in fetching types: ", error.message);
