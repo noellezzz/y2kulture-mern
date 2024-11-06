@@ -1,4 +1,5 @@
 import Product from "../models/Product.js"
+import User from "../models/User.js"
 import mongoose from 'mongoose'
 import cloudinary from 'cloudinary'
 import express from "express";
@@ -249,3 +250,169 @@ export const deleteStock = async(req, res) => {
         res.status(500).json({ message: "Error in deleting stock", error })
     }
 }
+
+export const checkUserOrders = async(req, res) => {
+    try {
+        const { userId, productId } = req.params
+        const { review, rating } = req.body
+        const reviewData = {
+            userId,
+            rating, 
+            review
+        };
+
+        const product = await Product.findById(productId)
+        const user = await User.findById(userId)
+
+        let userHasProduct = false
+
+        user.checkout.map((order) => {
+            order.order.items.map((item) => {
+                if(item.productId == productId) {
+                    userHasProduct = true
+                }
+            })
+        })
+
+        if (!userHasProduct) {
+            return res.status(200).json({ success: false, message:"User has not purchased this product.", userHasProduct })
+        }
+
+        return res.status(200).json({ success: true, message:"User has purchased this product.", userHasProduct })
+    } catch(error) {
+        return res.status(500).json({ message: "Error in checking user orders", error })
+    }
+}
+
+export const checkIfReviewed = async (req, res) => {
+    try {
+        const { userId, productId } = req.params;
+        const product = await Product.findById(productId);
+
+        // Iterate using for loop to break early
+        for (let review of product.reviews) {
+            if (review.userId.toString() === userId) {
+                return res.status(200).json({
+                    success: false,
+                    message: "User has already reviewed this product.",
+                    review
+                });
+            }
+        }
+
+        // If no review is found, send this response
+        return res.status(200).json({
+            success: true,
+            message: "User has not reviewed this product."
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            message: "Error in checking user reviews",
+            error
+        });
+    }
+};
+export const addReview = async(req, res) => {
+    try {
+        const { userId, productId } = req.params
+        const { review, rating } = req.body
+        const reviewData = {
+            userId,
+            rating, 
+            review
+        };
+
+        const product = await Product.findById(productId)
+        const user = await User.findById(userId)
+
+        let userHasProduct = false
+
+        user.checkout.map((order) => {
+            order.order.items.map((item) => {
+                if(item.productId == productId) {
+                    userHasProduct = true
+                }
+            })
+        })
+
+        if (!userHasProduct) {
+            return res.status(404).json({ message:"User has not purchased this product.", userHasProduct })
+        }
+
+        product.reviews.map((review) => {
+            if(review.userId == userId) {
+                return res.status(404).json({ message:"User has already reviewed this product." })
+            }
+        })
+
+        product.reviews.push(reviewData);
+        await product.save();
+
+        return res.status(200).json({ message:"Successfully added Review.", product })
+
+    } catch(error) {
+        // console.log("Error adding review", e)
+        res.status(500).json({ message: "Error in adding Review", error })
+    }
+}
+
+export const updateReview = async(req, res) => {
+    try {
+        const { userId, productId } = req.params
+        const { review, rating } = req.body
+        const reviewData = {
+            userId,
+            rating, 
+            review
+        };
+
+        const newReview = review
+
+        let reviewFound = false
+        const product = await Product.findById(productId)
+        product.reviews.map((review) => {
+            if(review.userId == userId) {
+                review.review = newReview
+                review.rating = rating
+                reviewFound = true
+            }
+        })
+
+        if(reviewFound) {
+            await product.save()
+            return res.status(200).json({ message:"Successfully updated Review.", product })
+        } else {
+            return res.status(404).json({ message:"No Review Found." })
+        }
+
+    } catch(error) {
+        res.status(500).json({ message: "Error in updating Review", error })
+    }
+}
+
+export const deleteReview = async (req, res) => {
+    try {
+        const { userId, productId } = req.params;
+        const product = await Product.findById(productId);
+
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+
+        const reviewIndex = product.reviews.findIndex(review => review.userId.toString() === userId);
+
+        if (reviewIndex === -1) {
+            return res.status(404).json({ message: "Review not found" });
+        }
+
+        product.reviews.splice(reviewIndex, 1);
+
+        await product.save();
+
+        return res.status(200).json({ message: "Review successfully deleted.", product });
+        
+    } catch (error) {
+        return res.status(500).json({ message: "Error in deleting Review", error });
+    }
+};

@@ -13,8 +13,13 @@ import './styles/BlobButton.css'
 import jeans from '../../assets/jeans.png'
 import tshirt from '../../assets/tshirt.png'
 import boots from '../../assets/boots.png'
+import { MdStarRate } from "react-icons/md";
+import TextField from '@mui/material/TextField';
+import Textarea from '@mui/joy/Textarea';
 
 const Welcome = () => {
+  const [reviewProduct, setReviewProduct] = useState(null)
+  const [reviewModal, setReviewModal] = useState(false)
   const [userId, setUserId] = useState('')
   const [productInfo, setProductInfo] = useState([])
   // const [cartInfo, setCartInfo] = useState({})
@@ -35,9 +40,26 @@ const Welcome = () => {
     fetchData('product', setProductList)
     checkLogin()
   }, [])
+
   useEffect(() => {
-    console.log(productList)
-  }, [productList])
+    if (userLoggedIn) {
+      const fetchUserProducts = async () => {
+        const updatedProductList = await Promise.all(
+          productList.map(async (product) => {
+            const userHasProduct = await checkUserOrders(product._id);
+            return {
+              ...product,
+              userHasProduct,
+            };
+          })
+        );
+
+        setProductList(updatedProductList);
+      };
+
+      fetchUserProducts();
+    }
+  }, [userLoggedIn])
 
   const addToCart = async (productId) => {
     if (!userLoggedIn) {
@@ -47,6 +69,18 @@ const Welcome = () => {
     const result = await fetchDataN('product', productId)
     setProductInfo(result.data.data)
     setOpenModal(true)
+  }
+
+  const checkUserOrders = async (productId) => {
+    try {
+      const res = await axios.post(`http://localhost:8000/api/product/check/${productId}/${userId}/`)
+      // console.log(res)
+      const userHasProduct = res.data.success
+      return userHasProduct
+      // console.log(userHasProduct)
+    } catch (e) {
+      console.log(e)
+    }
   }
 
   return (
@@ -128,7 +162,8 @@ const Welcome = () => {
             productList.length == 0 ? (
               <div className="d">No Available Products</div>
             ) : (
-              productList.map((product, index) => {
+              productList.slice(0, 6).map((product, index) => {
+                console.log(product)
                 return (
                   <div key={index} className="product-tile__primary">
                     <div className="tile-img__container">
@@ -142,6 +177,14 @@ const Welcome = () => {
                       <div className="tile-controls">
                         <div className="product-price">Price: ${product.price}</div>
                         <button onClick={() => { addToCart(product._id) }} className="prime-button tile-button">Add to Cart</button>
+                        {product.userHasProduct ? (
+                          <button className="rate" onClick={() => {
+                            setReviewModal(true)
+                            setReviewProduct(product._id)
+                          }}><MdStarRate /></button>
+                        ) : (
+                          <></>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -159,9 +202,181 @@ const Welcome = () => {
         >
           <ConfirmModal setModalOpen={setOpenModal} productInfo={productInfo} />
         </CSSTransition>
+
+        <CSSTransition
+          in={reviewModal}
+          timeout={300}
+          classNames="modal"
+          unmountOnExit
+        >
+          <Review setModalOpen={setReviewModal} userId={userId} productId={reviewProduct} />
+        </CSSTransition>
       </section>
     </>
 
+  )
+}
+
+const Review = ({ setModalOpen, userId, productId }) => {
+  const [review, setReview] = useState(null)
+  const [hasReviewed, setHasReviewed] = useState(false)
+  const [formState, setFormState] = useState({
+    'rating': '',
+    'review': ''
+  })
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormState((prevState) => ({
+      ...prevState,
+      [name]: value
+    }));
+    console.log(formState)
+  };
+
+  const closeModals = () => {
+    setModalOpen(false)
+  }
+
+  useEffect(() => {
+    checkIfUserReviewed()
+  }, [])
+
+  const checkIfUserReviewed = async () => {
+    const res = await axios.get(`http://localhost:8000/api/product/checkReviews/${productId}/${userId}/`)
+    if (res.data.success == false) {
+      setHasReviewed(true)
+      setReview(res.data.review)
+      setFormState({
+        'rating': res.data.review.rating,
+        'review': res.data.review.review
+      })
+      // console.log(res.data)
+    }
+  }
+
+  useEffect(() => {
+    console.log(review)
+  }, [review])
+
+  const postReview = async () => {
+    try {
+      const res = await axios.post(`http://localhost:8000/api/product/review/${productId}/${userId}/`, formState)
+      console.log(res)
+      toast.success('Review Posted!')
+      setModalOpen(false)
+    } catch (e) {
+      console.log(e)
+      toast.error("Review unsuccesful.")
+    }
+  }
+
+  const updateReview = async () => {
+    try {
+      const res = await axios.post(`http://localhost:8000/api/product/updateReview/${productId}/${userId}/`, formState)
+      console.log(res)
+      toast.success('Review Updated!')
+      setModalOpen(false)
+    } catch (e) {
+      console.log(e)
+      toast.error("Update unsuccesful.")
+    }
+  }
+
+  const deleteReview = async () => {
+    try {
+      const res = await axios.post(`http://localhost:8000/api/product/delete/${productId}/${userId}/`)
+      console.log(res)
+      toast.success('Review Deleted!')
+      setModalOpen(false)
+    } catch (e) {
+      console.log(e)
+      toast.error("Delete unsuccesful.")
+    }
+  }
+
+  return (
+    <>
+      <div
+        className='modal-background'
+        onClick={() => {
+          closeModals();
+        }}
+      >
+        {
+          hasReviewed ? (
+            <div className="review-modal" onClick={(e) => e.stopPropagation()}>
+              <TextField
+                id="outlined-basic"
+                label="User"
+                variant="outlined"
+                InputProps={{
+                  readOnly: true,
+                }}
+                value={userId}
+              />
+              <TextField
+                id="outlined-basic"
+                label="Rating"
+                variant="outlined"
+                name="rating"
+                onChange={handleChange}
+                value={formState.rating}
+              />
+              <div className="review-field">
+                <Textarea
+                  minRows={2}
+                  placeholder="Write your review..."
+                  size="lg"
+                  variant="outlined"
+                  name="review"
+                  onChange={handleChange}
+                  value={formState.review}
+                />
+              </div>
+              <div className="review-controls">
+                <button onClick={updateReview} className="prime-button">Post Review</button>
+                <button onClick={deleteReview} className="prime-button delete-button">Delete Review</button>
+              </div>
+            </div>
+          ) : (
+            <div className="review-modal" onClick={(e) => e.stopPropagation()}>
+              <TextField
+                id="outlined-basic"
+                label="User"
+                variant="outlined"
+                InputProps={{
+                  readOnly: true,
+                }}
+                value={userId}
+              />
+              <TextField
+                id="outlined-basic"
+                label="Rating"
+                variant="outlined"
+                name="rating"
+                onChange={handleChange}
+                value={formState.rating}
+              />
+              <div className="review-field">
+                <Textarea
+                  minRows={2}
+                  placeholder="Write your review..."
+                  size="lg"
+                  variant="outlined"
+                  name="review"
+                  onChange={handleChange}
+                  value={formState.review}
+                />
+              </div>
+              <div className="review-controls">
+                <button onClick={postReview} className="prime-button">Post Review</button>
+              </div>
+            </div>
+          )
+        }
+      </div >
+    </>
   )
 }
 
