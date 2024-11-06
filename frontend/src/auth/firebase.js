@@ -3,13 +3,13 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDF5LqDM8zOsSbhs7bck9nS-UiIxxOBv1g",
-  authDomain: "mern-project-58110.firebaseapp.com",
-  projectId: "mern-project-58110",
-  storageBucket: "mern-project-58110.firebasestorage.app",
-  messagingSenderId: "407386615367",
-  appId: "1:407386615367:web:52ad7172716637e2b94b62",
-  measurementId: "G-MS9VHN5MR7"
+  apiKey: "AIzaSyBXnR73IcpKcGM5vGHGW0VnOp_vhoe_gkY",
+  authDomain: "y2kulture-17f2d.firebaseapp.com",
+  projectId: "y2kulture-17f2d",
+  storageBucket: "y2kulture-17f2d.firebasestorage.app",
+  messagingSenderId: "247310474637",
+  appId: "1:247310474637:web:f97baf333d4ba154de31c4",
+  measurementId: "G-N09ZM8MYJL"
 };
 
 // Initialize Firebase
