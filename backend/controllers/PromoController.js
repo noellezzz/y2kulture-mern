@@ -6,6 +6,7 @@ export const getPromo = async (request, response) => {
     try {
         const promo = await Promo.find({})
             .populate('promo_for')
+            .sort({ createdAt: -1 })
             .exec();
 
         response.status(200).json({

@@ -360,3 +360,30 @@ gap:10px;
 .mb-20 {
     margin-bottom: 20px;
 }
+
+.review-modal {
+    height: 350px !important;
+    width: 550px !important;
+    border-radius: 20px;
+    animation: dropLogin 0.8s forwards; 
+    background-color: white;
+    padding:20px 40px;
+    display: flex;
+    flex-direction: column;
+    gap:10px
+}
+
+.review-controls {
+    display: flex;
+    gap:10px;
+}
+
+.review-controls .delete-button {
+    border: 2px solid red;
+    color:red;
+    background-color: white;
+}
+
+.review-controls .delete-button:hover {
+    color:white;
+}
