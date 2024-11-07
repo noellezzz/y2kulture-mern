@@ -2,7 +2,7 @@
 
 - [x]   MP 1: Product/Service CRUD bootstrap datatables. upload multiple photos 10pts
 
-- [x]   Product/Service CRUD MUI datatables (gregnb/mui-datatables). upload multiple photos. product/service details are on an expandable/collapsible rows 15pts 
+- [x]   Product/Service CRUD MUI datatables (gregnb/mui-datatables). upload multiple photos. product/service details are on an expandable/collapsible rows (MAKE THE PRODUCTS COLLAPSIBLE) 15pts 
 
 - [ ]   Product/Service CRUD MUI datatables (gregnb/mui-datatables). upload multiple photos. product/service details are on an expandable/collapsible rows. bulk delete using checkboxes
 
@@ -14,9 +14,9 @@
 - [ ] user profile update with photo upload using firebase storage. 10pts
 
 # MP3 Review Ratings 20pts
-
-- [ ] users who availed of the product/service can write a review and rate the product service 10pts
-- [ ] users can update their own review rating. 5pts
+(Fix the reviews, the user should be allowed multiple reviews and they are also only allowed to leave a review after the order is succesful)
+- [x] users who availed of the product/service can write a review and rate the product service 10pts
+- [x] users can update their own review rating. 5pts
 - [ ] admin can delete a review 5pts. 
 
 # TERM TEST LAB 30pts
