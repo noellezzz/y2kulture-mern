@@ -23,9 +23,23 @@ import { MdInventory } from "react-icons/md";
 
 import { DataGrid } from '@mui/x-data-grid';
 import Paper from '@mui/material/Paper';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
 
 import { IconButton, Typography, Grid } from '@mui/material';
 import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Collapse from '@mui/material/Collapse';
+import Box from '@mui/material/Box';
+import { FaPlus, FaTrash } from "react-icons/fa";
 
 const Product = () => {
   // Product Isolate
@@ -40,6 +54,7 @@ const Product = () => {
   const [stockModal, setStockModal] = useState(false);
   const [imagesPreview, setImagesPreview] = useState([])
   const [foreignHolder, setForeignHolder] = useState('')
+  const [checkedId, setCheckedId] = useState([]);
   const [formState, setFormState] = useState({ _id: '', title: '', description: '', category: '', price: '', material: '', categoryId: '' });
 
   const onChange = e => {
@@ -142,6 +157,13 @@ const Product = () => {
     deleteFunc('product', id, setApiData)
   };
 
+  const loadContents = async (id) => {
+    try {
+      const res = await axios.get(`http://localhost:8000/api/product/${id}`)
+    } catch (e) {
+      console.log(e)
+    }
+  }
 
   const columns = [
     {
@@ -221,12 +243,12 @@ const Product = () => {
     setSelectedRowIds(selectionModel);
   };
 
-  const printSelectedIds = async() => {
+  const printSelectedIds = async () => {
     try {
       selectedRowIds.map((ids) => {
         handleDelete(ids)
       })
-    } catch(e) {
+    } catch (e) {
       console.log(e)
     }
   };
@@ -323,23 +345,72 @@ const Product = () => {
             : 'N/A',
         createdAt: new Date(product.createdAt).toLocaleString(),
         updatedAt: new Date(product.updatedAt).toLocaleString(),
+        stock: product.stock
       }));
       setFlattenData(flattened);
     }
   }, [apiData]);
 
+  const handleCheck = (id, isChecked) => {
+    setCheckedId((prevCheckedId) => {
+      if (isChecked) {
+        return [...prevCheckedId, id];
+      } else {
+        return prevCheckedId.filter((item) => item !== id);
+      }
+    });
+  };
+
+  const bulkDelete = () => {
+    try {
+      checkedId.map((id) => {
+        deleteFunc('product', id, setApiData)
+      })
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
   return (
     <div className="main-container__admin">
       <div className="container sub-container__single-lg">
         <div className="container-body">
-          <DataGrid
-            rows={flattenData}
-            columns={columns}
-            checkboxSelection
-            onRowSelectionModelChange={handleSelectionChange}
-            pageSizeOptions={[5, 10]}
-            sx={{ border: 0 }}
-          />
+          <TableContainer component={Paper} sx={{ maxHeight: 400, overflow: 'auto' }}>
+            <Table aria-label="collapsible table">
+              <TableHead>
+                <TableRow>
+                  <TableCell />
+                  <TableCell align="center">
+                    {/* <Checkbox
+                        checked={checked[0] && checked[1]}
+                        indeterminate={checked[0] !== checked[1]}
+                        onChange={handleChange1}
+                      /> */}
+                  </TableCell>
+
+                  <TableCell>ID</TableCell>
+                  <TableCell align="right">Title</TableCell>
+                  <TableCell align="right">Description</TableCell>
+                  <TableCell align="right">Price</TableCell>
+                  <TableCell align="right">Material</TableCell>
+                  {/* <TableCell align="right">Instructor</TableCell> */}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+
+                {flattenData ? (
+                  flattenData.length > 0 ? (
+                    flattenData.map((row) => (
+                      <Row key={row.id} row={row} handleCheck={handleCheck} loadEditModal={loadDataByIdEdit} deleteCourse={handleDelete} loadContents={loadContents} />
+                    ))
+                  ) : (
+                    <div className="table-placeholder">No Data Available</div>
+                  )
+                ) : null}
+
+              </TableBody>
+            </Table>
+          </TableContainer>
         </div>
 
         <div className="container-footer">
@@ -347,6 +418,10 @@ const Product = () => {
           <Button variant="contained" className='invert-button'
             onClick={() => { printSelectedIds() }}
           >Delete Selected Rows
+          </Button>
+          <Button variant="contained" className='invert-button'
+            onClick={() => { bulkDelete() }}
+          >Bulk Delete
           </Button>
           <Button variant="contained"
             onClick={() => { loadModalCreate() }}
@@ -394,4 +469,93 @@ const Product = () => {
   );
 }
 
+function Row(props) {
+  const { row, handleCheck, loadEditModal, deleteCourse, loadContents } = props;
+  const [open, setOpen] = React.useState(false);
+  console.log(row)
+
+  return (
+    <React.Fragment>
+      <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
+        <TableCell>
+          <IconButton
+            aria-label="expand row"
+            size="small"
+            onClick={() => setOpen(!open)}
+          >
+            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+          </IconButton>
+        </TableCell>
+        <TableCell align="center">
+          <Checkbox
+            inputProps={{ 'aria-label': 'controlled' }}
+            onChange={(e) => handleCheck(row.id, e.target.checked)}
+          />
+        </TableCell>
+        <TableCell component="th" scope="row">{row.id}</TableCell>
+        <TableCell align="right">{row.title}</TableCell>
+        <TableCell align="right">{row.description}</TableCell>
+        <TableCell align="right">{row.price}</TableCell>
+        <TableCell align="right">{row.material}</TableCell>
+        {/* <TableCell align="right">{row.instructor}</TableCell> */}
+      </TableRow>
+      <TableRow>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0, width: '100%' }} colSpan={8}>
+          <Collapse in={open} timeout="auto" unmountOnExit>
+            <Box sx={{ margin: 1 }}>
+              <Typography variant="h6" gutterBottom component="div">
+                Stock Info
+              </Typography>
+              <Table size="small" aria-label="purchases">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Color</TableCell>
+                    <TableCell>Size</TableCell>
+                    <TableCell align="right">Quantity</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {row.stock && row.stock.length > 0 && (
+                    row.stock.map((content) => (
+                      <TableRow key={content._id}>
+                        <TableCell component="th" scope="row">
+                          {content.color}
+                        </TableCell>
+                        <TableCell>{content.size}</TableCell>
+                        <TableCell align="right">
+                          {content.quantity}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </Box>
+            {
+              row.courseContents && row.courseContents.length == 0 ? (
+                <div className="table-placeholder">
+                  No Data Available
+                </div>
+              ) : (
+                <div></div>
+              )
+            }
+            {/* <div className="collapsible-table__controls">
+              <button className="add-content" onClick={() => { loadContents(row._id) }}>
+                <FaPlus /> &nbsp;
+                Add New Content
+              </button>
+            </div> */}
+            <div className="collapsible-table__controls">
+              <Button className='collapsible-control__item delete' variant="contained" onClick={() => { deleteCourse(row.id) }}>Delete</Button>
+              <Button className='collapsible-control__item update' variant="contained" onClick={() => { loadEditModal(row.id) }}>Update</Button>
+            </div>
+          </Collapse>
+        </TableCell>
+      </TableRow>
+    </React.Fragment>
+  );
+}
+
 export default Product;
+
