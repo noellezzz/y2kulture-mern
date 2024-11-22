@@ -89,6 +89,8 @@ const Inventory = () => {
         clearForm()
     }
 
+    
+
     return (
         <div className="main-container__admin">
             <div className="sub-container__double-semi">
