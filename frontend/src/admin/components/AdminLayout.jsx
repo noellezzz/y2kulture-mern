@@ -104,18 +104,20 @@ const demoTheme = createTheme({
   typography: {
     h1: {
       fontSize: '2rem', 
+      
     },
     h2: {
       fontSize: '1.5rem',
     },
     body1: {
       fontSize: '1rem',
+      fontFamily: 'var(--primary-font)',
     },
     button: {
       fontSize: '0.875rem', 
     },
     navigation: {
-      fontSize: '5rem', 
+      fontSize: '0rem', 
     },
   },
 });
