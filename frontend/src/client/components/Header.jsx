@@ -109,7 +109,7 @@ const Header = () => {
         <div className="main-navigation">
           <div className="navigation-line">
             <Link to="/">Home</Link>
-            <Link>Store</Link>
+            <Link to="/store">Store</Link>
             <Link>About Us</Link>
             <Link>Support</Link>
           </div>
