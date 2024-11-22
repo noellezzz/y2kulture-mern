@@ -8,6 +8,8 @@
     src: url('./assets/ITCAvantGardeStd-Md.ttf.ttf') format('truetype'),
   }
 
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
 :root {
     --primary-color: #fd552e;
     --pale-primary-color: #f07c61;
@@ -21,7 +23,7 @@
     --success-color: #4caf50;
 
     --primary-font: 'ITCAvantGardeBK', sans-serif;
-    --primary-md-font: 'ITCAvantGardeMd', sans-serif;
+    --primary-md-font: 'Poppins', sans-serif;
 
     --herosize-font: 112px;
     --extralarge-font: 64px;

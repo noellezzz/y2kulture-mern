@@ -58,19 +58,24 @@ const LoginModal = ({ setModalOpen, formActive, setFormActive, setUserModal, set
     const user = await firebaseLogin(formState.email, formState.password)
     const token = await user.getIdToken();
     const res = await axios.post("http://localhost:8000/auth", { token });
-    // console.log(response.data);
+    console.log(res.data);
+   
+
   }
 
   const login = async(e) => {
     e.preventDefault()
 
     await loginAttempt()
-    window.location.reload()
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000)
+    // window.location.reload()
   }
 
   const handleSubmit = async(e) => {
     e.preventDefault();
-    firebaseRegister(formState.email, formState.password)
+    await firebaseRegister(formState.email, formState.password)
     const response = await createFunc('user', formState)
     setBasicInfo({id: response.data.data._id, email: response.data.data.email})
     loginAttempt()

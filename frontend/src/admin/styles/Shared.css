@@ -199,3 +199,9 @@
 .input-group__b label {
     width: 40%;
 }
+
+.modal-container h2{
+    font-size: var(--semi-font);
+    font-weight: 600;
+    color: var(--primary-color);
+}
