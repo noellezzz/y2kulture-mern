@@ -12,6 +12,7 @@ export const getUser = async (request, response) => {
                 model: 'Product'
             })
             .sort({ createdAt: -1 });
+            console.log(user)
         response.status(200).json({ success: true, message: "Users Retrieved.", data: user });
     } catch (error) {
         console.log("Error in fetching Users: ", error.message);
