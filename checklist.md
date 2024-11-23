@@ -52,7 +52,7 @@
 # QUIZ 3
 
 - [ ] pagination on products list on homepage. 10pts
-- [x] infinite scroll on products list on homepage. 15pts
+- [ ] infinite scroll on products list on homepage. 15pts
 
 # QUIZ 4
 - [x] facebook or gmail login 15pts react-facebook-login or similar packages.
