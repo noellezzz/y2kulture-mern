@@ -206,3 +206,6 @@
     color: var(--primary-color);
 }
 
+.MuiButton-custom___btn {
+    background-color: var(--primary-color) !important;
+}
