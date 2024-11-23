@@ -4,7 +4,7 @@
 
 - [x]   Product/Service CRUD MUI datatables (gregnb/mui-datatables). upload multiple photos. product/service details are on an expandable/collapsible rows (MAKE THE PRODUCTS COLLAPSIBLE) 15pts 
 
-- [ ]   Product/Service CRUD MUI datatables (gregnb/mui-datatables). upload multiple photos. product/service details are on an expandable/collapsible rows. bulk delete using checkboxes
+- [x]   Product/Service CRUD MUI datatables (gregnb/mui-datatables). upload multiple photos. product/service details are on an expandable/collapsible rows. bulk delete using checkboxes (SELECT ALL missing and the images for the collapsible)
 
 # MP2 User Functions 20pts
 

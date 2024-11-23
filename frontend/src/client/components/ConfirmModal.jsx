@@ -77,6 +77,12 @@ const ConfirmModal = ({ setModalOpen, productInfo }) => {
             size: selectedSize
         };
         console.log(cartInfo)
+        toast.success('Added to Cart!'); 
+        setTimeout(() => { 
+
+            window.location.reload()
+        }, 500);
+        
         try {
             const result = await axios.post(`http://localhost:8000/api/user/addToCart/${userId}`, cartInfo)
             console.log(result)
