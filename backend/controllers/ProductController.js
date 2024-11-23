@@ -8,151 +8,34 @@ import Category from '../models/Category.js';
 export const getProduct = async (request, response) => {
     try {
         const page = parseInt(request.query.page) || 1;
-        const limit = parseInt(request.query.limit) || 12;
+        const limit = parseInt(request.query.limit) || 10;
         const skip = (page - 1) * limit;
 
-        // Get arrays of category types and genders from query params
-        const categoryTypes = [].concat(request.query.categoryType || []);
-        const genders = [].concat(request.query.gender || []);
-        const sortFields = [].concat(request.query.sortFields || []);
-        const minPrices = [].concat(request.query.minPrice || []);
-        const maxPrices = [].concat(request.query.maxPrice || []);
-
-        console.log('Requested Categories:', categoryTypes);
-        console.log('Requested Genders:', genders);
-        console.log('Sort Fields:', sortFields);
-        console.log('Price Ranges:', minPrices.map((min, i) => `$${min} - $${maxPrices[i] || 'infinity'}`));
-
-        let query = {};
-
-        // Handle price range filter
-        if (minPrices.length > 0) {
-            const priceQueries = minPrices.map((min, index) => {
-                const priceQuery = {};
-                priceQuery.price = { $gte: Number(min) };
-                if (maxPrices[index]) {
-                    priceQuery.price.$lte = Number(maxPrices[index]);
-                }
-                return priceQuery;
-            });
-
-            if (priceQueries.length > 0) {
-                if (Object.keys(query).length > 0) {
-                    query = {
-                        $and: [
-                            query,
-                            { $or: priceQueries }
-                        ]
-                    };
-                } else {
-                    query.$or = priceQueries;
-                }
-            }
-        }
-
-        if (categoryTypes.length > 0 || genders.length > 0) {
-            // First, find all categories that match the requested types
-            let categoryQuery = {};
-            
-            if (categoryTypes.length > 0) {
-                // Convert category titles to case-insensitive regex patterns
-                const categoryPatterns = categoryTypes.map(cat => 
-                    new RegExp(`^${cat}$`, 'i')
-                );
-                categoryQuery.title = { $in: categoryPatterns };
-            }
-
-            // Log all available categories for debugging
-            const allCategories = await Category.find({}).populate('clothing_type');
-            console.log('All available categories:', allCategories.map(c => ({
-                id: c._id,
-                title: c.title,
-                types: c.clothing_type.map(t => t.title)
-            })));
-
-            // Find matching categories
-            const categories = await Category.find(categoryQuery).populate('clothing_type');
-            console.log('Found categories:', categories.map(c => ({
-                id: c._id,
-                title: c.title,
-                types: c.clothing_type.map(t => t.title)
-            })));
-
-            // If gender filter is applied, filter categories further
-            if (genders.length > 0) {
-                const filteredCategories = categories.filter(category => 
-                    category.clothing_type.some(type => 
-                        genders.some(gender => 
-                            type.title.toLowerCase() === gender.toLowerCase()
-                        )
-                    )
-                );
-                
-                if (filteredCategories.length > 0) {
-                    query.category = { $in: filteredCategories.map(cat => cat._id) };
-                } else {
-                    // No categories match both filters
-                    return response.status(200).json({
-                        success: true,
-                        message: "No products found for the selected filters.",
-                        data: [],
-                        currentPage: page,
-                        totalPages: 0,
-                        hasMore: false
-                    });
-                }
-            } else if (categories.length > 0) {
-                // Only category filter applied
-                query.category = { $in: categories.map(cat => cat._id) };
-            }
-        }
-
-        console.log('Final MongoDB query:', JSON.stringify(query));
-
-        // Build sort options
-        const sortOption = {};
-        sortFields.forEach(field => {
-            if (field === 'titleAsc') sortOption.title = 1;
-            if (field === 'titleDesc') sortOption.title = -1;
-            if (field === 'priceAsc') sortOption.price = 1;
-            if (field === 'priceDesc') sortOption.price = -1;
-        });
-        
-        // Default sort if none selected
-        if (Object.keys(sortOption).length === 0) {
-            sortOption.title = 1; // Default to title ascending
-        }
-
-        console.log('Sort options:', sortOption);
-
-        const totalProducts = await Product.countDocuments(query);
-        
-        const products = await Product.find(query)
-            .populate({
-                path: 'category',
-                populate: {
-                    path: 'clothing_type',
-                    model: 'Type'
-                }
-            })
-            .sort(sortOption)
+        const totalProducts = await Product.countDocuments();
+        const products = await Product.find({})
+            .populate('category')
+            .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit)
             .exec();
 
-        console.log(`Found ${products.length} products with these filters`);
-            
-        response.status(200).json({ 
-            success: true, 
-            message: products.length ? "Products Retrieved." : "No products found for the selected filters.",
+        response.status(200).json({
+            success: true,
+            message: products.length ? "Products Retrieved." : "No products found.",
             data: products,
-            currentPage: page,
-            totalPages: Math.ceil(totalProducts / limit),
-            hasMore: page * limit < totalProducts
+            pagination: {
+                total: totalProducts,
+                page,
+                pages: Math.ceil(totalProducts / limit),
+                limit
+            }
         });
     } catch (error) {
-        console.error("Error in fetching products:", error);
-        response.status(500).json({ success: false, message: "Server Error." });
+        console.log("Error in fetching Products: ", error.message);
+        response.status(500).json({
+            success: false,
+            message: "Server Error."
+        });
     }
 };
 
