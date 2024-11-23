@@ -80,13 +80,17 @@ const Cart = () => {
       const result = await axios.get(`http://localhost:8000/api/user/${id}`);
       const cart = result.data.data.cart || [];
       cart.forEach((cartItem) => {
-        console.log("cartItem", cartItem)
+        if (!cartItem.productId) {
+          console.log(`Skipping cart item with missing productId: ${cartItem._id}`);
+          return; // Skip this item if productId is null or undefined
+        }
+  
         tempList.push({
           cartItemId: cartItem._id,
           productId: cartItem.productId._id,
-          stockId: cartItem.stockId,
           name: cartItem.productId.title,
           price: cartItem.productId.price,
+          stockId: cartItem.stockId,
           color: cartItem.color,
           size: cartItem.size,
           quantity: cartItem.quantity,
@@ -99,6 +103,7 @@ const Cart = () => {
       console.log(`Error while fetching Data`, error);
     }
   };
+  
 
   const handleAdd = (index) => {
     const newCounters = [...counters];
