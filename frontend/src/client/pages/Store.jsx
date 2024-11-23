@@ -1,18 +1,69 @@
-import React, { useState, useEffect } from 'react';
-import { fetchData } from '../../admin/utils/crudUtils'; // Utility function for API calls
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { fetchData } from '../../admin/utils/crudUtils';
 import toast from 'react-hot-toast';
-import './styles/Shared.css'; // Assuming separate styles for Store
+import './styles/Shared.css';
 import { MdStarRate } from 'react-icons/md';
+import axios from 'axios';
 
 const Store = () => {
   const [productList, setProductList] = useState([]);
   const [userLoggedIn, setUserLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [allProducts, setAllProducts] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const observer = useRef();
+
+  const lastProductRef = useCallback(node => {
+    if (loading) return;
+    if (observer.current) observer.current.disconnect();
+    
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) {
+        loadNextPage();
+      }
+    });
+    
+    if (node) observer.current.observe(node);
+  }, [loading]);
 
   useEffect(() => {
-    // Fetch products when the component mounts
-    fetchData('product', setProductList);
+    // Initial load of all products
+    const loadAllProducts = async () => {
+      try {
+        const response = await fetchData('product', setAllProducts, 1, 1000); // Load all products
+        setTotalPages(response.totalPages);
+        setProductList(response.data);
+      } catch (error) {
+        console.error('Error loading all products:', error);
+      }
+    };
+    loadAllProducts();
     checkLogin();
   }, []);
+
+  const loadNextPage = () => {
+    if (loading) return;
+    setLoading(true);
+    
+    // Calculate the next set of products to show
+    setPage(prevPage => {
+      const nextPage = prevPage + 1;
+      const startIdx = ((prevPage - 1) * 12) % allProducts.length;
+      const endIdx = startIdx + 12;
+      
+      // Get next set of products, wrapping around if needed
+      const nextProducts = [
+        ...allProducts.slice(startIdx, Math.min(endIdx, allProducts.length)),
+        ...(endIdx > allProducts.length ? allProducts.slice(0, endIdx - allProducts.length) : [])
+      ];
+
+      // Append the next set of products
+      setProductList(prev => [...prev, ...nextProducts]);
+      setLoading(false);
+      return nextPage;
+    });
+  };
 
   const checkLogin = async () => {
     try {
@@ -29,7 +80,6 @@ const Store = () => {
       return;
     }
     toast.success(`Product ${productId} added to cart!`);
-    // Add logic for adding to cart here.
   };
 
   return (
@@ -43,10 +93,14 @@ const Store = () => {
           <p>No products available at the moment.</p>
         ) : (
           productList.map((product, index) => (
-            <div key={index} className="store-product-card">
+            <div 
+              key={`${product._id}-${index}`}
+              ref={index === productList.length - 1 ? lastProductRef : null}
+              className="store-product-card"
+            >
               <div className="product-image">
                 <img
-                  src="https://placehold.co/200x300" // Placeholder or dynamic product image
+                  src="https://placehold.co/200x300"
                   alt={product.title}
                 />
               </div>
@@ -80,6 +134,7 @@ const Store = () => {
           ))
         )}
       </div>
+      {loading && <div className="loading">Loading more products...</div>}
     </div>
   );
 };
