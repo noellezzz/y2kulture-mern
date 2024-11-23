@@ -1,14 +1,19 @@
 import axios from 'axios'
 import toast from 'react-hot-toast'
 
-export const fetchData = async (object, setForm) => {
+export const fetchData = async (object, setForm, page = 1, limit = 12) => {
     try {
-        const response = await axios.get(`http://localhost:8000/api/${object}`)
-        setForm(response.data.data)
-        // console.log(`Working ${object}`, response.data.data)
-      } catch (error) {
+        const response = await axios.get(`http://localhost:8000/api/${object}?page=${page}&limit=${limit}`)
+        if (page === 1) {
+            setForm(response.data.data)
+        } else {
+            setForm(prev => [...prev, ...response.data.data])
+        }
+        return response.data
+    } catch (error) {
         console.log(`Error while fetching ${object} Data`, error)
-      }
+        return null
+    }
 }
 
 export const fetchDataN = async (object, id) => {
@@ -74,4 +79,3 @@ export const deleteFunc = async (object, id, setForm) => {
       console.log("Error in User Delete", error)
     })
 }
-
