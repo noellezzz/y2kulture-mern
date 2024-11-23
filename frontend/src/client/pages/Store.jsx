@@ -1,49 +1,84 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import { fetchData } from '../../admin/utils/crudUtils'; // Utility function for API calls
+import toast from 'react-hot-toast';
+import './styles/Shared.css'; // Assuming separate styles for Store
+import { MdStarRate } from 'react-icons/md';
 
 const Store = () => {
-  const [products, setProducts] = useState([]); // State to hold products
-  const [loading, setLoading] = useState(true); // State to handle loading status
-  const [error, setError] = useState(null); // State to handle API errors
+  const [productList, setProductList] = useState([]);
+  const [userLoggedIn, setUserLoggedIn] = useState(false);
 
-  // Function to fetch products
-  const getProducts = async () => {
+  useEffect(() => {
+    // Fetch products when the component mounts
+    fetchData('product', setProductList);
+    checkLogin();
+  }, []);
+
+  const checkLogin = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/api/product'); // Replace with your actual API endpoint
-      console.log(response.data); // Log the response data to inspect it
-      setProducts(response.data); // Assuming the API response returns an array of products
-    } catch (err) {
-      setError('Failed to fetch products. Please try again later.');
-      console.error(err);
-    } finally {
-      setLoading(false);
+      const response = await axios.get('http://localhost:8000/auth');
+      setUserLoggedIn(true);
+    } catch {
+      setUserLoggedIn(false);
     }
   };
 
-  // Fetch products when the component mounts
-  useEffect(() => {
-    getProducts();
-  }, []);
-
-  if (loading) {
-    return <p>Loading products...</p>;
-  }
-
-  if (error) {
-    return <p>{error}</p>;
-  }
+  const addToCart = (productId) => {
+    if (!userLoggedIn) {
+      toast.error('Please Log In First!');
+      return;
+    }
+    toast.success(`Product ${productId} added to cart!`);
+    // Add logic for adding to cart here.
+  };
 
   return (
-    <div>
-      <h1>Store</h1>
-      <div className="products-grid">
-        {Array.isArray(products) && products.map((products) => (
-          <div key={products._id} className="product-card">
-            <h2>{product.name}</h2>
-            <p>{products.description}</p>
-            <p><strong>Price:</strong> ${products.price}</p>
-          </div>
-        ))}
+    <div className="store-container">
+      <div className="store-header">
+        <h1>Our Products</h1>
+        <p>Explore our collection and find your perfect style!</p>
+      </div>
+      <div className="store-grid">
+        {productList.length === 0 ? (
+          <p>No products available at the moment.</p>
+        ) : (
+          productList.map((product, index) => (
+            <div key={index} className="store-product-card">
+              <div className="product-image">
+                <img
+                  src="https://placehold.co/200x300" // Placeholder or dynamic product image
+                  alt={product.title}
+                />
+              </div>
+              <div className="product-info">
+                <h3>{product.title}</h3>
+                <p className="product-category">{product.category[0]?.title || 'Uncategorized'}</p>
+                <p className="product-description">{product.description}</p>
+                <p className="product-price">Price: ${product.price}</p>
+              </div>
+              <div className="product-controls">
+                <button
+                  onClick={() => addToCart(product._id)}
+                  className="prime-button"
+                >
+                  Add to Cart
+                </button>
+                {product.reviews?.length > 0 && (
+                  <div className="product-rating">
+                    <MdStarRate />
+                    <span>
+                      {(
+                        product.reviews.reduce((sum, review) => sum + review.rating, 0) /
+                        product.reviews.length
+                      ).toFixed(1)}{' '}
+                      Stars
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
