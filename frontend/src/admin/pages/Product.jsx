@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import "primereact/resources/themes/lara-light-cyan/theme.css";
-
-// Utils
-import { fetchData, fetchDataN, createFunc, addToTable, updateFunc, addAndRemoveToTable, deleteFunc } from '../utils/crudUtils';
+import axios from 'axios';
 
 // Icons and Imported Components
 import Fab from '@mui/material/Fab';
@@ -40,6 +38,11 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Collapse from '@mui/material/Collapse';
 import Box from '@mui/material/Box';
 import { FaPlus, FaTrash } from "react-icons/fa";
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
 
 const Product = () => {
   // Product Isolate
@@ -48,6 +51,8 @@ const Product = () => {
   // CRUD Necessities
   const [apiData, setApiData] = useState([]);
   const [flattenData, setFlattenData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [openModal, setOpenModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
   const [infoModal, setInfoModal] = useState(false);
@@ -56,6 +61,12 @@ const Product = () => {
   const [foreignHolder, setForeignHolder] = useState('')
   const [checkedId, setCheckedId] = useState([]);
   const [formState, setFormState] = useState({ _id: '', title: '', description: '', category: '', price: '', material: '', categoryId: '' });
+
+  // Pagination
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
   const onChange = e => {
     const files = Array.from(e.target.files)
@@ -89,7 +100,7 @@ const Product = () => {
   }
 
   const loadDataGen = async (id) => {
-    const response = await fetchDataN('product', id)
+    const response = await axios.get(`http://localhost:8000/api/product/${id}`)
     setFormState({
       _id: id,
       title: response.data.data.title,
@@ -119,7 +130,7 @@ const Product = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault()
-    const response = await createFunc('product', formState);
+    const response = await axios.post('http://localhost:8000/api/product', formState);
     const newProduct = {
       _id: response.data.data._id,
       title: formState.title,
@@ -131,12 +142,12 @@ const Product = () => {
       updatedAt: new Date().toLocaleString(),
       newData: true
     };
-    addToTable(setApiData, newProduct)
+    setApiData((prevData) => [...prevData, newProduct])
     setOpenModal(false);
   };
 
   const handleUpdate = async () => {
-    const response = await updateFunc('product', formState._id, formState)
+    const response = await axios.put(`http://localhost:8000/api/product/${formState._id}`, formState)
     console.log(formState)
     const newProduct = {
       _id: response.data.data._id,
@@ -149,12 +160,13 @@ const Product = () => {
       updatedAt: new Date().toLocaleString(),
       newData: true,
     };
-    addAndRemoveToTable(setApiData, newProduct)
+    setApiData((prevData) => prevData.map((data) => data._id === newProduct._id ? newProduct : data))
     setEditModal(false);
   };
 
   const handleDelete = (id) => {
-    deleteFunc('product', id, setApiData)
+    axios.delete(`http://localhost:8000/api/product/${id}`)
+    setApiData((prevData) => prevData.filter((data) => data._id !== id))
   };
 
   const loadContents = async (id) => {
@@ -253,6 +265,76 @@ const Product = () => {
     }
   };
 
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(`http://localhost:8000/api/product?page=${page}&limit=${limit}`);
+        if (response.data.success) {
+          setApiData(response.data.data);
+          setTotal(response.data.pagination.total);
+          setTotalPages(response.data.pagination.pages);
+        } else {
+          setError('Failed to fetch products');
+        }
+
+        // Fetch categories
+        const catResponse = await axios.get('http://localhost:8000/api/category');
+        if (catResponse.data.success) {
+          setCategoryOps(catResponse.data.data);
+        }
+      } catch (err) {
+        console.error('Error fetching data:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, [page, limit]);
+
+  useEffect(() => {
+    if (apiData.length > 0) {
+      const flattened = apiData.map(product => ({
+        id: product._id,
+        title: product.title || 'No Title',
+        description: product.description || 'No Description',
+        price: product.price || 0,
+        material: product.material || 'No Material',
+        categoryTitle: product.category?.title || 'Uncategorized',
+        createdAt: new Date(product.createdAt).toLocaleString(),
+        updatedAt: new Date(product.updatedAt).toLocaleString(),
+        stock: Array.isArray(product.stock) ? product.stock : []
+      }));
+      setFlattenData(flattened);
+    }
+  }, [apiData]);
+
+  const logData = () => {
+    console.log(flattenData)
+  }
+
+  const handleCheck = (id, isChecked) => {
+    setCheckedId((prevCheckedId) => {
+      if (isChecked) {
+        return [...prevCheckedId, id];
+      } else {
+        return prevCheckedId.filter((item) => item !== id);
+      }
+    });
+  };
+
+  const bulkDelete = () => {
+    try {
+      checkedId.map((id) => {
+        handleDelete(id)
+      })
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
   const modalData = {
     title: 'Product',
     content: 'product.',
@@ -321,61 +403,14 @@ const Product = () => {
     ]
   };
 
-  useEffect(() => {
-    fetchData('product', setApiData);
-    fetchData('category', setCategoryOps);
-  }, []);
-
-  const logData = () => {
-    console.log(flattenData)
-  }
-
-  useEffect(() => {
-    if (apiData.length > 0) {
-      const flattened = apiData.map(product => ({
-        id: product._id,
-        title: product.title,
-        description: product.description,
-        price: product.price,
-        material: product.material,
-        categoryTitle: (typeof product.category === 'string')
-          ? product.category
-          : (Array.isArray(product.category) && product.category.length > 0)
-            ? product.category[0].title
-            : 'N/A',
-        createdAt: new Date(product.createdAt).toLocaleString(),
-        updatedAt: new Date(product.updatedAt).toLocaleString(),
-        stock: product.stock
-      }));
-      setFlattenData(flattened);
-    }
-  }, [apiData]);
-
-  const handleCheck = (id, isChecked) => {
-    setCheckedId((prevCheckedId) => {
-      if (isChecked) {
-        return [...prevCheckedId, id];
-      } else {
-        return prevCheckedId.filter((item) => item !== id);
-      }
-    });
-  };
-
-  const bulkDelete = () => {
-    try {
-      checkedId.map((id) => {
-        deleteFunc('product', id, setApiData)
-      })
-    } catch (e) {
-      console.log(e)
-    }
-  }
+  if (loading) return <div>Loading products...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="main-container__admin">
       <div className="container sub-container__single-lg">
         <div className="container-body">
-          <TableContainer component={Paper} sx={{ maxHeight: 400, overflow: 'auto' }}>
+          <TableContainer component={Paper} sx={{ maxHeight: 'calc(100vh - 300px)', overflow: 'auto' }}>
             <Table aria-label="collapsible table">
               <TableHead>
                 <TableRow>
@@ -387,46 +422,171 @@ const Product = () => {
                         onChange={handleChange1}
                       /> */}
                   </TableCell>
-
                   <TableCell>ID</TableCell>
                   <TableCell align="right">Title</TableCell>
                   <TableCell align="right">Description</TableCell>
                   <TableCell align="right">Price</TableCell>
                   <TableCell align="right">Material</TableCell>
-                  {/* <TableCell align="right">Instructor</TableCell> */}
                 </TableRow>
               </TableHead>
               <TableBody>
-
                 {flattenData ? (
                   flattenData.length > 0 ? (
                     flattenData.map((row) => (
                       <Row key={row.id} row={row} handleCheck={handleCheck} loadEditModal={loadDataByIdEdit} deleteCourse={handleDelete} loadContents={loadContents} />
                     ))
                   ) : (
-                    <div className="table-placeholder">No Data Available</div>
+                    <TableRow>
+                      <TableCell colSpan={7} align="center">
+                        <Typography>No Data Available</Typography>
+                      </TableCell>
+                    </TableRow>
                   )
                 ) : null}
-
               </TableBody>
             </Table>
           </TableContainer>
         </div>
 
-        <div className="container-footer">
-          {/* <button onClick={printSelectedIds}>Print Selected IDs</button> */}
-          <Button variant="contained" className='invert-button'
-            onClick={() => { printSelectedIds() }}
-          >Delete Selected Rows
-          </Button>
-          <Button variant="contained" className='invert-button'
-            onClick={() => { bulkDelete() }}
-          >Bulk Delete
-          </Button>
-          <Button variant="contained"
-            onClick={() => { loadModalCreate() }}
-          >Create New
-          </Button>
+        <div className="container-footer" style={{ padding: '16px' }}>
+          <Box sx={{ 
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+          }}>
+            {/* Action Buttons Row */}
+            <Box sx={{ 
+              display: 'flex',
+              justifyContent: 'flex-start',
+              gap: 2,
+              borderBottom: '1px solid rgba(224, 224, 224, 1)',
+              pb: 2
+            }}>
+              <Button 
+                variant="contained"
+                onClick={() => { loadModalCreate() }}
+                sx={{
+                  backgroundColor: '#1976d2',
+                  '&:hover': {
+                    backgroundColor: '#1565c0',
+                  }
+                }}
+              >
+                Create New
+              </Button>
+              <Button 
+                variant="contained" 
+                className='invert-button'
+                onClick={() => { printSelectedIds() }}
+                sx={{
+                  backgroundColor: '#d32f2f',
+                  color: 'white',
+                  '&:hover': {
+                    backgroundColor: '#c62828',
+                  }
+                }}
+              >
+                Delete Selected Rows
+              </Button>
+              <Button 
+                variant="contained" 
+                className='invert-button'
+                onClick={() => { bulkDelete() }}
+                sx={{
+                  backgroundColor: '#d32f2f',
+                  color: 'white',
+                  '&:hover': {
+                    backgroundColor: '#c62828',
+                  }
+                }}
+              >
+                Bulk Delete
+              </Button>
+            </Box>
+
+            {/* Pagination Row */}
+            <Box sx={{ 
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: 2
+            }}>
+              {/* Left side - Page Size & Total */}
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: 2,
+                flex: '1 1 auto'
+              }}>
+                <FormControl size="small" sx={{ minWidth: 120 }}>
+                  <Select
+                    value={limit}
+                    onChange={(e) => setLimit(Number(e.target.value))}
+                    sx={{
+                      height: '36px',
+                      '& .MuiSelect-select': {
+                        paddingY: '8px',
+                      }
+                    }}
+                  >
+                    <MenuItem value={5}>5 per page</MenuItem>
+                    <MenuItem value={10}>10 per page</MenuItem>
+                    <MenuItem value={20}>20 per page</MenuItem>
+                    <MenuItem value={50}>50 per page</MenuItem>
+                  </Select>
+                </FormControl>
+                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                  Total Products: {total}
+                </Typography>
+              </Box>
+
+              {/* Right side - Pagination Controls */}
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: 1,
+                flex: '0 0 auto'
+              }}>
+                <Button 
+                  variant="outlined" 
+                  size="small"
+                  disabled={page === 1}
+                  onClick={() => setPage(prev => Math.max(1, prev - 1))}
+                  sx={{
+                    minWidth: '32px',
+                    height: '32px',
+                    px: 1
+                  }}
+                >
+                  <NavigateBeforeIcon />
+                </Button>
+                <Typography 
+                  variant="body2" 
+                  sx={{ 
+                    mx: 2,
+                    minWidth: '100px',
+                    textAlign: 'center'
+                  }}
+                >
+                  Page {page} of {totalPages}
+                </Typography>
+                <Button 
+                  variant="outlined"
+                  size="small"
+                  disabled={page === totalPages}
+                  onClick={() => setPage(prev => Math.min(totalPages, prev + 1))}
+                  sx={{
+                    minWidth: '32px',
+                    height: '32px',
+                    px: 1
+                  }}
+                >
+                  <NavigateNextIcon />
+                </Button>
+              </Box>
+            </Box>
+          </Box>
 
           <CSSTransition
             in={openModal}
@@ -558,4 +718,3 @@ function Row(props) {
 }
 
 export default Product;
-
