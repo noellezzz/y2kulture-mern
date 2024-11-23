@@ -5,7 +5,8 @@ import { createProduct, deleteProduct, getOneProduct, getProduct, updateProduct,
         updateReview,
         checkUserOrders,
         checkIfReviewed,
-        deleteReview
+        deleteReview,
+        productSeeder
         } from "../controllers/ProductController.js";
 import { upload } from "../utils/multer.js";
 
@@ -26,5 +27,7 @@ router.post('/check/:productId/:userId', checkUserOrders)
 router.post('/delete/:productId/:userId', deleteReview)
 router.get('/checkReviews/:productId/:userId', checkIfReviewed)
 router.post('/updateReview/:productId/:userId', updateReview)
+
+router.get('/seed/randomized', productSeeder)
 
 export default router;

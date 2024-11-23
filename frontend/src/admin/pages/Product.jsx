@@ -143,6 +143,10 @@ const Product = () => {
       newData: true
     };
     setApiData((prevData) => [...prevData, newProduct])
+    setTimeout(() => { 
+
+      window.location.reload()
+  }, 500);
     setOpenModal(false);
   };
 
@@ -455,54 +459,6 @@ const Product = () => {
             gap: 2,
           }}>
             {/* Action Buttons Row */}
-            <Box sx={{ 
-              display: 'flex',
-              justifyContent: 'flex-start',
-              gap: 2,
-              borderBottom: '1px solid rgba(224, 224, 224, 1)',
-              pb: 2
-            }}>
-              <Button 
-                variant="contained"
-                onClick={() => { loadModalCreate() }}
-                sx={{
-                  backgroundColor: '#1976d2',
-                  '&:hover': {
-                    backgroundColor: '#1565c0',
-                  }
-                }}
-              >
-                Create New
-              </Button>
-              <Button 
-                variant="contained" 
-                className='invert-button'
-                onClick={() => { printSelectedIds() }}
-                sx={{
-                  backgroundColor: '#d32f2f',
-                  color: 'white',
-                  '&:hover': {
-                    backgroundColor: '#c62828',
-                  }
-                }}
-              >
-                Delete Selected Rows
-              </Button>
-              <Button 
-                variant="contained" 
-                className='invert-button'
-                onClick={() => { bulkDelete() }}
-                sx={{
-                  backgroundColor: '#d32f2f',
-                  color: 'white',
-                  '&:hover': {
-                    backgroundColor: '#c62828',
-                  }
-                }}
-              >
-                Bulk Delete
-              </Button>
-            </Box>
 
             {/* Pagination Row */}
             <Box sx={{ 
@@ -536,7 +492,7 @@ const Product = () => {
                     <MenuItem value={50}>50 per page</MenuItem>
                   </Select>
                 </FormControl>
-                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                <Typography variant="body2" sx={{ color: 'text.secondary', minWidth:'200px' }}>
                   Total Products: {total}
                 </Typography>
               </Box>
@@ -585,6 +541,55 @@ const Product = () => {
                   <NavigateNextIcon />
                 </Button>
               </Box>
+            </Box>
+            <Box sx={{ 
+              display: 'flex',
+              justifyContent: 'flex-start',
+              gap: 2,
+              borderBottom: '1px solid rgba(224, 224, 224, 1)',
+              pb: 2
+            }}>
+              <Button 
+              className='MuiButton-custom___btn'
+                variant="contained"
+                onClick={() => { loadModalCreate() }}
+                sx={{
+                  backgroundColor: '#1976d2',
+                  '&:hover': {
+                    backgroundColor: '#1565c0',
+                  }
+                }}
+              >
+                Create New
+              </Button>
+              <Button 
+                variant="contained" 
+                className='invert-button'
+                onClick={() => { printSelectedIds() }}
+                sx={{
+                  backgroundColor: '#d32f2f',
+                  color: 'white',
+                  '&:hover': {
+                    backgroundColor: '#c62828',
+                  }
+                }}
+              >
+                Delete Selected Rows
+              </Button>
+              <Button 
+                variant="contained" 
+                className='invert-button'
+                onClick={() => { bulkDelete() }}
+                sx={{
+                  backgroundColor: '#d32f2f',
+                  color: 'white',
+                  '&:hover': {
+                    backgroundColor: '#c62828',
+                  }
+                }}
+              >
+                Bulk Delete
+              </Button>
             </Box>
           </Box>
 
@@ -652,7 +657,7 @@ function Row(props) {
             onChange={(e) => handleCheck(row.id, e.target.checked)}
           />
         </TableCell>
-        <TableCell component="th" scope="row">{row.id}</TableCell>
+        <TableCell component="th" scope="row" sx={{ minWidth:'400px' }}>{row.id}</TableCell>
         <TableCell align="right">{row.title}</TableCell>
         <TableCell align="right">{row.description}</TableCell>
         <TableCell align="right">{row.price}</TableCell>
