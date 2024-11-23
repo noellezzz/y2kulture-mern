@@ -9,6 +9,13 @@ export const getCategory = async (request, response) => {
             .sort({ createdAt: -1 })
             .exec();
 
+        // Log all category titles for debugging
+        console.log('All category titles:', category.map(cat => ({
+            id: cat._id,
+            title: cat.title,
+            types: cat.clothing_type.map(t => t.title)
+        })));
+
         response.status(200).json({
             success: true,
             message: "Categories Retrieved.",
