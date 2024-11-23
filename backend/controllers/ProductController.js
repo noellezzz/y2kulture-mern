@@ -433,3 +433,113 @@ export const deleteReview = async (req, res) => {
         return res.status(500).json({ message: "Error in deleting Review", error });
     }
 };
+
+// export const productSeeder = async(req, res) => {
+//     try {
+//         for(let i = 0; i < 10; i++) {
+//             const product = new Product({
+//                 title: `Product ${i}`,
+//                 description: `Description for Product ${i}`,
+//                 price: 1000,
+//                 category: "60b9b1c0f1b4c7c0a4a9f4c2",
+//                 images: [
+//                     {
+//                         public_id: "public_id",
+//                         url: "url"
+//                     }
+//                 ],
+//                 stock: [
+//                     {
+//                         color: "Red",
+//                         size: "M",
+//                         quantity: 10
+//                     },
+//                     {
+//                         color: "Blue",
+//                         size: "L",
+//                         quantity: 10
+//                     }
+//                 ]
+//             })
+
+//             await product.save()
+//         }
+//     } catch(e) {
+//         console.log("Error in seeding products", e)
+//     }
+// }
+
+const titles = [
+    "Casual T-Shirt", 
+    "Formal Shirt", 
+    "Denim Jacket", 
+    "Sports Shorts", 
+    "Summer Dress", 
+    "Winter Coat", 
+    "Woolen Scarf", 
+    "Running Shoes", 
+    "Leather Belt", 
+    "Baseball Cap"
+];
+
+const descriptions = [
+    "Comfortable and stylish casual wear.",
+    "Perfect for office or formal events.",
+    "Rugged and durable for all seasons.",
+    "Lightweight and breathable sportswear.",
+    "Elegant and airy for sunny days.",
+    "Cozy and warm for chilly winters.",
+    "Soft and trendy winter accessory.",
+    "Built for performance and durability.",
+    "Classic accessory for everyday wear.",
+    "Protects from the sun with a sporty look."
+];
+
+// Possible stock attributes
+const colors = ["Red", "Blue", "Green", "Black", "White", "Yellow"];
+const sizes = ["S", "M", "L", "XL", "XXL"];
+
+// Function to generate random items from an array
+const getRandomElement = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+// Function to generate random stock
+const generateRandomStock = () => {
+    const stockCount = Math.floor(Math.random() * 5) + 1; // Random number of stock entries
+    const stock = [];
+    for (let i = 0; i < stockCount; i++) {
+        stock.push({
+            color: getRandomElement(colors),
+            size: getRandomElement(sizes),
+            quantity: Math.floor(Math.random() * 20) + 1 // Random quantity between 1 and 20
+        });
+    }
+    return stock;
+};
+
+// Main function to create products
+export const productSeeder = async () => {
+    try {
+        // Fetch available categories from MongoDB
+        const categories = await Category.find({});
+        if (categories.length === 0) {
+            console.log("No categories available in the database.");
+            return;
+        }
+
+        for (let i = 0; i < titles.length; i++) {
+            const product = new Product({
+                title: titles[i],
+                description: descriptions[i],
+                price: Math.floor(Math.random() * 5000) + 500, // Random price between 500 and 5000
+                category: getRandomElement(categories)._id, // Random category
+                images: [], // No images
+                stock: generateRandomStock() // Randomized stock
+            });
+
+            await product.save();
+            console.log(`Product ${titles[i]} created successfully!`);
+        }
+    } catch (error) {
+        console.error("Error creating products:", error);
+    }
+};
