@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { fetchData } from '../utils/crudUtils'
 import axios from 'axios'
+import '../styles/inventory.css'
 
 const Inventory = () => {
     const [invData, setInvData] = useState([])
@@ -83,8 +84,20 @@ const Inventory = () => {
     const handleSubmit = async() => {
         try {
             const result = await axios.post(`http://localhost:8000/api/product/addStock/${selectedProduct.productId}`, selectedProduct)
+            // Add visual feedback for success
+            const successMessage = document.createElement('div');
+            successMessage.className = 'success-message';
+            successMessage.textContent = 'Stock updated successfully';
+            document.querySelector('.sub-container__side').appendChild(successMessage);
+            setTimeout(() => successMessage.remove(), 3000);
         } catch (e) {
             console.log("Error in submitting stock info", e)
+            // Add visual feedback for error
+            const errorMessage = document.createElement('div');
+            errorMessage.className = 'error-message';
+            errorMessage.textContent = 'Failed to update stock';
+            document.querySelector('.sub-container__side').appendChild(errorMessage);
+            setTimeout(() => errorMessage.remove(), 3000);
         }
         clearForm()
     }
