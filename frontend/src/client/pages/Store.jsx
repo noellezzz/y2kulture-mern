@@ -10,15 +10,14 @@ const Store = () => {
   const [userLoggedIn, setUserLoggedIn] = useState(false);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
-  const [limit] = useState(12);
-  const [total, setTotal] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
+  const [allProducts, setAllProducts] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [selectedPriceRanges, setSelectedPriceRanges] = useState([]);
+  const [selectedGenders, setSelectedGenders] = useState([]);
   const [selectedSorts, setSelectedSorts] = useState([]);
-  const [selectedTypes, setSelectedTypes] = useState([]);
+  const [selectedPriceRanges, setSelectedPriceRanges] = useState([]);
   const [availableCategories, setAvailableCategories] = useState([]);
-  const [availableTypes, setAvailableTypes] = useState([]);
+  const [availableGenders, setAvailableGenders] = useState(['Men', 'Women', 'Unisex']);
   const observer = useRef();
 
   const priceRanges = [
@@ -31,51 +30,56 @@ const Store = () => {
     { min: 10000, max: null, label: 'Over $10,000' }
   ];
 
-  const sortOptions = [
-    { value: 'title_asc', label: 'Title (A-Z)' },
-    { value: 'title_desc', label: 'Title (Z-A)' },
-    { value: 'price_asc', label: 'Price (Low to High)' },
-    { value: 'price_desc', label: 'Price (High to Low)' }
-  ];
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get('http://localhost:8000/api/category');
+        if (response.data.success) {
+          const categories = response.data.data;
+          console.log('Available categories from database:', categories);
+          setAvailableCategories(categories.map(cat => cat.title));
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+        toast.error('Failed to load categories');
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    loadFilteredProducts();
+    checkLogin();
+  }, [selectedCategories, selectedGenders, selectedSorts, selectedPriceRanges]);
 
   const handleCategoryChange = (category) => {
-    setSelectedCategories(prev =>
-      prev.find(cat => cat._id === category._id)
-        ? prev.filter(cat => cat._id !== category._id)
-        : [...prev, category]
+    setSelectedCategories(prev => 
+      prev.includes(category) ? prev.filter(cat => cat !== category) : [...prev, category]
     );
-    setPage(1);
   };
 
-  const handlePriceRangeChange = (range) => {
-    setSelectedPriceRanges(prev =>
-      prev.find(r => r.min === range.min && r.max === range.max)
-        ? []
-        : [range]
+  const handleGenderChange = (gender) => {
+    setSelectedGenders(prev =>
+      prev.includes(gender) ? prev.filter(g => g !== gender) : [...prev, gender]
     );
-    setPage(1);
   };
 
   const handleSortChange = (sort) => {
     setSelectedSorts(prev => {
-      const sortExists = prev.some(s => s === sort.value);
-      if (sortExists) {
-        return prev.filter(s => s !== sort.value);
-      }
-      return [...prev, sort.value];
+      const field = sort.startsWith('title') ? 'title' : 'price';
+      const newSorts = prev.filter(s => !s.startsWith(field));
+      return prev.includes(sort) ? newSorts : [...newSorts, sort];
     });
-    setPage(1);
   };
 
-  const handleTypeChange = (type) => {
-    setSelectedTypes(prev => {
-      const typeExists = prev.some(t => t._id === type._id);
-      if (typeExists) {
-        return prev.filter(t => t._id !== type._id);
+  const handlePriceRangeChange = (range) => {
+    setSelectedPriceRanges(prev => {
+      const isSelected = prev.some(r => r.min === range.min && r.max === range.max);
+      if (isSelected) {
+        return prev.filter(r => !(r.min === range.min && r.max === range.max));
       }
-      return [...prev, type];
+      return [...prev, range];
     });
-    setPage(1);
   };
 
   const loadFilteredProducts = async () => {
@@ -83,193 +87,78 @@ const Store = () => {
       setLoading(true);
       const params = new URLSearchParams();
       
-      // Handle category filters
-      if (selectedCategories.length > 0) {
-        // Get all type IDs from selected categories
-        const selectedTypeIds = new Set();
-        selectedCategories.forEach(category => {
-          category.clothing_type.forEach(type => {
-            selectedTypeIds.add(type._id);
-          });
-        });
-
-        // Add category IDs to params
-        selectedCategories.forEach(category => 
-          params.append('categoryType', category._id)
-        );
-      }
-
-      // Handle type filters
-      if (selectedTypes.length > 0) {
-        selectedTypes.forEach(type => 
-          params.append('typeId', type._id)
-        );
-      }
-
-      // Handle sorting
-      if (selectedSorts.length > 0) {
-        selectedSorts.forEach(sort => 
-          params.append('sortFields', sort)
-        );
-      }
+      selectedCategories.forEach(category => params.append('categoryType', category));
+      selectedGenders.forEach(gender => params.append('gender', gender));
+      selectedSorts.forEach(sort => params.append('sortFields', sort));
       
-      // Handle price range filters
-      if (selectedPriceRanges.length > 0) {
-        const range = selectedPriceRanges[0];
-        if (range.min) params.append('minPrice', range.min);
-        if (range.max) params.append('maxPrice', range.max);
-      }
-      
-      // Add pagination parameters
-      params.append('page', page);
-      params.append('limit', limit);
-
-      console.log('Request params:', params.toString());
-      const response = await axios.get(`http://localhost:8000/api/product?${params}`);
-      console.log('Response:', response.data);
-      
-      if (response.data.success) {
-        const products = response.data.data;
-        setProductList(prev => page === 1 ? products : [...prev, ...products]);
-        setTotal(response.data.pagination.total);
-        setTotalPages(response.data.pagination.pages);
-
-        if (products.length === 0 && page === 1) {
-          toast.info('No products found for the selected filters');
+      // Add price range parameters
+      selectedPriceRanges.forEach(range => {
+        params.append('minPrice', range.min);
+        if (range.max) {
+          params.append('maxPrice', range.max);
         }
-      } else {
-        toast.error('Failed to load products');
+      });
+      
+      params.append('limit', '1000');
+      
+      const response = await axios.get(`http://localhost:8000/api/product?${params}`);
+      
+      setAllProducts(response.data.data);
+      setProductList(response.data.data.slice(0, 12));
+      setPage(1);
+      setTotalPages(Math.ceil(response.data.data.length / 12));
+
+      if (response.data.data.length === 0) {
+        toast.error('No products found for the selected filters');
       }
     } catch (error) {
       console.error('Error loading filtered products:', error);
-      toast.error('Error loading products');
     } finally {
       setLoading(false);
     }
   };
 
-  const clearFilters = () => {
-    setSelectedCategories([]);
-    setSelectedTypes([]);
-    setSelectedPriceRanges([]);
-    setSelectedSorts([]);
-    setPage(1);
+  const loadNextPage = () => {
+    if (loading) return;
+    setLoading(true);
+    
+    setPage(prevPage => {
+      const startIdx = (prevPage * 12) % allProducts.length;
+      const endIdx = startIdx + 12;
+      const nextProducts = [
+        ...allProducts.slice(startIdx, Math.min(endIdx, allProducts.length)),
+        ...(endIdx > allProducts.length ? allProducts.slice(0, endIdx - allProducts.length) : [])
+      ];
+      setProductList(prev => [...prev, ...nextProducts]);
+      setLoading(false);
+      return prevPage + 1;
+    });
   };
-
-  useEffect(() => {
-    const fetchCategoriesAndTypes = async () => {
-      try {
-        // Fetch categories
-        const categoryResponse = await axios.get('http://localhost:8000/api/category');
-        if (categoryResponse.data.success) {
-          console.log('Raw categories:', categoryResponse.data.data);
-
-          // First, normalize category titles to ensure consistent comparison
-          const normalizedCategories = categoryResponse.data.data.map(cat => ({
-            ...cat,
-            title: cat.title.trim().toLowerCase()
-          }));
-
-          // Group categories by normalized title
-          const categoriesMap = {};
-          normalizedCategories.forEach(category => {
-            const title = category.title;
-            if (!categoriesMap[title]) {
-              categoriesMap[title] = {
-                ...category,
-                title: category.title.trim(), // Keep original case for display
-                clothing_type: [...category.clothing_type]
-              };
-            } else {
-              // Merge clothing types
-              category.clothing_type.forEach(type => {
-                if (!categoriesMap[title].clothing_type.some(t => t._id === type._id)) {
-                  categoriesMap[title].clothing_type.push(type);
-                }
-              });
-            }
-          });
-
-          const uniqueCategories = Object.values(categoriesMap);
-          console.log('Unique categories:', uniqueCategories);
-          setAvailableCategories(uniqueCategories);
-
-          // Fetch and deduplicate types
-          const typeResponse = await axios.get('http://localhost:8000/api/type');
-          if (typeResponse.data.success) {
-            console.log('Raw types:', typeResponse.data.data);
-            const typesMap = {};
-            typeResponse.data.data.forEach(type => {
-              const title = type.title.trim().toLowerCase();
-              if (!typesMap[title]) {
-                typesMap[title] = {
-                  ...type,
-                  title: type.title.trim() // Keep original case for display
-                };
-              }
-            });
-            const uniqueTypes = Object.values(typesMap);
-            console.log('Unique types:', uniqueTypes);
-            setAvailableTypes(uniqueTypes);
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        toast.error('Failed to load filters');
-      }
-    };
-
-    fetchCategoriesAndTypes();
-    checkLogin();
-  }, []);
-
-  useEffect(() => {
-    console.log('Current available categories:', availableCategories);
-  }, [availableCategories]);
-
-  useEffect(() => {
-    loadFilteredProducts();
-  }, [page, selectedCategories, selectedTypes, selectedPriceRanges, selectedSorts]);
 
   const lastProductRef = useCallback(node => {
     if (loading || !node) return;
     if (observer.current) observer.current.disconnect();
     observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && page < totalPages) {
-        setPage(prev => prev + 1);
-      }
+      if (entries[0].isIntersecting) loadNextPage();
     });
     observer.current.observe(node);
-  }, [loading, page, totalPages]);
+  }, [loading]);
 
   const checkLogin = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/auth');
-      setUserLoggedIn(response.data.success);
+      await axios.get('http://localhost:8000/auth');
+      setUserLoggedIn(true);
     } catch {
       setUserLoggedIn(false);
     }
   };
 
-  const addToCart = async (productId) => {
+  const addToCart = (productId) => {
     if (!userLoggedIn) {
-      toast.error('Please log in first!');
+      toast.error('Please Log In First!');
       return;
     }
-    try {
-      const response = await axios.post('http://localhost:8000/api/cart/add', {
-        productId,
-        quantity: 1
-      });
-      if (response.data.success) {
-        toast.success('Product added to cart!');
-      } else {
-        toast.error('Failed to add product to cart');
-      }
-    } catch (error) {
-      console.error('Error adding to cart:', error);
-      toast.error('Error adding product to cart');
-    }
+    toast.success(`Product ${productId} added to cart!`);
   };
 
   return (
@@ -283,34 +172,30 @@ const Store = () => {
         <div className="filter-sidebar">
           <div className="filter-section">
             <h3>Categories</h3>
-            {availableCategories
-              .sort((a, b) => a.title.localeCompare(b.title))
-              .map(category => (
-                <label key={category._id} className="filter-checkbox">
-                  <input
-                    type="checkbox"
-                    checked={selectedCategories.some(cat => cat._id === category._id)}
-                    onChange={() => handleCategoryChange(category)}
-                  />
-                  <span>{category.title}</span>
-                </label>
-              ))}
+            {availableCategories.map(category => (
+              <label key={category} className="filter-checkbox">
+                <input
+                  type="checkbox"
+                  checked={selectedCategories.includes(category)}
+                  onChange={() => handleCategoryChange(category)}
+                />
+                <span>{category}</span>
+              </label>
+            ))}
           </div>
 
           <div className="filter-section">
-            <h3>Type</h3>
-            {availableTypes
-              .sort((a, b) => a.title.localeCompare(b.title))
-              .map(type => (
-                <label key={type._id} className="filter-checkbox">
-                  <input
-                    type="checkbox"
-                    checked={selectedTypes.some(t => t._id === type._id)}
-                    onChange={() => handleTypeChange(type)}
-                  />
-                  <span>{type.title}</span>
-                </label>
-              ))}
+            <h3>Gender</h3>
+            {availableGenders.map(gender => (
+              <label key={gender} className="filter-checkbox">
+                <input
+                  type="checkbox"
+                  checked={selectedGenders.includes(gender)}
+                  onChange={() => handleGenderChange(gender)}
+                />
+                <span>{gender}</span>
+              </label>
+            ))}
           </div>
 
           <div className="filter-section">
@@ -328,85 +213,94 @@ const Store = () => {
           </div>
 
           <div className="filter-section">
-            <h3>Sort By</h3>
-            {sortOptions.map(sort => (
-              <label key={sort.value} className="filter-checkbox">
-                <input
-                  type="checkbox"
-                  checked={selectedSorts.includes(sort.value)}
-                  onChange={() => handleSortChange(sort)}
-                />
-                <span>{sort.label}</span>
-              </label>
-            ))}
+            <h3>Sort By Name</h3>
+            <label className="filter-checkbox">
+              <input
+                type="checkbox"
+                checked={selectedSorts.includes('titleAsc')}
+                onChange={() => handleSortChange('titleAsc')}
+              />
+              <span>A to Z</span>
+            </label>
+            <label className="filter-checkbox">
+              <input
+                type="checkbox"
+                checked={selectedSorts.includes('titleDesc')}
+                onChange={() => handleSortChange('titleDesc')}
+              />
+              <span>Z to A</span>
+            </label>
           </div>
 
-          <button 
-            className="clear-filters-btn"
-            onClick={clearFilters}
-            disabled={!selectedCategories.length && !selectedTypes.length && !selectedPriceRanges.length && !selectedSorts.length}
-          >
-            Clear All Filters
-          </button>
+          <div className="filter-section">
+            <h3>Sort By Price</h3>
+            <label className="filter-checkbox">
+              <input
+                type="checkbox"
+                checked={selectedSorts.includes('priceAsc')}
+                onChange={() => handleSortChange('priceAsc')}
+              />
+              <span>Low to High</span>
+            </label>
+            <label className="filter-checkbox">
+              <input
+                type="checkbox"
+                checked={selectedSorts.includes('priceDesc')}
+                onChange={() => handleSortChange('priceDesc')}
+              />
+              <span>High to Low</span>
+            </label>
+          </div>
         </div>
 
         <div className="store-content">
-          {loading && page === 1 ? (
-            <div className="loading">Loading products...</div>
-          ) : (
-            <div className="store-grid">
-              {productList.length === 0 ? (
-                <div className="no-products">
-                  <p>No products available for the selected filters.</p>
-                </div>
-              ) : (
-                productList.map((product, index) => (
-                  <div 
-                    key={product._id}
-                    ref={index === productList.length - 1 ? lastProductRef : null}
-                    className="store-product-card"
-                  >
-                    <div className="product-image">
-                      <img
-                        src={product.images[0]?.url || "https://placehold.co/200x300"}
-                        alt={product.title}
-                      />
-                    </div>
-                    <div className="product-info">
-                      <h3>{product.title}</h3>
-                      <p className="product-category">
-                        {product.category.map(cat => cat.title).join(', ')}
-                      </p>
-                      <p className="product-description">{product.description}</p>
-                      <p className="product-price">Price: ${product.price.toLocaleString()}</p>
-                    </div>
-                    <div className="product-controls">
-                      <button
-                        onClick={() => addToCart(product._id)}
-                        className="prime-button"
-                        disabled={!userLoggedIn}
-                      >
-                        Add to Cart
-                      </button>
-                      {product.reviews?.length > 0 && (
-                        <div className="product-rating">
-                          <MdStarRate />
-                          <span>
-                            {(product.reviews.reduce((sum, review) => sum + review.rating, 0) / 
-                              product.reviews.length).toFixed(1)}{' '}
-                            Stars
-                          </span>
-                        </div>
-                      )}
-                    </div>
+          <div className="store-grid">
+            {productList.length === 0 ? (
+              <div className="no-products">
+                <p>No products available for the selected filters.</p>
+              </div>
+            ) : (
+              productList.map((product, index) => (
+                <div 
+                  key={`${product._id}-${index}`}
+                  ref={index === productList.length - 1 ? lastProductRef : null}
+                  className="store-product-card"
+                >
+                  <div className="product-image">
+                    <img
+                      src={product.images[0]?.url || "https://placehold.co/200x300"}
+                      alt={product.title}
+                    />
                   </div>
-                ))
-              )}
-              {loading && page > 1 && (
-                <div className="loading">Loading more products...</div>
-              )}
-            </div>
-          )}
+                  <div className="product-info">
+                    <h3>{product.title}</h3>
+                    <p className="product-category">{product.category[0]?.title || 'Uncategorized'}</p>
+                    <p className="product-description">{product.description}</p>
+                    <p className="product-price">Price: ${product.price}</p>
+                  </div>
+                  <div className="product-controls">
+                    <button
+                      onClick={() => addToCart(product._id)}
+                      className="prime-button"
+                    >
+                      Add to Cart
+                    </button>
+                    {product.reviews?.length > 0 && (
+                      <div className="product-rating">
+                        <MdStarRate />
+                        <span>
+                          {(product.reviews.reduce((sum, review) => sum + review.rating, 0) / 
+                            product.reviews.length).toFixed(1)}{' '}
+                          Stars
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+          {loading && <div className="loading">Loading more products...</div>}
         </div>
       </div>
     </div>
