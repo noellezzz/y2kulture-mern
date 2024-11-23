@@ -10,6 +10,7 @@ import Orders from './admin/pages/Orders'
 import { Toaster } from 'react-hot-toast';
 import ClientLayout from './client/components/ClientLayout'
 import Welcome from './client/pages/Welcome'
+import Store from './client/pages/Store' // Import Store.jsx
 import axios from 'axios'
 import Cart from './client/pages/Cart'
 import Profle from './client/pages/Profile'
@@ -61,6 +62,7 @@ function App() {
       <Routes>
         <Route path="/" element={<ClientLayout />}>
           <Route index element={<Welcome />} />
+          <Route path="store" element={<Store />} /> {/* Add Store route here */}
           <Route element={<ProtectedRoute />}>
             <Route path="cart" element={<Cart />} />
             <Route path="profile" element={<Profle />} />
