@@ -31,6 +31,7 @@ const Users = () => {
     const [users, setUsers] = useState([]);
     const [openModal, setOpenModal] = useState(false);
     const [editModal, setEditModal] = useState(false);
+    const [viewModal, setViewModal] = useState(false); // View modal state
     const [currentUser, setCurrentUser] = useState({
         first_name: "",
         last_name: "",
@@ -45,7 +46,7 @@ const Users = () => {
         avatar: [],
         deleted: false,
     });
-    
+
     const [formState, setFormState] = useState({
         first_name: "",
         last_name: "",
@@ -165,6 +166,12 @@ const Users = () => {
         }
     };
 
+    // Handle View User
+    const handleViewUser = (user) => {
+        setCurrentUser(user); // Set the selected user's details in the state
+        setViewModal(true); // Open the modal to display the details
+    };
+
     return (
         <div className="main-container__admin">
             <div className="container sub-container__single-lg">
@@ -209,7 +216,7 @@ const Users = () => {
                                     </Fab>
                                     &nbsp;
                                     <Fab
-                                        onClick={() => {}}
+                                        onClick={() => handleViewUser(rowData)} // Add this handler for viewing user details
                                         color="info"
                                         aria-label="info"
                                         size="small"
@@ -228,8 +235,8 @@ const Users = () => {
                         Create New User
                     </Button>
 
-                    {/* Create Modal */}
-                    <CSSTransition in={openModal} timeout={300} classNames="modal" unmountOnExit>
+                     {/* Create Modal */}
+                     <CSSTransition in={openModal} timeout={300} classNames="modal" unmountOnExit>
                         <Dialog open={openModal} onClose={() => setOpenModal(false)} fullWidth maxWidth="sm">
                             <DialogTitle>Create User</DialogTitle>
                             <DialogContent>
@@ -329,7 +336,7 @@ const Users = () => {
                             <DialogTitle>Edit User</DialogTitle>
                             <DialogContent>
                                 <Box display="flex" flexDirection="column" gap={2}>
-                                    <TextField
+                                <TextField
                                         name="first_name"
                                         label="First Name"
                                         value={formState.first_name}
@@ -354,6 +361,15 @@ const Users = () => {
                                         variant="outlined"
                                     />
                                     <TextField
+                                        name="password"
+                                        label="Password"
+                                        type="password"
+                                        value={formState.password}
+                                        onChange={(e) => setFormState({ ...formState, password: e.target.value })}
+                                        fullWidth
+                                        variant="outlined"
+                                    />
+                                    <TextField
                                         name="contact_number"
                                         label="Contact Number"
                                         value={formState.contact_number}
@@ -361,6 +377,19 @@ const Users = () => {
                                         fullWidth
                                         variant="outlined"
                                     />
+                                    <FormControl fullWidth variant="outlined">
+                                        <InputLabel>Gender</InputLabel>
+                                        <Select
+                                            name="gender"
+                                            value={formState.gender}
+                                            onChange={(e) => setFormState({ ...formState, gender: e.target.value })}
+                                            label="Gender"
+                                        >
+                                            <MenuItem value="Male">Male</MenuItem>
+                                            <MenuItem value="Female">Female</MenuItem>
+                                            <MenuItem value="Other">Other</MenuItem>
+                                        </Select>
+                                    </FormControl>
                                     <FormControl fullWidth variant="outlined">
                                         <InputLabel>Role</InputLabel>
                                         <Select
@@ -373,6 +402,18 @@ const Users = () => {
                                             <MenuItem value="admin">Admin</MenuItem>
                                         </Select>
                                     </FormControl>
+                                    <FormControl fullWidth variant="outlined">
+                                        <InputLabel>Status</InputLabel>
+                                        <Select
+                                            name="status"
+                                            value={formState.status}
+                                            onChange={(e) => setFormState({ ...formState, status: e.target.value })}
+                                            label="Status"
+                                        >
+                                            <MenuItem value="active">Active</MenuItem>
+                                            <MenuItem value="inactive">Inactive</MenuItem>
+                                        </Select>
+                                    </FormControl>
                                 </Box>
                             </DialogContent>
                             <DialogActions>
@@ -380,6 +421,90 @@ const Users = () => {
                                 <Button variant="contained" color="primary" onClick={handleUpdate}>
                                     Save Changes
                                 </Button>
+                            </DialogActions>
+                        </Dialog>
+                    </CSSTransition>
+
+                    {/* View Modal */}
+                    <CSSTransition in={viewModal} timeout={300} classNames="modal" unmountOnExit>
+                        <Dialog open={viewModal} onClose={() => setViewModal(false)} fullWidth maxWidth="sm">
+                            <DialogTitle>User Details</DialogTitle>
+                            <DialogContent>
+                                <Box display="flex" flexDirection="column" gap={2}>
+                                    <TextField
+                                        name="first_name"
+                                        label="First Name"
+                                        value={currentUser.first_name}
+                                        InputProps={{
+                                            readOnly: true,
+                                        }}
+                                        fullWidth
+                                        variant="outlined"
+                                    />
+                                    <TextField
+                                        name="last_name"
+                                        label="Last Name"
+                                        value={currentUser.last_name}
+                                        InputProps={{
+                                            readOnly: true,
+                                        }}
+                                        fullWidth
+                                        variant="outlined"
+                                    />
+                                    <TextField
+                                        name="email"
+                                        label="Email"
+                                        value={currentUser.email}
+                                        InputProps={{
+                                            readOnly: true,
+                                        }}
+                                        fullWidth
+                                        variant="outlined"
+                                    />
+                                    <TextField
+                                        name="contact_number"
+                                        label="Contact Number"
+                                        value={currentUser.contact_number}
+                                        InputProps={{
+                                            readOnly: true,
+                                        }}
+                                        fullWidth
+                                        variant="outlined"
+                                    />
+                                    <TextField
+                                        name="birthday"
+                                        label="Birthday"
+                                        value={currentUser.birthday}
+                                        InputProps={{
+                                            readOnly: true,
+                                        }}
+                                        fullWidth
+                                        variant="outlined"
+                                    />
+                                    <TextField
+                                        name="role"
+                                        label="Role"
+                                        value={currentUser.role}
+                                        InputProps={{
+                                            readOnly: true,
+                                        }}
+                                        fullWidth
+                                        variant="outlined"
+                                    />
+                                    <TextField
+                                        name="status"
+                                        label="Status"
+                                        value={currentUser.status}
+                                        InputProps={{
+                                            readOnly: true,
+                                        }}
+                                        fullWidth
+                                        variant="outlined"
+                                    />
+                                </Box>
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={() => setViewModal(false)} color="primary">Close</Button>
                             </DialogActions>
                         </Dialog>
                     </CSSTransition>
