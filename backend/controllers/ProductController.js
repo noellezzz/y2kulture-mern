@@ -6,6 +6,12 @@ import express from "express";
 
 export const getProduct = async (request, response) => {
     try {
+        const page = parseInt(request.query.page) || 1;
+        const limit = parseInt(request.query.limit) || 12;
+        const skip = (page - 1) * limit;
+
+        const totalProducts = await Product.countDocuments({});
+        
         const product = await Product.find({})
             .populate({
                 path: 'category',
@@ -15,8 +21,18 @@ export const getProduct = async (request, response) => {
                 }
             })
             .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
             .exec();
-        response.status(200).json({ success: true, message: "Product Retrieved.", data: product });
+            
+        response.status(200).json({ 
+            success: true, 
+            message: "Products Retrieved.",
+            data: product,
+            currentPage: page,
+            totalPages: Math.ceil(totalProducts / limit),
+            hasMore: page * limit < totalProducts
+        });
     } catch (error) {
         console.log("Error in fetching products: ", error.message);
         response.status(500).json({ success: false, message: "Server Error." });
