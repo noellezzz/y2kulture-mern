@@ -1,16 +1,15 @@
 import axios from 'axios'
 import toast from 'react-hot-toast'
 
-export const fetchData = async (object) => {
-  try {
-      const response = await axios.get(`http://localhost:8000/api/${object}`);
-      return response.data.data; // Adjust based on your API structure
-  } catch (error) {
-      console.error(`Error fetching ${object} data`, error);
-      throw error; // Propagate the error to handle it in the calling code
-  }
-};
-
+export const fetchData = async (object, setForm) => {
+    try {
+        const response = await axios.get(`http://localhost:8000/api/${object}`)
+        setForm(response.data.data)
+        // console.log(`Working ${object}`, response.data.data)
+      } catch (error) {
+        console.log(`Error while fetching ${object} Data`, error)
+      }
+}
 
 export const fetchDataN = async (object, id) => {
     try {
