@@ -6,8 +6,11 @@ import { MdStarRate } from 'react-icons/md';
 import axios from 'axios';
 import ConfirmModal from '../components/ConfirmModal';
 import { CSSTransition } from 'react-transition-group';
+// import { MdStarRate } from "react-icons/md";
 
 const Store = () => {
+  const [reviewProduct, setReviewProduct] = useState(null)
+  const [reviewModal, setReviewModal] = useState(false)
   const [productInfo, setProductInfo] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [productList, setProductList] = useState([]);
@@ -92,6 +95,38 @@ const Store = () => {
       setUserLoggedIn(false);
     }
   };
+
+  useEffect(() => {
+    if (userLoggedIn) {
+      const fetchUserProducts = async () => {
+        const updatedProductList = await Promise.all(
+          productList.map(async (product) => {
+            const userHasProduct = await checkUserOrders(product._id);
+            return {
+              ...product,
+              userHasProduct,
+            };
+          })
+        );
+
+        setProductList(updatedProductList);
+      };
+
+      fetchUserProducts();
+    }
+  }, [userLoggedIn])
+
+  const checkUserOrders = async (productId) => {
+    try {
+      const res = await axios.post(`http://localhost:8000/api/product/check/${productId}/${userId}/`)
+      // console.log(res)
+      const userHasProduct = res.data.success
+      return userHasProduct
+      // console.log(userHasProduct)
+    } catch (e) {
+      console.log(e)
+    }
+  }
 
   const addToCart = async (productId) => {
     if (!userLoggedIn) {
@@ -210,6 +245,14 @@ const Store = () => {
                     <button onClick={() => addToCart(product._id)} className="prime-button">
                       Add to Cart
                     </button>
+                    {product.userHasProduct ? (
+                          <button className="rate" onClick={() => {
+                            setReviewModal(true)
+                            setReviewProduct(product._id)
+                          }}><MdStarRate /></button>
+                        ) : (
+                          <></>
+                        )}
                     {product.reviews?.length > 0 && (
                       <div className="product-rating">
                         <MdStarRate />
@@ -236,5 +279,178 @@ const Store = () => {
     </div>
   );
 };
+
+
+const Review = ({ setModalOpen, userId, productId }) => {
+  const [review, setReview] = useState(null)
+  const [hasReviewed, setHasReviewed] = useState(false)
+  const [formState, setFormState] = useState({
+    'rating': '',
+    'review': ''
+  })
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormState((prevState) => ({
+      ...prevState,
+      [name]: value
+    }));
+    console.log(formState)
+  };
+
+  const closeModals = () => {
+    setModalOpen(false)
+  }
+
+  useEffect(() => {
+    checkIfUserReviewed()
+  }, [])
+
+  const checkIfUserReviewed = async () => {
+    const res = await axios.get(`http://localhost:8000/api/product/checkReviews/${productId}/${userId}/`)
+    if (res.data.success == false) {
+      setHasReviewed(true)
+      setReview(res.data.review)
+      setFormState({
+        'rating': res.data.review.rating,
+        'review': res.data.review.review
+      })
+      // console.log(res.data)
+    }
+  }
+
+  useEffect(() => {
+    console.log(review)
+  }, [review])
+
+  const postReview = async () => {
+    try {
+      const res = await axios.post(`http://localhost:8000/api/product/review/${productId}/${userId}/`, formState)
+      console.log(res)
+      toast.success('Review Posted!')
+      setModalOpen(false)
+    } catch (e) {
+      console.log(e)
+      toast.error("Review unsuccesful.")
+    }
+  }
+
+  const updateReview = async () => {
+    try {
+      const res = await axios.post(`http://localhost:8000/api/product/updateReview/${productId}/${userId}/`, formState)
+      console.log(res)
+      toast.success('Review Updated!')
+      setModalOpen(false)
+    } catch (e) {
+      console.log(e)
+      toast.error("Update unsuccesful.")
+    }
+  }
+
+  const deleteReview = async () => {
+    try {
+      const res = await axios.post(`http://localhost:8000/api/product/delete/${productId}/${userId}/`)
+      console.log(res)
+      toast.success('Review Deleted!')
+      setModalOpen(false)
+    } catch (e) {
+      console.log(e)
+      toast.error("Delete unsuccesful.")
+    }
+  }
+
+  return (
+    <>
+      <div
+        className='modal-background'
+        onClick={() => {
+          closeModals();
+        }}
+      >
+        {
+          hasReviewed ? (
+            <div className="review-modal" onClick={(e) => e.stopPropagation()}>
+              <TextField
+                id="outlined-basic"
+                label="User"
+                variant="outlined"
+                InputProps={{
+                  readOnly: true,
+                }}
+                value={userId}
+              />
+              <TextField
+                id="outlined-basic"
+                label="Rating"
+                variant="outlined"
+                name="rating"
+                onChange={handleChange}
+                value={formState.rating}
+              />
+              <div className="review-field">
+                <Textarea
+                  minRows={2}
+                  placeholder="Write your review..."
+                  size="lg"
+                  variant="outlined"
+                  name="review"
+                  onChange={handleChange}
+                  value={formState.review}
+                />
+              </div>
+              <div className="review-controls">
+                <button onClick={updateReview} className="prime-button">Post Review</button>
+                <button onClick={deleteReview} className="prime-button delete-button">Delete Review</button>
+              </div>
+            </div>
+          ) : (
+            <div className="review-modal" onClick={(e) => e.stopPropagation()}>
+              <TextField
+                id="outlined-basic"
+                label="User"
+                variant="outlined"
+                InputProps={{
+                  readOnly: true,
+                }}
+                value={userId}
+              />
+              <TextField
+                id="outlined-basic"
+                label="Rating"
+                variant="outlined"
+                name="rating"
+                onChange={handleChange}
+                value={formState.rating}
+              />
+              <div className="review-field">
+                <Textarea
+                  minRows={2}
+                  placeholder="Write your review..."
+                  size="lg"
+                  variant="outlined"
+                  name="review"
+                  onChange={handleChange}
+                  value={formState.review}
+                />
+              </div>
+              <div className="review-controls">
+                <button onClick={postReview} className="prime-button">Post Review</button>
+              </div>
+            </div>
+          )
+        }
+      </div >
+
+      <CSSTransition
+          in={reviewModal}
+          timeout={300}
+          classNames="modal"
+          unmountOnExit
+        >
+          <Review setModalOpen={setReviewModal} userId={userId} productId={reviewProduct} />
+        </CSSTransition>
+    </>
+  )
+}
 
 export default Store;
