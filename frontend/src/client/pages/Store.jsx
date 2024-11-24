@@ -30,14 +30,14 @@ const Store = () => {
       setLoading(true);
       const response = await axios.get('http://localhost:8000/api/product?limit=1000');
       let filteredProducts = response.data.data;
-
+  
       // Filter by Category
       if (filters.category.length > 0) {
         filteredProducts = filteredProducts.filter((product) =>
           product.category.some((cat) => filters.category.includes(cat.title))
         );
       }
-
+  
       // Filter by Price
       if (filters.price.length > 0) {
         filteredProducts = filteredProducts.filter((product) => {
@@ -47,19 +47,19 @@ const Store = () => {
           });
         });
       }
-
-      // Filter by Rating
+  
+      // Filter by Rating (exact match)
       if (filters.rating.length > 0) {
-        filteredProducts = filteredProducts.filter((product) =>
-          filters.rating.some((rating) => {
-            const avgRating =
-              product.reviews?.reduce((sum, review) => sum + review.rating, 0) /
-                product.reviews.length || 0;
-            return avgRating >= Number(rating);
-          })
-        );
+        filteredProducts = filteredProducts.filter((product) => {
+          const avgRating =
+            product.reviews?.reduce((sum, review) => sum + review.rating, 0) /
+            product.reviews.length || 0;
+  
+          // Check if the average rating matches exactly the selected rating
+          return filters.rating.some((rating) => avgRating === Number(rating));
+        });
       }
-
+  
       // Sort Products
       if (filters.sortBy) {
         filteredProducts = filteredProducts.sort((a, b) => {
@@ -70,9 +70,9 @@ const Store = () => {
           return 0;
         });
       }
-
+  
       setProductList(filteredProducts);
-
+  
       if (filteredProducts.length === 0) {
         toast.error('No products found with the selected filters');
       }
@@ -82,6 +82,7 @@ const Store = () => {
       setLoading(false);
     }
   };
+  
 
   const checkLogin = async () => {
     try {
