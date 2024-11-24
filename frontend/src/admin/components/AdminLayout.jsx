@@ -72,6 +72,11 @@ const NAVIGATION = [
         title: 'Promos',
         icon: <LoyaltyIcon />,
       },
+      {
+        segment: 'reviews',
+        title: 'Reviews',
+        icon: <DescriptionIcon />,
+      }
     ],
   },
 ];

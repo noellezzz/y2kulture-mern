@@ -16,6 +16,7 @@ import Cart from './client/pages/Cart'
 import Profle from './client/pages/Profile'
 import Inventory from './admin/pages/Inventory'
 import Users from './admin/pages/Users'
+import Reviews from './admin/pages/Reviews'
 
 import { AuthProvider } from './AuthContext';
 import ProtectedRoute from './ProtectedRoute';
@@ -47,6 +48,8 @@ function App() {
     { path: "crud/category", element: <Category /> },
     { path: "crud/promo", element: <Promo /> },
     { path: "users", element: <Users /> },
+    { path: "crud/reviews", element: <Reviews /> },  
+
   ];
 
   return (

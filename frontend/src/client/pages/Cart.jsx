@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import './styles/Cart.css';
 import axios from 'axios';
@@ -5,6 +6,7 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import toast from 'react-hot-toast';
 import { CSSTransition } from 'react-transition-group';
+import { fetchDataN } from '../../admin/utils/crudUtils';
 
 const Cart = () => {
   const [userId, setUserId] = useState('');
@@ -74,13 +76,21 @@ const Cart = () => {
     }
   }
 
+  const checkIfExist = async(id) => {
+    const item = await fetchDataN('product', id);
+    console.log(item)
+  }
+
   const retrieveCart = async (id) => {
     let tempList = [];
     try {
       const result = await axios.get(`http://localhost:8000/api/user/${id}`);
+
       const cart = result.data.data.cart || [];
       cart.forEach((cartItem) => {
-        console.log("cartItem", cartItem)
+        if(cartItem.productId === null) {
+          console.log("Product not found")
+        } else {
         tempList.push({
           cartItemId: cartItem._id,
           productId: cartItem.productId._id,
@@ -92,6 +102,7 @@ const Cart = () => {
           quantity: cartItem.quantity,
           checked: false
         });
+      }
       });
       setItems(tempList);
       setCounters(tempList.map(item => item.quantity));

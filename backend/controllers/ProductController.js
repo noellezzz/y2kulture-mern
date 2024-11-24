@@ -516,6 +516,9 @@ const generateRandomStock = () => {
     return stock;
 };
 
+const material = ["Cotton", "Polyester", "Wool", "Leather", "Denim", "Silk"];
+
+
 // Main function to create products
 export const productSeeder = async () => {
     try {
@@ -533,7 +536,8 @@ export const productSeeder = async () => {
                 price: Math.floor(Math.random() * 5000) + 500, // Random price between 500 and 5000
                 category: getRandomElement(categories)._id, // Random category
                 images: [], // No images
-                stock: generateRandomStock() // Randomized stock
+                stock: generateRandomStock(), // Randomized stock
+                material: material[Math.floor(Math.random() * material.length)] // Random material
             });
 
             await product.save();
@@ -543,3 +547,35 @@ export const productSeeder = async () => {
         console.error("Error creating products:", error);
     }
 };
+
+const rating = [1, 2, 3, 4, 5];
+const reviews = [
+    "Great product, highly recommended!",
+    "Good quality, will buy again.",
+    "Average product, nothing special.",
+    "Not satisfied with the product.",
+    "Worst product ever, would not recommend."
+];
+
+export const reviewSeeder = async () => {
+    try {
+        const products = await Product.find({});
+        const users = await User.find({});
+
+        for (let product of products) {
+            const reviewCount = Math.floor(Math.random() * 5) + 1; // Random number of reviews
+            for (let i = 0; i < reviewCount; i++) {
+                const review = {
+                    userId: getRandomElement(users)._id,
+                    rating: getRandomElement(rating),
+                    review: getRandomElement(reviews)
+                };
+                product.reviews.push(review);
+            }
+            await product.save();
+            console.log(`Reviews added for product ${product.title}`);
+        }
+    } catch (error) {
+        console.error("Error adding reviews:", error);
+    }
+}

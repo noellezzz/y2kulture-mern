@@ -12,6 +12,7 @@ import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { useAuth } from '../../AuthContext';
+import { deDE } from '@mui/x-date-pickers/locales';
 // import { FaUser } from "react-icons/fa";
 
 const Header = () => {
@@ -92,8 +93,17 @@ const Header = () => {
 
   const fetchCart = async (id) => {
     try {
+      let deductions = 0;
       const response = await axios.get(`http://localhost:8000/api/user/${id}`)
       setCartNums(response.data.data.cart.length)
+      
+      response.data.data.cart.map((item, index) => {
+        if(!item.productId) {
+          deductions = deductions + 1;
+        }
+      })
+      const final_count = response.data.data.cart.length
+      setCartNums(response.data.data.cart.length - deductions)
     } catch (e) {
       console.log(e)
     }
