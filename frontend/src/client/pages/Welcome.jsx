@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import './styles/Shared.css'
 import heroImage from '../../assets/heroimage.png'
 import { fetchData } from '../../admin/utils/crudUtils'
@@ -16,6 +16,8 @@ import boots from '../../assets/boots.png'
 import { MdStarRate } from "react-icons/md";
 import TextField from '@mui/material/TextField';
 import Textarea from '@mui/joy/Textarea';
+import Skeleton from '@mui/material/Skeleton';
+import Box from '@mui/material/Box';
 
 const Welcome = () => {
   const [reviewProduct, setReviewProduct] = useState(null)
@@ -25,63 +27,59 @@ const Welcome = () => {
   // const [cartInfo, setCartInfo] = useState({})
   const [userLoggedIn, setUserLoggedIn] = useState(false)
   const [openModal, setOpenModal] = useState(false)
-  const checkLogin = async (request, response) => {
+
+  const [productList, setProductList] = useState([]);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const observer = useRef();
+
+  const fetchProducts = async (currentPage) => {
+    if (loading) return;
+    setLoading(true);
+
     try {
-      const response = await axios.get('http://localhost:8000/auth')
-      setUserLoggedIn(true)
-      setUserId(response.data.user._id)
-    } catch {
-      setUserLoggedIn(false)
-    }
-  }
+      const response = await axios.get(`http://localhost:8000/api/product?page=${currentPage}&limit=6`);
+      const { data, pagination } = response.data;
 
-  const [productList, setProductList] = useState([])
+
+      setProductList((prev) => [...prev, ...data]);
+      setHasMore(currentPage < pagination.pages);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const lastProductRef = useRef();
+
   useEffect(() => {
-    fetchData('product', setProductList)
-    checkLogin()
-  }, [])
+    setLoading(true)
+    setTimeout(() => {
+      fetchProducts(page);
+    }, 1000);
+    setLoading(false)
+  }, [page]);
 
   useEffect(() => {
-    if (userLoggedIn) {
-      const fetchUserProducts = async () => {
-        const updatedProductList = await Promise.all(
-          productList.map(async (product) => {
-            const userHasProduct = await checkUserOrders(product._id);
-            return {
-              ...product,
-              userHasProduct,
-            };
-          })
-        );
+    const options = { root: null, rootMargin: '0px', threshold: 1.0 };
+    observer.current = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && hasMore && !loading) {
+        setPage((prev) => prev + 1);
+      }
+    }, options);
 
-        setProductList(updatedProductList);
-      };
-
-      fetchUserProducts();
+    if (lastProductRef.current) {
+      observer.current.observe(lastProductRef.current);
     }
-  }, [userLoggedIn])
 
-  const addToCart = async (productId) => {
-    if (!userLoggedIn) {
-      toast.error('Please Log In First!');
-      return
-    }
-    const result = await fetchDataN('product', productId)
-    setProductInfo(result.data.data)
-    setOpenModal(true)
-  }
-
-  const checkUserOrders = async (productId) => {
-    try {
-      const res = await axios.post(`http://localhost:8000/api/product/check/${productId}/${userId}/`)
-      // console.log(res)
-      const userHasProduct = res.data.success
-      return userHasProduct
-      // console.log(userHasProduct)
-    } catch (e) {
-      console.log(e)
-    }
-  }
+    return () => {
+      if (observer.current && lastProductRef.current) {
+        observer.current.unobserve(lastProductRef.current);
+      }
+    };
+  }, [lastProductRef, hasMore, loading]);
 
   return (
     <>
@@ -158,61 +156,33 @@ const Welcome = () => {
           </div>
         </div>
         <div className="store-primary">
-          {
-            productList.length == 0 ? (
-              <div className="d">No Available Products</div>
-            ) : (
-              productList.slice(0, 6).map((product, index) => {
-                console.log(product)
-                return (
-                  <div key={index} className="product-tile__primary">
-                    <div className="tile-img__container">
-                      <div className="product-badge">New</div>
-                      <img src="https://placehold.co/200x800" alt="Product" />
-                    </div>
-                    <div className="tile-body__container">
-                      <div className="product-title">{product.title}</div>
-                      <div className="product-category">{product.category[0].title}</div>
-                      <div className="product-description">{product.description}</div>
-                      <div className="product-ratings">
-                        {
-                          product.reviews.length > 0 ? (
-                            (() => {
-                              let ratingTotal = 0;
-                              product.reviews.map((review) => {
-                                ratingTotal += review.rating;
-                              });
-                              const averageRating = ratingTotal / product.reviews.length;
-
-                              return (
-                                <div>
-                                  <p>Reviews: {averageRating} star/s</p>
-                                </div>
-                              );
-                            })()
-                          ) : (
-                            <div>No Reviews</div>
-                          )
-                        }
-                      </div>
-                      <div className="tile-controls">
-                        <div className="product-price">Price: ${product.price}</div>
-                        <button onClick={() => { addToCart(product._id) }} className="prime-button tile-button">Add to Cart</button>
-                        {product.userHasProduct ? (
-                          <button className="rate" onClick={() => {
-                            setReviewModal(true)
-                            setReviewProduct(product._id)
-                          }}><MdStarRate /></button>
-                        ) : (
-                          <></>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )
-              })
-            )
-          }
+          {productList.map((product, index) => (
+            <div
+              key={index}
+              ref={index === productList.length - 1 ? lastProductRef : null}
+              className="product-tile__primary"
+            >
+              {/* Render Product Info */}
+              <div className="tile-img__container">
+                <img src="https://placehold.co/200x800" alt={product.title} />
+              </div>
+              <div className="tile-body__container">
+                <div className="product-title">{product.title}</div>
+                <div className="product-category">{product.category[0].title}</div>
+                <div className="product-price">Price: ${product.price}</div>
+              </div>
+            </div>
+          ))}
+          {hasMore && <Box sx={{
+             display: 'flex',
+            flexDirection: 'row', // Align children in a row
+            gap: 2, // Add spacing between children
+            alignItems: 'center',
+          }}>
+            <Skeleton variant="rounded" width={437} height={280} />
+            <Skeleton variant="rounded" width={437} height={280} />
+            <Skeleton variant="rounded" width={437} height={280} />
+          </Box>}
 
         </div>
         <CSSTransition

@@ -13,6 +13,7 @@ import session from 'express-session'
 import { corsOptions } from './config/corsOptions.js'
 import cloudinary from 'cloudinary'
 import Multer from 'multer'
+import User from './models/User.js'
 
 import { connectDB } from './config/db.js'
 
@@ -47,20 +48,6 @@ const upload = Multer({
   storage,
 });
 
-app.post("/upload", upload.single("my_file"), async (req, res) => {
-    try {
-        const b64 = Buffer.from(req.file.buffer).toString("base64");
-        let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
-        const cldRes = await handleUpload(dataURI);
-        res.json(cldRes);
-    } catch (error) {
-        console.log(error);
-        res.send({
-        message: error.message,
-        });
-    }
-});
-
 app.use('/api/category', categoryRoute);
 app.use('/api/type', typeRoute);
 app.use('/api/product', productRoute);
@@ -74,3 +61,55 @@ app.listen(port, () => {
     console.log("Attempting to connect to Database...")
     connectDB(mongodb_uri)
 })
+
+app.get('/sales-data', async (req, res) => {
+    try {
+        const { startDate, endDate } = req.query;
+        // console.log(starDate, endDate)
+        // Validate date range
+        if (!startDate || !endDate) {
+            return res.status(400).json({ message: "Start and end dates are required." });
+        }
+
+        // Convert query parameters to Date objects
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        // Aggregate sales data from the User model
+        const salesData = await User.aggregate([
+            { $unwind: "$checkout" }, // Unwind the checkout array
+            { $unwind: "$checkout.order.items" }, // Unwind the order items array
+            {
+                $match: {
+                    "checkout.order.datePlaced": { $gte: start, $lte: end }
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        year: { $year: "$checkout.order.datePlaced" },
+                        month: { $month: "$checkout.order.datePlaced" },
+                        day: { $dayOfMonth: "$checkout.order.datePlaced" }
+                    },
+                    totalSales: { $sum: "$checkout.order.total_cost" }, // Sum total_cost
+                    totalItemsSold: { $sum: "$checkout.order.items.quantity" } // Sum total items
+                }
+            },
+            {
+                $sort: { "_id": 1 } // Sort by year, month, and day
+            }
+        ]);
+
+        res.status(200).json({
+            success: true,
+            data: salesData,
+            message: "Sales data retrieved successfully."
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Error retrieving sales data.",
+            error: error.message
+        });
+    }
+});
