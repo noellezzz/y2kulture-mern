@@ -5,6 +5,26 @@ import cloudinary from 'cloudinary'
 import express from "express";
 import Category from '../models/Category.js';
 
+export const getAllProduct = async (request, response) => {
+    try {
+        const product = await Product.find({})
+            .sort({ createdAt: -1 })
+            .exec();
+
+        response.status(200).json({
+            success: true,
+            message: "Product Retrieved.",
+            data: product
+        });
+    } catch (error) {
+        console.log("Error in fetching Products: ", error.message);
+        response.status(500).json({
+            success: false,
+            message: "Server Error."
+        });
+    }
+};
+
 export const getProduct = async (request, response) => {
     try {
         const page = parseInt(request.query.page) || 1;
@@ -411,6 +431,7 @@ export const updateReview = async(req, res) => {
 export const deleteReview = async (req, res) => {
     try {
         const { userId, productId } = req.params;
+        console.log(userId)
         const product = await Product.findById(productId);
 
         if (!product) {
