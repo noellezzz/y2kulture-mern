@@ -37,35 +37,6 @@ export const getOneUser = async (request, response) => {
 export const createUser = async (request, response) => {
     const user = request.body;
 
-    // let images = []
-    // if (typeof request.body.avatar === 'string') {
-    //     images.push(request.body.avatar)
-    // } else {
-    //     images = request.body.avatar
-    // }
-
-    // let imagesLinks = [];
-    // for (let i = 0; i < images.length; i++) {
-    //     try {
-    //         const result = await cloudinary.v2.uploader.upload(images[i], {
-    //             folder: 'products',
-    //             width: 500,
-    //             height: 500,
-    //             crop: "scale",
-    //         });
-
-    //         imagesLinks.push({
-    //             public_id: result.public_id,
-    //             url: result.secure_url
-    //         })
-
-    //     } catch (error) {
-    //         console.log("Cant Upload", error)
-    //     }
-    // }
-
-    // request.body.avatar = imagesLinks
-
     if (!user.email || !user.password) {
         return response.status(400).json({ success: false, message: "Please provide all fields." });
     }
@@ -119,7 +90,6 @@ export const updateUser = async (request, response) => {
         images.push(request.body.avatar);
     }
 
-    // console.log('after', request.body.avatar)
     const user = request.body;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
