@@ -21,6 +21,8 @@ import Reviews from './admin/pages/Reviews'
 import { AuthProvider } from './AuthContext';
 import ProtectedRoute from './ProtectedRoute';
 
+import ProductReview from './admin/pages/ProductReview'
+
 function App() {
   axios.defaults.withCredentials = true;
   const [userLoggedIn, setUserLoggedIn] = useState(false)
@@ -49,6 +51,7 @@ function App() {
     { path: "crud/promo", element: <Promo /> },
     { path: "users", element: <Users /> },
     { path: "crud/reviews", element: <Reviews /> },  
+    { path: "crud/reviews/:id", element: <ProductReview /> },  
 
   ];
 

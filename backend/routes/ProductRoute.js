@@ -7,12 +7,14 @@ import { createProduct, deleteProduct, getOneProduct, getProduct, updateProduct,
         checkIfReviewed,
         deleteReview,
         productSeeder,
-        reviewSeeder
+        reviewSeeder,
+        getAllProduct,
         } from "../controllers/ProductController.js";
 import { upload } from "../utils/multer.js";
 
 const router = express.Router();
 
+router.get('/all', getAllProduct);
 router.get('/', getProduct);
 router.get('/:id', getOneProduct);
 router.post('/', upload.array('images', 10), createProduct);
