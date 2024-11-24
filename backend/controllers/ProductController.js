@@ -516,6 +516,9 @@ const generateRandomStock = () => {
     return stock;
 };
 
+const material = ["Cotton", "Polyester", "Wool", "Leather", "Denim", "Silk"];
+
+
 // Main function to create products
 export const productSeeder = async () => {
     try {
@@ -533,7 +536,8 @@ export const productSeeder = async () => {
                 price: Math.floor(Math.random() * 5000) + 500, // Random price between 500 and 5000
                 category: getRandomElement(categories)._id, // Random category
                 images: [], // No images
-                stock: generateRandomStock() // Randomized stock
+                stock: generateRandomStock(), // Randomized stock
+                material: material[Math.floor(Math.random() * material.length)] // Random material
             });
 
             await product.save();

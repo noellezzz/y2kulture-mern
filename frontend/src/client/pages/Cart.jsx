@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import './styles/Cart.css';
 import axios from 'axios';
@@ -5,6 +6,7 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import toast from 'react-hot-toast';
 import { CSSTransition } from 'react-transition-group';
+import { fetchDataN } from '../../admin/utils/crudUtils';
 
 const Cart = () => {
   const [userId, setUserId] = useState('');
@@ -74,28 +76,33 @@ const Cart = () => {
     }
   }
 
+  const checkIfExist = async(id) => {
+    const item = await fetchDataN('product', id);
+    console.log(item)
+  }
+
   const retrieveCart = async (id) => {
     let tempList = [];
     try {
       const result = await axios.get(`http://localhost:8000/api/user/${id}`);
+
       const cart = result.data.data.cart || [];
       cart.forEach((cartItem) => {
-        if (!cartItem.productId) {
-          console.log(`Skipping cart item with missing productId: ${cartItem._id}`);
-          return; // Skip this item if productId is null or undefined
-        }
-  
+        if(cartItem.productId === null) {
+          console.log("Product not found")
+        } else {
         tempList.push({
           cartItemId: cartItem._id,
           productId: cartItem.productId._id,
+          stockId: cartItem.stockId,
           name: cartItem.productId.title,
           price: cartItem.productId.price,
-          stockId: cartItem.stockId,
           color: cartItem.color,
           size: cartItem.size,
           quantity: cartItem.quantity,
           checked: false
         });
+      }
       });
       setItems(tempList);
       setCounters(tempList.map(item => item.quantity));
@@ -103,7 +110,6 @@ const Cart = () => {
       console.log(`Error while fetching Data`, error);
     }
   };
-  
 
   const handleAdd = (index) => {
     const newCounters = [...counters];

@@ -261,6 +261,19 @@ const AccountOverview = () => {
 const Orders = () => {
   const [orderList, setOrderList] = useState([])
   const [temporaryInfo, setTemporaryInfo] = useState({})
+  const checkIfExist = async (id) => {
+    try {
+      const response = await axios.get(`http://localhost:8000/api/product/${id}`)
+      if(response.data.success) {
+        return true
+      } else {
+        return false
+      }
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
   const checkLogin = async () => {
     try {
       const response = await axios.get('http://localhost:8000/auth');
@@ -271,6 +284,16 @@ const Orders = () => {
           if (item.order.status == "Pending" || item.order.status == "Delivered" || item.order.status == "Shipped") {
             const tempItemsList = await Promise.all(item.order.items.map(async (product) => {
               const productInfo = await axios.get(`http://localhost:8000/api/product/${product.productId}`);
+              if(productInfo.data.data === null) {
+                return {
+                  quantity: product.quantity,
+                  color: product.color,
+                  size: product.size,
+                  title: "Deleted",
+                  image: "https://placehold.co/600x400",
+                  hasNull: true
+                };
+              }
               return {
                 quantity: product.quantity,
                 color: product.color,
@@ -361,6 +384,9 @@ const Orders = () => {
                 {
                   Array.isArray(order.items) && order.items.length > 0 ? (
                     order.items.map((item, index2) => (
+                      item.hasNull ? (
+                        <div>This cart contains Deleted Products</div>
+                      ) : (
                       <div key={index2} className="order-list">
                         <div className="order-img__container">
                           <img src={item.image} alt={item.title} />
@@ -369,7 +395,7 @@ const Orders = () => {
                         <div className="order-variant">Variant: {item.color || 'N/A'}, {item.size}</div>
                         <div className="order-quantity">Quantity: {item.quantity}</div>
                       </div>
-                    ))
+                      )))
                   ) : (
                     <div>No items found for this order.</div>
                   )
