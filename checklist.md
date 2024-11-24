@@ -40,8 +40,8 @@
 
 # QUIZ 1 Product Filter 15pts
 
-- [x] price filter 5pts
-- [x] category filter 5pts 
+- [ ] price filter 5pts
+- [ ] category filter 5pts 
 - [ ] ratings filter 5pts
 
 # QUIZ 2 
