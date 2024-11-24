@@ -43,19 +43,17 @@ const Profile = () => {
     const file = event.target.files[0];
     if (!file) return;
 
-    const avatarRef = ref(storage, `avatars/${id}`);
     console.log("Uploading...")
 
     try {
-      // Upload file
-      await uploadBytes(avatarRef, file);
-      console.log("Avatar uploaded successfully");
-
-      // Retrieve the download URL
-      const downloadUrl = await getDownloadURL(avatarRef);
-      setAvatarUrl(downloadUrl);
-
-      // Save the download URL to the database (optional)
+      const reader = new FileReader();
+            reader.onload = () => {
+                if (reader.readyState === 2) {
+                  setAvatarUrl(reader.result)
+                  changeProfileImg(reader.result)
+                }
+            }
+            reader.readAsDataURL(file)
     } catch (error) {
       console.error("Error uploading avatar:", error);
     }
@@ -69,10 +67,23 @@ const Profile = () => {
   const [contentPage, setContentPage] = useState('Account Overview')
   const [userInfo, setUserInfo] = useState({})
   const [id, setId] = useState(null)
+
+const changeProfileImg = async(image) => {
+  try {
+    const formSub = {
+      avatar: [image]
+    }
+    const formUpload = await axios.put(`http://localhost:8000/api/user/${id}`, formSub)
+    console.log(formUpload)
+  } catch (error) {
+    console.log(error)
+  }
+}
+
   const checkLogin = async () => {
     try {
       const response = await axios.get('http://localhost:8000/auth')
-      console.log("user", response.data.user.avatar[0].url)
+      console.log("user", response.data.user.avatar)
       setUserInfo(response.data.user)
       setId(response.data.user._id)
       if (response.data.user.avatar && response.data.user.avatar.length > 0 ) {
