@@ -792,3 +792,78 @@ section {
 }
 
 
+.store-container {
+  display: flex;
+}
+
+.filters {
+  width: 20%;
+  padding: 15px;
+  background-color: var(--secondary-color);
+  border-radius: 10px; /* Rounded borders */
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.2); /* Initial shadow */
+  transition: transform 0.2s ease, box-shadow 0.2s ease; /* Smooth hover transition */
+  height: 750px;
+  padding-top: 50px;
+  border: 1px solid #ddd; /* Border for consistency */
+}
+
+.filters:hover {
+  transform: scale(1.02); /* Slight zoom effect on hover */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Enhanced shadow on hover */
+}
+
+.filters div {
+  margin-bottom: 1rem; /* Spacing between filter sections */
+}
+
+.filters h3 {
+  margin-top: 0.5rem; /* Space above filter headings */
+  margin-bottom: 1rem; /* Space below filter headings */
+}
+
+.filters label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.filters button {
+  margin-top: 20px;
+  padding: 10px;
+  width: 100%;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px; /* Rounded corners for buttons */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth hover effects */
+}
+
+.filters button:hover {
+  background-color: var(--fifth-color);
+  transform: scale(1.05); /* Slight zoom effect on hover */
+}
+
+.store-content {
+  flex: 1;
+  padding: 20px;
+}
+
+.filters label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.filters button {
+  margin-top: 20px;
+  padding: 10px;
+  width: 100%;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.filters button:hover {
+  background-color: var(--fifth-color);
+}
