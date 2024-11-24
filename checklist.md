@@ -40,9 +40,9 @@
 
 # QUIZ 1 Product Filter 15pts
 
-- [ ] price filter 5pts
-- [ ] category filter 5pts 
-- [ ] ratings filter 5pts
+- [x] price filter 5pts
+- [x] category filter 5pts 
+- [x] ratings filter 5pts
 
 # QUIZ 2 
 
@@ -52,7 +52,7 @@
 # QUIZ 3
 
 - [ ] pagination on products list on homepage. 10pts
-- [x] infinite scroll on products list on homepage. 15pts
+- [ ] infinite scroll on products list on homepage. 15pts
 
 # QUIZ 4
 - [x] facebook or gmail login 15pts react-facebook-login or similar packages.
