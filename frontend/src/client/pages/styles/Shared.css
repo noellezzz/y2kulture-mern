@@ -578,7 +578,7 @@ section {
   }
   
   .prime-button {
-    background-color: var(--primary-color);
+    background-color: var(--primary-color) !important;
     color: var(--secondary-color);
     border: none;
     border-radius: 5px;
@@ -754,19 +754,6 @@ section {
   align-items: center;
 }
 
-.prime-button {
-  background: #007bff;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.prime-button:hover {
-  background: #0056b3;
-}
 
 .product-rating {
   display: flex;
@@ -803,3 +790,5 @@ section {
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   }
 }
+
+
