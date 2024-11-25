@@ -46,6 +46,11 @@ const NAVIGATION = [
     icon: <MdInventory />,
   },
   {
+    segment: 'admin/analytics',
+    title: 'Analytics',
+    icon: <MdInventory />,
+  },
+  {
     kind: 'divider',
   },
   {

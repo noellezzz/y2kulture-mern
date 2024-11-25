@@ -46,8 +46,8 @@
 
 # QUIZ 2 
 
-- [ ] monthly sales charts. all months on the chart label. line chart 10pts 
-- [ ] sales charts with date range filter.  line or bar chart 15pts
+- [x] monthly sales charts. all months on the chart label. line chart 10pts 
+- [x] sales charts with date range filter.  line or bar chart 15pts
 
 # QUIZ 3
 
