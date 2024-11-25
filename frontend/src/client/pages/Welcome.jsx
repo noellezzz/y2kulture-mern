@@ -19,7 +19,10 @@ import Textarea from '@mui/joy/Textarea';
 import Skeleton from '@mui/material/Skeleton';
 import Box from '@mui/material/Box';
 
+import { useAuth } from '../../AuthContext';
+
 const Welcome = () => {
+  const { isAuthenticated, user } = useAuth();
   const [reviewProduct, setReviewProduct] = useState(null)
   const [reviewModal, setReviewModal] = useState(false)
   const [userId, setUserId] = useState('')
@@ -41,9 +44,16 @@ const Welcome = () => {
     try {
       const response = await axios.get(`http://localhost:8000/api/product?page=${currentPage}&limit=6`);
       const { data, pagination } = response.data;
-
-
-      setProductList((prev) => [...prev, ...data]);
+      const updatedProductList = await Promise.all(
+        data.map(async (product) => {
+          const userHasProduct = await checkUserOrders(product._id, user._id);
+          return {
+            ...product,
+            userHasProduct,
+          };
+        })
+      );
+      setProductList((prev) => [...prev, ...updatedProductList]);
       setHasMore(currentPage < pagination.pages);
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -80,6 +90,19 @@ const Welcome = () => {
       }
     };
   }, [lastProductRef, hasMore, loading]);
+
+  const checkUserOrders = async (productId, user) => {
+    try {
+      console.log(user)
+      const res = await axios.post(`http://localhost:8000/api/product/check/${productId}/${user}`)
+      // console.log(res)
+      const userHasProduct = res.data.success
+      return userHasProduct
+      // console.log(userHasProduct)
+    } catch (e) {
+      console.log(e)
+    }
+  }
 
   return (
     <>
@@ -170,11 +193,24 @@ const Welcome = () => {
                 <div className="product-title">{product.title}</div>
                 <div className="product-category">{product.category[0].title}</div>
                 <div className="product-price">Price: ${product.price}</div>
+                <div className="tile-controls">
+                  <div className="product-price">Price: ${product.price}</div>
+                  <button onClick={() => { addToCart(product._id) }} className="prime-button tile-button">Add to Cart</button>
+                  {product.userHasProduct ? (
+                    <button className="rate" onClick={() => {
+                      setReviewModal(true)
+                      setReviewProduct(product._id)
+                    }}><MdStarRate /></button>
+                  ) : (
+                    <></>
+                  )}
+                </div>
               </div>
+
             </div>
           ))}
           {hasMore && <Box sx={{
-             display: 'flex',
+            display: 'flex',
             flexDirection: 'row', // Align children in a row
             gap: 2, // Add spacing between children
             alignItems: 'center',
@@ -200,7 +236,7 @@ const Welcome = () => {
           classNames="modal"
           unmountOnExit
         >
-          <Review setModalOpen={setReviewModal} userId={userId} productId={reviewProduct} />
+          <Review setModalOpen={setReviewModal} userId={user._id} productId={reviewProduct} />
         </CSSTransition>
       </section>
     </>
