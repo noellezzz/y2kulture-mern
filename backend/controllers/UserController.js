@@ -3,6 +3,9 @@ import Product from "../models/Product.js";
 import mongoose from 'mongoose'
 import cloudinary from 'cloudinary'
 import { request } from "express";
+import { sendMail } from '../mailtrapConfig.js'; // Correct path to mailtrapConfig.js
+import { generateOrderEmail } from '../mailtrap/email.js'; // Correct path to email.js
+
 
 export const getUser = async (request, response) => {
     try {
@@ -151,79 +154,76 @@ export const addToCart = async (req, res) => {
 };
 export const addToCheckout = async (req, res) => {
     const { userId } = req.params;
-    const { items, status, datePlaced, shippingDetails, promoCode, total_cost } = req.body;
-    const cartItemIds = items.map(item => item.cartItemId);
-
-    console.log(total_cost)
-
+    const { items, status, datePlaced, shippingDetails, total_cost } = req.body;
+  
     if (!userId || !items || !items.length) {
-        return res.status(400).json({ message: "User ID and items array are required." });
+      return res.status(400).json({ message: "User ID and items array are required." });
     }
-
+  
     try {
-        const user = await User.findById(userId);
-
-        if (!user) {
-            return res.status(404).json({ message: "User not found." });
+      const user = await User.findById(userId);
+  
+      if (!user) {
+        return res.status(404).json({ message: "User not found." });
+      }
+  
+      for (let item of items) {
+        const product = await Product.findById(item.productId);
+        if (!product) {
+          return res.status(404).json({ message: `Product with ID ${item.productId} not found.` });
         }
-
-        for (let item of items) {
-            const product = await Product.findById(item.productId);
-            if (!product) {
-                return res.status(404).json({ message: `Product with ID ${item.productId} not found.` });
-            }
-
-            const stockItem = product.stock.find(
-                (stock) => stock._id.toString() === item.stockId && stock.color === item.color && stock.size === item.size
-            );
-
-            if (!stockItem) {
-                return res.status(404).json({ message: `Stock with ID ${item.stockId} not found for product ${item.productId}.` });
-            }
-
-            if (item.quantity > stockItem.quantity) {
-                return res.status(400).json({
-                    message: `Insufficient stock for ${product.title} (Color: ${item.color}, Size: ${item.size}). Available: ${stockItem.quantity}, Requested: ${item.quantity}.`
-                });
-            }
-            stockItem.quantity -= item.quantity;
-
-            await product.save();
+  
+        const stockItem = product.stock.find(
+          (stock) => stock._id.toString() === item.stockId && stock.color === item.color && stock.size === item.size
+        );
+  
+        if (!stockItem) {
+          return res.status(404).json({ message: `Stock with ID ${item.stockId} not found for product ${item.productId}.` });
         }
-
-        await Promise.all(items.map(async (item) => {
-            const product = await Product.findById(item.productId);
-            await product.save();
-        }));
-
-        const newOrder = {
-            order: {
-                items: items.map(item => ({
-                    productId: item.productId,
-                    stockId: item.stockId,
-                    color: item.color,
-                    size: item.size,
-                    quantity: item.quantity,
-                })),
-                status: status || 'Pending',
-                datePlaced: datePlaced || new Date(),
-                dateShipped: null,
-                dateDelivered: null,
-                total_cost: total_cost,
-                shippingDetails: shippingDetails
-            }
-        };
-
-        user.checkout.push(newOrder);
-        user.cart = user.cart.filter(cartItem => !cartItemIds.includes(cartItem._id.toString()));
-
-        await user.save();
-
-        res.status(200).json({ message: "Checkout added successfully.", checkout: user.checkout });
+  
+        if (item.quantity > stockItem.quantity) {
+          return res.status(400).json({
+            message: `Insufficient stock for ${product.title} (Color: ${item.color}, Size: ${item.size}). Available: ${stockItem.quantity}, Requested: ${item.quantity}.`
+          });
+        }
+  
+        stockItem.quantity -= item.quantity;
+        await product.save();
+      }
+  
+      const newOrder = {
+        order: {
+          items: items.map(item => ({
+            productId: item.productId,
+            stockId: item.stockId,
+            color: item.color,
+            size: item.size,
+            quantity: item.quantity,
+            productName: item.name,
+            price: item.price,
+          })),
+          status: status || 'Pending',
+          datePlaced: datePlaced || new Date(),
+          shippingDetails,
+          total_cost,
+        },
+      };
+  
+      user.checkout.push(newOrder);
+      user.cart = user.cart.filter(cartItem => !items.find(item => item.cartItemId === cartItem._id.toString()));
+  
+      await user.save();
+      console.log("Order items:", newOrder.order.items);
+      // Generate and send email
+      const emailHtml = generateOrderEmail(newOrder.order.items, total_cost);
+      await sendMail(user.email, 'Your Order Confirmation', emailHtml);
+  
+      res.status(200).json({ message: "Checkout added successfully.", checkout: user.checkout });
     } catch (error) {
-        res.status(500).json({ message: "Failed to add to checkout", error });
+      console.error("Error during checkout:", error);
+      res.status(500).json({ message: "Failed to add to checkout", error });
     }
-};
+  };
 
 export const updateOrderStatus = async (req, res) => {
     try {
