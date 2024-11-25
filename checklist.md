@@ -11,13 +11,13 @@
 - [x] username and password authentication 5pts 
 - [x] user profile update with photo upload. 5pts 
 - [x] username and password firebase authentication 10pts
-- [ ] user profile update with photo upload using firebase storage. 10pts
+- [x] user profile update with photo upload using firebase storage. 10pts
 
 # MP3 Review Ratings 20pts
 (Fix the reviews, the user should be allowed multiple reviews and they are also only allowed to leave a review after the order is succesful)
 - [x] users who availed of the product/service can write a review and rate the product service 10pts
 - [x] users can update their own review rating. 5pts
-- [ ] admin can delete a review 5pts. 
+- [x] admin can delete a review 5pts. 
 
 # TERM TEST LAB 30pts
 
@@ -46,8 +46,8 @@
 
 # QUIZ 2 
 
-- [ ] monthly sales charts. all months on the chart label. line chart 10pts 
-- [ ] sales charts with date range filter.  line or bar chart 15pts
+- [x] monthly sales charts. all months on the chart label. line chart 10pts 
+- [x] sales charts with date range filter.  line or bar chart 15pts
 
 # QUIZ 3
 

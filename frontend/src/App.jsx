@@ -22,6 +22,7 @@ import { AuthProvider } from './AuthContext';
 import ProtectedRoute from './ProtectedRoute';
 
 import ProductReview from './admin/pages/ProductReview'
+import Analytics from './admin/pages/Analytics'
 
 function App() {
   axios.defaults.withCredentials = true;
@@ -50,6 +51,7 @@ function App() {
     { path: "crud/category", element: <Category /> },
     { path: "crud/promo", element: <Promo /> },
     { path: "users", element: <Users /> },
+    { path: "analytics", element: <Analytics /> },
     { path: "crud/reviews", element: <Reviews /> },  
     { path: "crud/reviews/:id", element: <ProductReview /> },  
 
