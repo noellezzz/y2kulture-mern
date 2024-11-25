@@ -26,11 +26,6 @@ const NAVIGATION = [
     title: 'Main items',
   },
   {
-    segment: 'admin',
-    title: 'Dashboard',
-    icon: <DashboardIcon />,
-  },
-  {
     segment: 'admin/orders',
     title: 'Orders',
     icon: <ShoppingCartIcon />,

@@ -5,6 +5,7 @@ import cloudinary from 'cloudinary'
 import express from "express";
 import Category from '../models/Category.js';
 
+
 export const getAllProduct = async (request, response) => {
     try {
         const product = await Product.find({})
